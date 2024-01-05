@@ -312,6 +312,70 @@ function main_xiaoyahelper(){
 
 }
 
+function install_xiaoya_alist_tvbox(){
+
+    INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+    read -ep "CONFIG_DIR:" CONFIG_DIR
+    [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+
+    INFO "请输入Alist端口（默认 5344 ）"
+    read -ep "ALIST_PORT:" ALIST_PORT
+    [[ -z "${ALIST_PORT}" ]] && ALIST_PORT="5344"
+
+    INFO "请输入后台管理端口（默认 4567 ）"
+    read -ep "HT_PORT:" HT_PORT
+    [[ -z "${HT_PORT}" ]] && HT_PORT="4567"
+
+    INFO "请输入内存限制（默认 -Xmx512M ）"
+    read -ep "MEM_OPT:" MEM_OPT
+    [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
+
+    INFO "请输入其他挂载参数（默认 无 ）"
+    read -ep "MOUNT:" MOUNT
+
+    docker run -itd \
+        -p ${HT_PORT}:4567 \
+        -p ${ALIST_PORT}:80 \
+        -e ALIST_PORT=${ALIST_PORT} \
+        -e MEM_OPT="${MEM_OPT}" \
+        -v ${CONFIG_DIR}:/data \
+        ${MOUNT} \
+        --restart=always \
+        --name=xiaoya-tvbox \
+        haroldli/xiaoya-tvbox:latest
+
+    INFO "安装完成！"
+
+}
+
+function update_xiaoya_alist_tvbox(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始更新小雅Alist-TVBox${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        xiaoya-tvbox
+    docker rmi containrrr/watchtower:latest
+    INFO "更新成功"
+
+}
+
+function uninstall_xiaoya_alist_tvbox(){
+
+    docker stop xiaoya-tvbox
+    docker rm xiaoya-tvbox
+    docker rmi haroldli/xiaoya-tvbox:latest
+    INFO "卸载成功"
+
+}
+
 function main_xiaoya_alist_tvbox(){
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -325,15 +389,15 @@ function main_xiaoya_alist_tvbox(){
     case "$num" in
         1)
         clear
-        TODO
+        install_xiaoya_alist_tvbox
         ;;
         2)
         clear
-        TODO
+        update_xiaoya_alist_tvbox
         ;;
         3)
         clear
-        TODO
+        uninstall_xiaoya_alist_tvbox
         ;;
         4)
         clear
