@@ -43,6 +43,8 @@ function TODO(){
 
 function install_xiaoya_alist(){
 
+    INFO "小白全部回车即可完成安装！"
+
     INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
     read -ep "CONFIG_DIR:" CONFIG_DIR
     [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
@@ -281,6 +283,7 @@ function main_xiaoyahelper(){
     case "$num" in
         1)
         clear
+        INFO "小白全部回车即可完成安装！"
         INFO "是否使用Telegram通知 [Y/n]（默认 n 不使用）"
         read -ep "TG:" TG
         [[ -z "${TG}" ]] && TG="n"
@@ -313,6 +316,8 @@ function main_xiaoyahelper(){
 }
 
 function install_xiaoya_alist_tvbox(){
+
+    INFO "小白全部回车即可完成安装！"
 
     INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
     read -ep "CONFIG_DIR:" CONFIG_DIR
