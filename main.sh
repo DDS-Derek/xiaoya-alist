@@ -1,16 +1,40 @@
 #!/bin/bash
-
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+# __   ___                                    _ _     _   
+# \ \ / (_)                             /\   | (_)   | |  
+#  \ V / _  __ _  ___  _   _  __ _     /  \  | |_ ___| |_ 
+#   > < | |/ _` |/ _ \| | | |/ _` |   / /\ \ | | / __| __|
+#  / . \| | (_| | (_) | |_| | (_| |  / ____ \| | \__ \ |_ 
+# /_/ \_\_|\__,_|\___/ \__, |\__,_| /_/    \_\_|_|___/\__|
+#                       __/ |                             
+#                      |___/                              
+#
+# Copyright (c) 2023 DDSRem <https://blog.ddsrem.com>
+#
+# This is free software, licensed under the Mit License.
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+#
 # bash -c "$(curl http://docker.xiaoya.pro/update_new.sh | awk '{gsub("/etc/xiaoya", "/ssd/data/docker/xiaoya/xiaoya"); print}')"
-
+#
 # bash -c "$(curl http://docker.xiaoya.pro/emby_plus.sh \
 # | awk '{gsub("emby/embyserver:4.8.0.56", "amilys/embyserver:4.8.0.56"); print}' \
 # | awk '{gsub("emby/embyserver_arm64v8:4.8.0.56", "amilys/embyserver:4.8.0.56"); print}' \
 # | awk '{gsub("--name emby", "--name xiaoya-emby"); print}')"
-
+#
 # bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s 3 -tg
-
+#
 # docker run -d -p 4567:4567 -p 5344:80 -e ALIST_PORT=5344 --restart=always -v /etc/xiaoya:/data --name=xiaoya-tvbox haroldli/xiaoya-tvbox
 # bash -c "$(curl -fsSL https://d.har01d.cn/update_xiaoya.sh)"
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+#
+# The functions that the script can call are 'INFO' 'WARN' 'ERROR'
+#                 INFO function use(log output): INFO "xxxx"
+#                 WARN function use(log output): WARN "xxxx"
+#                 ERROR function use(log output): ERROR "xxxx"
+
 
 Blue="\033[34m"
 Green="\033[32m"
