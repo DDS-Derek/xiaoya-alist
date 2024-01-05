@@ -71,7 +71,7 @@ function install_xiaoya_alist(){
             ERROR "长度不对,阿里云盘 Token是32位长"
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
-        else	
+        else
             echo $token > ${CONFIG_DIR}/mytoken.txt
         fi
     fi
@@ -98,11 +98,11 @@ function install_xiaoya_alist(){
         read -p "FOLDERID:" folderid
         folder_id_len=${#folderid}
         if [ $folder_id_len -ne 40 ]; then
-                ERROR "长度不对,阿里云盘 folder id是40位长"
-                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-                exit 1
-            else
-                echo $folderid > ${CONFIG_DIR}/temp_transfer_folder_id.txt
+            ERROR "长度不对,阿里云盘 folder id是40位长"
+            ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+            exit 1
+        else
+            echo $folderid > ${CONFIG_DIR}/temp_transfer_folder_id.txt
         fi
     fi
 
@@ -128,15 +128,14 @@ function install_xiaoya_alist(){
                 --restart=always \
                 --name=xiaoya-hostmode \
                 xiaoyaliu/alist:hostmode
-        else	
+        else
             docker run -itd \
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
                 --name=xiaoya-hostmode \
                 xiaoyaliu/alist:hostmode
-        fi	
-        exit 0
+        fi
     fi
     if [[ ${NET_MODE} == [Nn] ]]; then
         if [ ! -s ${CONFIG_DIR}/docker_address.txt ]; then
@@ -186,17 +185,22 @@ function update_xiaoya_alist(){
         --cleanup \
         xiaoya-hostmode xiaoya
     docker rmi containrrr/watchtower:latest
-    INFO "更新成功"
+    INFO "更新成功！"
 }
 
 function uninstall_xiaoya_alist(){
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
 	docker stop xiaoya-hostmode
 	docker rm xiaoya-hostmode
 	docker rmi xiaoyaliu/alist:hostmode
     docker stop xiaoya
     docker rm xiaoya
     docker rmi xiaoyaliu/alist:latest
-    INFO "卸载成功"
+    INFO "卸载成功！"
 }
 
 function main_xiaoya_alist(){
@@ -297,10 +301,15 @@ function main_xiaoyahelper(){
         ;;
         2)
         clear
+        for i in `seq -w 3 -1 0`
+        do
+            echo -en "即将开始卸载小雅助手（xiaoyahelper）${Blue} $i ${Font}\r"  
+        sleep 1;
+        done
         docker stop xiaoyakeeper
         docker rm xiaoyakeeper
         docker rmi dockerproxy.com/library/alpine:3.18.2
-        INFO "卸载成功"
+        INFO "卸载成功！"
         ;;
         3)
         clear
@@ -368,16 +377,21 @@ function update_xiaoya_alist_tvbox(){
         --cleanup \
         xiaoya-tvbox
     docker rmi containrrr/watchtower:latest
-    INFO "更新成功"
+    INFO "更新成功！"
 
 }
 
 function uninstall_xiaoya_alist_tvbox(){
 
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载小雅Alist-TVBox${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
     docker stop xiaoya-tvbox
     docker rm xiaoya-tvbox
     docker rmi haroldli/xiaoya-tvbox:latest
-    INFO "卸载成功"
+    INFO "卸载成功！"
 
 }
 
