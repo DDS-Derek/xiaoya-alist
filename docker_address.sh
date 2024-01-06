@@ -17,11 +17,10 @@ function WARN() {
 echo -e "${WARN} ${1}"
 }
 
-cd /meida/xiaoya
+cd /media/xiaoya
 
 INFO "执行替换DOCKER_ADDRESS............"
 start_time2=`date +%s`
-find ./ -name "*.strm" -exec sed \-i "s#DOCKER_ADDRESS#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
 fdfind --extension strm --exec sed \-i "s#DOCKER_ADDRESS#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
 chmod -R 777 *	
 end_time2=`date +%s`
