@@ -548,6 +548,8 @@ function docker_address_xiaoya_all_emby(){
 
     pull_run_ddsderek_glue "/docker_address.sh"
 
+    INFO "替换DOCKER_ADDRESS完成！"
+
 }
 
 function uninstall_xiaoya_all_emby(){

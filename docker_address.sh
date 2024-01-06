@@ -8,13 +8,49 @@ INFO="[${Green}INFO${Font}]"
 ERROR="[${Red}ERROR${Font}]"
 WARN="[${Yellow}WARN${Font}]"
 function INFO() {
-echo -e "${INFO} ${1}"
+    echo -e "${INFO} ${1}"
 }
 function ERROR() {
-echo -e "${ERROR} ${1}"
+    echo -e "${ERROR} ${1}"
 }
 function WARN() {
-echo -e "${WARN} ${1}"
+    echo -e "${WARN} ${1}"
+}
+
+trap 'onCtrlC' INT
+function onCtrlC () {
+    #捕获CTRL+C，当脚本被ctrl+c的形式终止时同时终止程序的后台进程
+    kill -9 ${do_sth_pid} ${progress_pid}
+    exit 1
+}
+
+do_sth() {
+    #运行的主程序
+    fdfind --extension strm --exec sed \-i "s#DOCKER_ADDRESS#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
+    chmod -R 777 *
+}
+
+progress() {
+    #进度条程序
+    local main_pid=$1
+    local length=50
+    local ratio=1
+    while [ "$(ps -p ${main_pid} | wc -l)" -ne "1" ] ; do
+            mark='>'
+            progress_bar=
+            for i in $(seq 1 "${length}"); do
+                    if [ "$i" -gt "${ratio}" ] ; then
+                            mark='-'
+                    fi
+                    progress_bar="${progress_bar}${mark}"
+            done
+            printf "Progress: ${progress_bar}\r"
+            ratio=$((ratio+1))
+            if [ "${ratio}" -gt "${length}" ] ; then
+                    ratio=1
+            fi
+            sleep 0.5
+    done
 }
 
 cd /media/xiaoya
@@ -27,11 +63,18 @@ do
 sleep 1;
 done
 
-INFO "执行替换DOCKER_ADDRESS............"
+INFO "执行替换DOCKER_ADDRESS............                                              "
 start_time2=`date +%s`
-fdfind --extension strm --exec sed \-i "s#DOCKER_ADDRESS#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
-chmod -R 777 *	
+
+do_sth &
+do_sth_pid=$(jobs -p | tail -1)
+
+progress "${do_sth_pid}" &
+progress_pid=$(jobs -p | tail -1)
+
+wait "${do_sth_pid}"
+
 end_time2=`date +%s`
 total_time2=$((end_time2 - start_time2))
 total_time2=$((total_time2 / 60))
-INFO "替换执行时间：$total_time2 分钟"
+printf "${INFO} 替换执行时间：$total_time2 分钟                                      \n"
