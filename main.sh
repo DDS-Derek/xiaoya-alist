@@ -65,13 +65,27 @@ function TODO(){
     WARN "此功能未完成，请耐心等待开发者开发"
 }
 
-function install_xiaoya_alist(){
-
-    INFO "小白全部回车即可完成安装！"
+function get_config_dir(){
 
     INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
     read -ep "CONFIG_DIR:" CONFIG_DIR
     [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+
+}
+
+function get_media_dir(){
+
+    INFO "请输入媒体库目录（默认 /opt/media ）"
+    read -ep "MEDIA_DIR:" MEDIA_DIR
+    [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
+
+}
+
+function install_xiaoya_alist(){
+
+    INFO "小白全部回车即可完成安装！"
+
+    get_config_dir
 
     if [ ! -d ${CONFIG_DIR} ]; then
         mkdir -p ${CONFIG_DIR}
@@ -263,36 +277,327 @@ function main_xiaoya_alist(){
 
 }
 
+function test_xiaoya_status(){
+
+    if [ -s ${CONFIG_DIR}/docker_address.txt ]; then
+        docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+    else
+        ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
+        exit 1
+    fi
+
+	INFO "测试xiaoya的联通性.......尝试连接 ${docker_addr}"
+	wget -4 -q -T 5 -O /tmp/test.md "${docker_addr}/README.md"
+	test_size=$(du -k /tmp/test.md |cut -f1)
+	if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] ||[[ "$test_size" -eq 0 ]]; then
+		ERROR "请检查xiaoya是否正常运行后再试"
+		exit 1
+	else
+		INFO "xiaoya容器正常工作"	
+	fi
+
+    rm -rf /tmp/test.md
+
+}
+
+function pull_run_glue(){
+
+	local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
+	remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+	if [ ! "$local_sha" == "$remote_sha" ]; then
+		docker rmi xiaoyaliu/glue:latest
+	fi
+
+    docker run -it \
+        --security-opt seccomp=unconfined \
+        --rm \
+        --net=host \
+        -v ${MEDIA_DIR}:/media \
+        -v ${CONFIG_DIR}:/etc/xiaoya \
+        -e LANG=C.UTF-8 \
+        xiaoyaliu/glue:latest \
+        ${1}
+
+    docker rmi xiaoyaliu/glue:latest
+
+}
+
+function pull_run_ddsderek_glue(){
+
+	local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/xiaoya-glue:latest | cut -f2 -d:)
+	remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/xiaoya-glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+	if [ ! "$local_sha" == "$remote_sha" ]; then
+		docker rmi ddsderek/xiaoya-glue:latest
+	fi
+
+    docker run -it \
+        --security-opt seccomp=unconfined \
+        --rm \
+        --net=host \
+        -v ${MEDIA_DIR}:/media \
+        -v ${CONFIG_DIR}:/etc/xiaoya \
+        -e LANG=C.UTF-8 \
+        -e TZ=Asia/Shanghai \
+        ddsderek/xiaoya-glue:latest \
+        ${1}
+
+    docker rmi ddsderek/xiaoya-glue:latest
+
+}
+
+function download_unzip_xiaoya_all_emby(){
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p ${MEDIA_DIR}/temp
+	rm -rf ${MEDIA_DIR}/config
+    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+	free_size=$((free_size))
+    free_size_G=$((free_size/1024/1024))
+    if [ "$free_size" -le 63886080  ]; then
+        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+        exit 1
+    else
+        INFO "磁盘容量：${free_size_G}G"
+    fi
+	mkdir -p ${MEDIA_DIR}/xiaoya
+	mkdir -p ${MEDIA_DIR}/config
+	chmod 755 ${MEDIA_DIR}
+	chown root:root ${MEDIA_DIR}
+
+	if command -v ifconfig >/dev/null 2>&1; then
+		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1)
+	else
+		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1 | cut -f1 -d/)
+	fi
+
+    INFO "开始下载解压..."
+
+    pull_run_glue '/update_all.sh'
+    
+    echo "http://$docker0:8096" > ${CONFIG_DIR}/emby_server.txt
+    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+    chmod -R 777 ${MEDIA_DIR}
+
+    INFO "下载解压完成！"
+
+}
+
+function unzip_xiaoya_all_emby(){
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p ${MEDIA_DIR}/temp
+	rm -rf ${MEDIA_DIR}/config
+    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+	free_size=$((free_size))
+    free_size_G=$((free_size/1024/1024))
+    if [ "$free_size" -le 63886080  ]; then
+        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+        exit 1
+    else
+        INFO "磁盘容量：${free_size_G}G"
+    fi
+	mkdir -p ${MEDIA_DIR}/xiaoya
+	mkdir -p ${MEDIA_DIR}/config
+	chmod 755 ${MEDIA_DIR}
+	chown root:root ${MEDIA_DIR}
+
+	if command -v ifconfig >/dev/null 2>&1; then
+		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1)
+	else
+		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1 | cut -f1 -d/)
+	fi
+
+    INFO "开始解压..."
+
+    pull_run_glue '/unzip.sh'
+    
+    echo "http://$docker0:8096" > ${CONFIG_DIR}/emby_server.txt
+    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+    chmod -R 777 ${MEDIA_DIR}
+
+    INFO "解压完成！"
+
+}
+
+function install_emby_embyserver(){
+
+    cpu_arch=$(uname -m)
+    INFO "开始安装Emby容器....."
+    case $cpu_arch in
+        "x86_64" | *"amd64"*)
+            docker run -itd \
+                --name xiaoya-emby \
+                -v ${MEDIA_DIR}/config:/config \
+                -v ${MEDIA_DIR}/xiaoya:/media \
+                --net=host \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver:4.8.0.56
+        ;;
+        "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+            docker run -itd \
+                --name xiaoya-emby \
+                -v ${MEDIA_DIR}/config:/config \
+                -v ${MEDIA_DIR}/xiaoya:/media \
+                --net=host \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver_arm64v8:4.8.0.56
+        ;;
+        *)
+            ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
+            exit 1
+        ;;
+    esac
+
+}
+
+function install_amilys_embyserver(){
+
+    cpu_arch=$(uname -m)
+    INFO "开始安装Emby容器....."
+    case $cpu_arch in
+        "x86_64" | *"amd64"*)
+            docker run -itd \
+                --name xiaoya-emby \
+                -v ${MEDIA_DIR}/config:/config \
+                -v ${MEDIA_DIR}/xiaoya:/media \
+                --net=host \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                amilys/embyserver:4.8.0.56
+        ;;
+        *)
+            ERROR "目前只支持amd64架构，你的架构是：$cpu_arch"
+            exit 1
+        ;;
+    esac
+
+}
+
+function install_emby_xiaoya_all_emby(){
+
+    if [ "$1" == "official" ]; then
+        install_emby_embyserver
+    else
+        INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver ]（默认 2）"
+        read -ep "IMAGE:" IMAGE
+        [[ -z "${IMAGE}" ]] && IMAGE="2"
+        if [[ ${IMAGE} == [1] ]]; then
+            install_amilys_embyserver
+        elif [[ ${IMAGE} == [2] ]]; then
+            install_emby_embyserver
+        else
+            ERROR "输入无效，请重新选择"
+            install_emby_xiaoya_all_emby
+        fi
+    fi
+
+    INFO "Emby安装完成！"
+
+}
+
+function docker_address_xiaoya_all_emby(){
+
+    get_config_dir
+
+    get_media_dir
+
+    pull_run_ddsderek_glue "/docker_address.sh"
+
+}
+
+function uninstall_xiaoya_all_emby(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+	docker stop xiaoya-emby
+	docker rm xiaoya-emby
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+        "x86_64" | *"amd64"*)
+            docker rmi amilys/embyserver:4.8.0.56
+            docker rmi emby/embyserver:4.8.0.56
+        ;;
+        "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+            docker rmi emby/embyserver_arm64v8:4.8.0.56
+        ;;
+    esac
+    INFO "卸载成功！"
+
+}
+
 function main_xiaoya_all_emby(){
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Emby全家桶${Font}\n"
-    echo -e "1、安装"
-    echo -e "2、更新"
-    echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "1、一键安装全家桶"
+    echo -e "2、下载解压元数据"
+    echo -e "3、解压元数据"
+    echo -e "4、安装Emby（可选择版本）"
+    echo -e "5、替换DOCKER_ADDRESS"
+    echo -e "6、一键安装全家桶 Plus（包含所有步骤，可选择Emby版本）"
+    echo -e "7、卸载"
+    echo -e "8、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -ep "请输入数字 [1-8]:" num
     case "$num" in
         1)
         clear
-        TODO
+        download_unzip_xiaoya_all_emby
+        docker_address_xiaoya_all_emby
+        install_emby_xiaoya_all_emby "official"
         ;;
         2)
         clear
-        TODO
+        download_unzip_xiaoya_all_emby
         ;;
         3)
         clear
-        TODO
+        unzip_xiaoya_all_emby
         ;;
         4)
+        clear
+        get_media_dir
+        install_emby_xiaoya_all_emby
+        ;;
+        5)
+        clear
+        docker_address_xiaoya_all_emby
+        ;;
+        6)
+        clear
+        download_unzip_xiaoya_all_emby
+        docker_address_xiaoya_all_emby
+        install_emby_xiaoya_all_emby
+        ;;
+        7)
+        clear
+        uninstall_xiaoya_all_emby
+        ;;
+        8)
         clear
         main_return
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [1-8]'
         main_xiaoya_all_emby
         ;;
         esac
@@ -352,9 +657,7 @@ function install_xiaoya_alist_tvbox(){
 
     INFO "小白全部回车即可完成安装！"
 
-    INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-    read -ep "CONFIG_DIR:" CONFIG_DIR
-    [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+    get_config_dir
 
     INFO "请输入Alist端口（默认 5344 ）"
     read -ep "ALIST_PORT:" ALIST_PORT
