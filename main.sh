@@ -825,7 +825,7 @@ This is free software, licensed under the Mit License.
 
 ——————————————————————————————————————————————————————————————————————————————————"
     echo -e "1、安装/更新/卸载 小雅Alist"
-    echo -e "2、安装/更新/卸载 小雅Emby全家桶"
+    echo -e "2、安装/卸载 小雅Emby全家桶"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox"
     echo -e "5、退出脚本"
