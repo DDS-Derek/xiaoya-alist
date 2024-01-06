@@ -44,7 +44,7 @@ progress() {
                     fi
                     progress_bar="${progress_bar}${mark}"
             done
-            printf "Progress: ${progress_bar}\r"
+            printf "替换DOCKER_ADDRESS: ${progress_bar}\r"
             ratio=$((ratio+1))
             if [ "${ratio}" -gt "${length}" ] ; then
                     ratio=1
@@ -63,7 +63,7 @@ do
 sleep 1;
 done
 
-INFO "执行替换DOCKER_ADDRESS............                                              "
+INFO "执行替换DOCKER_ADDRESS                                                          "
 start_time2=`date +%s`
 
 do_sth &
