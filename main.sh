@@ -54,6 +54,12 @@ function WARN() {
 echo -e "${WARN} ${1}"
 }
 
+DDSREM_CONFIG_DIR=/etc/DDSRem
+
+if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
+    mkdir -p ${DDSREM_CONFIG_DIR}
+fi
+
 function root_need(){
     if [[ $EUID -ne 0 ]]; then
         ERRO '此脚本必须以 root 身份运行！'
@@ -67,17 +73,37 @@ function TODO(){
 
 function get_config_dir(){
 
-    INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-    read -ep "CONFIG_DIR:" CONFIG_DIR
-    [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+    else
+        INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+        touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+    fi
 
 }
 
 function get_media_dir(){
 
-    INFO "请输入媒体库目录（默认 /opt/media ）"
-    read -ep "MEDIA_DIR:" MEDIA_DIR
-    [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
+    if [ -f ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt ]; then
+        OLD_MEDIA_DIR=$(cat ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt)
+        INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -ep "MEDIA_DIR:" MEDIA_DIR
+        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
+        echo ${MEDIA_DIR} > ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
+    else
+        INFO "请输入媒体库目录（默认 /opt/media ）"
+        read -ep "MEDIA_DIR:" MEDIA_DIR
+        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/etc/xiaoya"
+        touch ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
+        echo ${MEDIA_DIR} > ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
+    fi
 
 }
 
