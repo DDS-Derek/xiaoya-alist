@@ -19,6 +19,14 @@ echo -e "${WARN} ${1}"
 
 cd /media/xiaoya
 
+docker_addr=$(head -n1 /etc/xiaoya/docker_address.txt)
+
+for i in `seq -w 3 -1 0`
+do
+    echo -en "${INFO} 即将开始替换地址：${docker_addr}${Blue} $i ${Font}\r"  
+sleep 1;
+done
+
 INFO "执行替换DOCKER_ADDRESS............"
 start_time2=`date +%s`
 fdfind --extension strm --exec sed \-i "s#DOCKER_ADDRESS#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
