@@ -640,6 +640,41 @@ function main_xiaoya_all_emby(){
 
 }
 
+function install_xiaoyahelper() {
+
+    INFO "小白全部回车即可完成安装！"
+
+    INFO "选择模式：模式3（定时运行小雅转存清理并升级小雅镜像）或模式5（只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3）[3/5]（默认 3）"
+    read -ep "MODE:" MODE
+    [[ -z "${MODE}" ]] && MODE="3"
+
+    INFO "是否使用Telegram通知 [Y/n]（默认 n 不使用）"
+    read -ep "TG:" TG
+    [[ -z "${TG}" ]] && TG="n"
+    if [[ ${TG} == [Yy] ]]; then
+        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s ${MODE} -tg
+    fi
+    if [[ ${TG} == [Nn] ]]; then
+        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s ${MODE}
+    fi
+    INFO "安装完成！"
+
+}
+
+function uninstall_xiaoyahelper() {
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载小雅助手（xiaoyahelper）${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker stop xiaoyakeeper
+    docker rm xiaoyakeeper
+    docker rmi dockerproxy.com/library/alpine:3.18.2
+    INFO "卸载成功！"
+
+}
+
 function main_xiaoyahelper(){
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -652,29 +687,11 @@ function main_xiaoyahelper(){
     case "$num" in
         1)
         clear
-        INFO "小白全部回车即可完成安装！"
-        INFO "是否使用Telegram通知 [Y/n]（默认 n 不使用）"
-        read -ep "TG:" TG
-        [[ -z "${TG}" ]] && TG="n"
-        if [[ ${TG} == [Yy] ]]; then
-            bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s 3 -tg
-        fi
-        if [[ ${TG} == [Nn] ]]; then
-            bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s 3
-        fi
-        INFO "安装完成！"
+        install_xiaoyahelper
         ;;
         2)
         clear
-        for i in `seq -w 3 -1 0`
-        do
-            echo -en "即将开始卸载小雅助手（xiaoyahelper）${Blue} $i ${Font}\r"  
-        sleep 1;
-        done
-        docker stop xiaoyakeeper
-        docker rm xiaoyakeeper
-        docker rmi dockerproxy.com/library/alpine:3.18.2
-        INFO "卸载成功！"
+        uninstall_xiaoyahelper
         ;;
         3)
         clear
