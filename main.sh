@@ -264,6 +264,10 @@ function uninstall_xiaoya_alist(){
     docker stop xiaoya
     docker rm xiaoya
     docker rmi xiaoyaliu/alist:latest
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        rm -rf ${OLD_CONFIG_DIR}
+    fi
     INFO "卸载成功！"
 }
 
@@ -565,6 +569,10 @@ function uninstall_xiaoya_all_emby(){
             docker rmi emby/embyserver_arm64v8:4.8.0.56
         ;;
     esac
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+        OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
+        rm -rf ${OLD_MEDIA_DIR}
+    fi
     INFO "卸载成功！"
 
 }
@@ -744,6 +752,10 @@ function uninstall_xiaoya_alist_tvbox(){
     docker stop xiaoya-tvbox
     docker rm xiaoya-tvbox
     docker rmi haroldli/xiaoya-tvbox:latest
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        rm -rf ${OLD_CONFIG_DIR}
+    fi
     INFO "卸载成功！"
 
 }
