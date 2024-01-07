@@ -897,6 +897,7 @@ function main_onelist(){
 
 function main_return(){
     curl -sL https://ddsrem.com/xiaoya_alist
+    echo -e "\n"
     echo -e "1、安装/更新/卸载 小雅Alist"
     echo -e "2、安装/卸载 小雅Emby全家桶"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
