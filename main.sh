@@ -60,6 +60,11 @@ if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
     mkdir -p ${DDSREM_CONFIG_DIR}
 fi
 
+# Fix https://github.com/DDS-Derek/xiaoya-alist/commit/a246bc582393b618b564e3beca2b9e1d40800a5d 中media目录保存错误
+if [ -f /xiaoya_alist_media_dir.txt ]; then
+    mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
+fi
+
 function root_need(){
     if [[ $EUID -ne 0 ]]; then
         ERRO '此脚本必须以 root 身份运行！'
@@ -91,18 +96,18 @@ function get_config_dir(){
 
 function get_media_dir(){
 
-    if [ -f ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt ]; then
-        OLD_MEDIA_DIR=$(cat ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt)
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+        OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
         INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -ep "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
-        echo ${MEDIA_DIR} > ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
+        echo ${MEDIA_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
     else
         INFO "请输入媒体库目录（默认 /opt/media ）"
         read -ep "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/etc/xiaoya"
-        touch ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
-        echo ${MEDIA_DIR} > ${DDSREM_MEDIA_DIR}/xiaoya_alist_media_dir.txt
+        touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
+        echo ${MEDIA_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
     fi
 
 }
@@ -815,22 +820,91 @@ function main_xiaoya_alist_tvbox(){
 
 }
 
-function main_return(){
+function install_onelist(){
+
+TODO
+
+}
+
+function update_onelist(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始更新Onelist${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        xiaoya-onelist
+    docker rmi containrrr/watchtower:latest
+    INFO "更新成功！"
+
+}
+
+function uninstall_onelist(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载Onelist${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker stop xiaoya-onelist
+    docker rm xiaoya-onelist
+    docker rmi msterzhang/onelist:latest
+    INFO "卸载成功！"
+
+}
+
+function main_onelist(){
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Onelist${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "4、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-4]:" num
+    case "$num" in
+        1)
+        clear
+        install_onelist
+        ;;
+        2)
+        clear
+        update_onelist
+        ;;
+        3)
+        clear
+        uninstall_onelist
+        ;;
+        4)
+        clear
+        main_return
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-4]'
+        main_onelist
+        ;;
+        esac
+
+}
+
+function main_return(){
     curl -sL https://ddsrem.com/xiaoya_alist
-    echo -e "
-Copyright (c) 2023 DDSRem <https://blog.ddsrem.com>
-
-This is free software, licensed under the Mit License.
-
-——————————————————————————————————————————————————————————————————————————————————"
     echo -e "1、安装/更新/卸载 小雅Alist"
     echo -e "2、安装/卸载 小雅Emby全家桶"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox"
-    echo -e "5、退出脚本"
+    echo -e "5、安装/更新/卸载 Onelist"
+    echo -e "6、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-5]:" num
+    read -ep "请输入数字 [1-6]:" num
     case "$num" in
         1)
         clear
@@ -850,11 +924,15 @@ This is free software, licensed under the Mit License.
         ;;
         5)
         clear
+        main_onelist
+        ;;
+        6)
+        clear
         exit 0
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-5]'
+        ERROR '请输入正确数字 [1-6]'
         main_return
         ;;
         esac
