@@ -834,7 +834,36 @@ function main_xiaoya_alist_tvbox(){
 
 function install_onelist(){
 
-TODO
+    if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
+        INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
+    else
+        INFO "请输入配置文件目录（默认 /etc/onelist ）"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/onelist"
+        touch ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
+    fi
+
+    INFO "请输入后台管理端口（默认 5245 ）"
+    read -ep "HT_PORT:" HT_PORT
+    [[ -z "${HT_PORT}" ]] && HT_PORT="5245"
+
+    docker run -itd \
+        -p ${HT_PORT}:5245 \
+        -e PUID=0 \
+        -e PGID=0 \
+        -e UMASK=022 \
+        -e TZ=Asia/Shanghai \
+        -v ${CONFIG_DIR}:/config \
+        --restart=always \
+        --name=xiaoya-onelist \
+        msterzhang/onelist:latest
+
+    INFO "安装完成！"
 
 }
 
