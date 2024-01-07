@@ -583,20 +583,133 @@ function uninstall_xiaoya_all_emby(){
 
 }
 
+function install_resilio(){
+
+    if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
+        INFO "已读取Resilio-Sync配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+    else
+        INFO "请输入配置文件目录（默认 /etc/xiaoya/resilio ）"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya/resilio"
+        touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+    fi
+
+    INFO "请输入后台管理端口（默认 8888 ）"
+    read -ep "HT_PORT:" HT_PORT
+    [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
+
+    get_media_dir
+
+    docker run -d \
+        --name=xiaoya-resilio \
+        -e PUID=0 \
+        -e PGID=0 \
+        -e TZ=Asia/Shanghai \
+        -p ${HT_PORT}:8888 \
+        -p 55555:55555 \
+        -v ${CONFIG_DIR}:/config \
+        -v ${CONFIG_DIR}/downloads:/downloads \
+        -v ${MEDIA_DIR}:/sync \
+        --restart=always \
+        linuxserver/resilio-sync:latest
+
+    INFO "安装完成！"
+
+}
+
+function update_resilio(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始更新Resilio-Sync${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        xiaoya-resilio
+    docker rmi containrrr/watchtower:latest
+    INFO "更新成功！"
+
+}
+
+function unisntall_resilio(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载Resilio-Sync${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker stop xiaoya-resilio
+    docker rm xiaoya-resilio
+    docker rmi linuxserver/resilio-sync:latest
+    if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
+        rm -rf ${OLD_CONFIG_DIR}
+    fi
+    INFO "卸载成功！"
+
+}
+
+function main_resilio(){
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Resilio-Sync${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "4、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-4]:" num
+    case "$num" in
+        1)
+        clear
+        install_resilio
+        ;;
+        2)
+        clear
+        update_resilio
+        ;;
+        3)
+        clear
+        unisntall_resilio
+        ;;
+        4)
+        clear
+        main_xiaoya_all_emby
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-4]'
+        main_resilio
+        ;;
+        esac
+    
+}
+
 function main_xiaoya_all_emby(){
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Emby全家桶${Font}\n"
-    echo -e "1、一键安装全家桶"
+    echo -e "1、一键安装Emby全家桶"
     echo -e "2、下载解压元数据"
     echo -e "3、解压元数据"
     echo -e "4、安装Emby（可选择版本）"
     echo -e "5、替换DOCKER_ADDRESS"
-    echo -e "6、一键安装全家桶 Plus（包含所有步骤，可选择Emby版本）"
-    echo -e "7、卸载"
-    echo -e "8、返回上级"
+    echo -e "6、一键安装Emby全家桶 Plus（包含所有步骤，可选择Emby版本）"
+    echo -e "7、安装/更新/卸载 Resilio-Sync"
+    echo -e "8、卸载Emby全家桶"
+    echo -e "9、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-8]:" num
+    read -ep "请输入数字 [1-9]:" num
     case "$num" in
         1)
         clear
@@ -629,9 +742,13 @@ function main_xiaoya_all_emby(){
         ;;
         7)
         clear
-        uninstall_xiaoya_all_emby
+        main_resilio
         ;;
         8)
+        clear
+        uninstall_xiaoya_all_emby
+        ;;
+        9)
         clear
         main_return
         ;;
