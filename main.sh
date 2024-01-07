@@ -372,7 +372,6 @@ function pull_run_ddsderek_glue(){
         -v ${MEDIA_DIR}:/media \
         -v ${CONFIG_DIR}:/etc/xiaoya \
         -e LANG=C.UTF-8 \
-        -e TZ=Asia/Shanghai \
         ddsderek/xiaoya-glue:latest \
         ${1}
 
