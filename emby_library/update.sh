@@ -70,12 +70,12 @@ function update_config(){
     INFO "正在重启EMBY..."
     SINCE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
     CONTAINER_NAME=${EMBY_NAME}
-    TARGET_LOG_LINE_OK="All entry points have started"
+    TARGET_LOG_LINE_SUCCESS="All entry points have started"
     TARGET_LOG_LINE_FAIL="sending all processes the KILL signal and exiting"
     while true; do
         line=$(docker logs --since "$SINCE_TIME" "$CONTAINER_NAME" | tail -n 1)
         echo $line
-        if [[ "$line" == *"$TARGET_LOG_LINE_OK"* ]]; then
+        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
             echo -e "——————————————————————————————————————————————————————————————————————————————————"
             INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
             rm -rf ${emby_config_data_new}/library_bak
