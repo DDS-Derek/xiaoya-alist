@@ -1,4 +1,22 @@
 #!/bin/bash
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+# __   ___                                    _ _     _   
+# \ \ / (_)                             /\   | (_)   | |  
+#  \ V / _  __ _  ___  _   _  __ _     /  \  | |_ ___| |_ 
+#   > < | |/ _` |/ _ \| | | |/ _` |   / /\ \ | | / __| __|
+#  / . \| | (_| | (_) | |_| | (_| |  / ____ \| | \__ \ |_ 
+# /_/ \_\_|\__,_|\___/ \__, |\__,_| /_/    \_\_|_|___/\__|
+#                       __/ |                             
+#                      |___/                              
+#
+# Copyright (c) 2023 DDSRem <https://blog.ddsrem.com>
+#
+# This is free software, licensed under the Mit License.
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+#
+# https://github.com/duckeaty/update_xiaoya_emby_config_library
 
 Green="\033[32m"
 Red="\033[31m"
@@ -17,11 +35,11 @@ function WARN() {
     echo -e "${WARN} ${1}"
 }
 
-bash /app/update.sh update_config
-bash /app/update.sh update_policy
+bash /app/module.sh update_config
+bash /app/module.sh update_policy
 
 crontab -r
-echo -e "${CRON} bash /app/update.sh update_config && bash /app/update.sh update_policy" >> /tmp/crontab.list
+echo -e "${CRON} bash /app/module.sh update_config && bash /app/module.sh update_policy" >> /tmp/crontab.list
 INFO "设置定时任务中..."
 crontab /tmp/crontab.list
 INFO "定时任务预览:"
