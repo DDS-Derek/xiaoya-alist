@@ -183,7 +183,7 @@ function install_xiaoya_alist(){
     [[ -z "${NET_MODE}" ]] && NET_MODE="n"
     if [[ ${NET_MODE} == [Yy] ]]; then
         if [ ! -s ${CONFIG_DIR}/docker_address.txt ]; then
-            echo "http://$localip:6789" > ${CONFIG_DIR}/docker_address.txt
+            echo "http://$localip:5678" > ${CONFIG_DIR}/docker_address.txt
         fi
         docker pull xiaoyaliu/alist:hostmode
         if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
@@ -413,7 +413,7 @@ function download_unzip_xiaoya_all_emby(){
 
     pull_run_glue '/update_all.sh'
     
-    echo "http://$docker0:8096" > ${CONFIG_DIR}/emby_server.txt
+    echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
     echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
     chmod -R 777 ${MEDIA_DIR}
 
@@ -455,7 +455,7 @@ function unzip_xiaoya_all_emby(){
 
     pull_run_glue '/unzip.sh'
     
-    echo "http://$docker0:8096" > ${CONFIG_DIR}/emby_server.txt
+    echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
     echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
     chmod -R 777 ${MEDIA_DIR}
 
@@ -473,7 +473,7 @@ function install_emby_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
-                --net=host \
+                --network=container:xiaoya \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -484,7 +484,7 @@ function install_emby_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
-                --net=host \
+                --network=container:xiaoya \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -508,7 +508,7 @@ function install_amilys_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
-                --net=host \
+                --network=container:xiaoya \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -714,7 +714,6 @@ function main_xiaoya_all_emby(){
         1)
         clear
         download_unzip_xiaoya_all_emby
-        docker_address_xiaoya_all_emby
         install_emby_xiaoya_all_emby "official"
         ;;
         2)
@@ -737,7 +736,6 @@ function main_xiaoya_all_emby(){
         6)
         clear
         download_unzip_xiaoya_all_emby
-        docker_address_xiaoya_all_emby
         install_emby_xiaoya_all_emby
         ;;
         7)
