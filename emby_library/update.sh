@@ -1,5 +1,22 @@
 #!/bin/bash
 
+Green="\033[32m"
+Red="\033[31m"
+Yellow='\033[33m'
+Font="\033[0m"
+INFO="[${Green}INFO${Font}]"
+ERROR="[${Red}ERROR${Font}]"
+WARN="[${Yellow}WARN${Font}]"
+function INFO() {
+    echo -e "${INFO} ${1}"
+}
+function ERROR() {
+    echo -e "${ERROR} ${1}"
+}
+function WARN() {
+    echo -e "${WARN} ${1}"
+}
+
 emby_config_data=/data/config/data
 emby_config_data_new=/data/config_data
 
@@ -40,7 +57,9 @@ function update_config(){
         mkdir -p ${emby_config_data_new}
     fi
 	sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
-	rm -f ${emby_config_data_new}/library.db*
+	mv -f ${emby_config_data_new}/library.db ${emby_config_data_new}/library_bak/library.db
+	mv -f ${emby_config_data_new}/library.db-wal ${emby_config_data_new}/library_bak/library.db-wal
+	mv -f ${emby_config_data_new}/library.db-shm ${emby_config_data_new}/library_bak/library.db-shm
 	cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
 	sqlite3 ${emby_config_data_new}/library.db "DROP TABLE IF EXISTS UserDatas;"
 	sqlite3 ${emby_config_data_new}/library.db ".read /root/xiaoya_emby_library_user.sql"
@@ -58,15 +77,19 @@ function update_config(){
 		if [[ "$line" == *"$TARGET_LOG_LINE_OK"* ]]; then
 			echo -e "——————————————————————————————————————————————————————————————————————————————————"
 			INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
+            break
 		elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
 			echo -e "——————————————————————————————————————————————————————————————————————————————————"
 			WARN "EMBY启动失败"
             INFO "正在恢复数据库并重启EMBY"
             docker stop ${EMBY_NAME}
             rm -f ${emby_config_data_new}/library.db*
-            cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
+            mv -f ${emby_config_data_new}/library_bak/library.db ${emby_config_data_new}/library.db
+            mv -f ${emby_config_data_new}/library_bak/library.db-wal ${emby_config_data_new}/library.db-wal
+            mv -f ${emby_config_data_new}/library_bak/library.db-shm ${emby_config_data_new}/library.db-shm
             docker start ${EMBY_NAME}
             INFO "已恢复数据库"
+            break
         fi
 		sleep 3
     done
