@@ -28,6 +28,12 @@
 # docker run -d -p 4567:4567 -p 5344:80 -e ALIST_PORT=5344 --restart=always -v /etc/xiaoya:/data --name=xiaoya-tvbox haroldli/xiaoya-tvbox
 # bash -c "$(curl -fsSL https://d.har01d.cn/update_xiaoya.sh)"
 #
+# bash -c "$(curl http://docker.xiaoya.pro/update_new.sh)"
+#
+# find ./ -name "*.strm" -exec sed \-i "s#http://127.0.0.1:5678#自己的地址#g; s# #%20#g; s#|#%7C#g" {} \;
+#
+# bash -c "$(curl http://docker.xiaoya.pro/emby.sh)" -s /媒体库目录
+#
 # ——————————————————————————————————————————————————————————————————————————————————
 #
 # The functions that the script can call are 'INFO' 'WARN' 'ERROR'
