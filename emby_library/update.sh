@@ -77,7 +77,7 @@ function update_config(){
         if [[ "$line" == *"$TARGET_LOG_LINE_OK"* ]]; then
             echo -e "——————————————————————————————————————————————————————————————————————————————————"
             INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
-            rm -f ${emby_config_data_new}/library_bak
+            rm -rf ${emby_config_data_new}/library_bak
             break
         elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
             echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -88,7 +88,7 @@ function update_config(){
             mv -f ${emby_config_data_new}/library_bak/library.db ${emby_config_data_new}/library.db
             mv -f ${emby_config_data_new}/library_bak/library.db-wal ${emby_config_data_new}/library.db-wal
             mv -f ${emby_config_data_new}/library_bak/library.db-shm ${emby_config_data_new}/library.db-shm
-            rm -f ${emby_config_data_new}/library_bak
+            rm -rf ${emby_config_data_new}/library_bak
             docker start ${EMBY_NAME}
             INFO "已恢复数据库"
             break
