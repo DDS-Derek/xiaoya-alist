@@ -35,7 +35,7 @@ function update_policy(){
         read -r policy <<< "$(echo "${response}" | jq -r ".[$i].Policy | to_entries | from_entries | tojson")"
         USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_API}"
         curl -i -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2"
-        INFO "【$name】"用户策略更新成功！
+        INFO "【$name】用户策略更新成功！"
         echo -e ""
         echo -e "——————————————————————————————————————————————————————————————————————————————————"
     done
