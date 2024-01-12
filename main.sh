@@ -419,6 +419,8 @@ function download_unzip_xiaoya_all_emby(){
     
     echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
     echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+
+    INFO "设置目录权限..."
     chmod -R 777 ${MEDIA_DIR}
 
     INFO "下载解压完成！"
@@ -461,6 +463,8 @@ function unzip_xiaoya_all_emby(){
     
     echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
     echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+
+    INFO "设置目录权限..."
     chmod -R 777 ${MEDIA_DIR}
 
     INFO "解压完成！"
@@ -543,6 +547,10 @@ function install_emby_xiaoya_all_emby(){
             install_emby_xiaoya_all_emby
         fi
     fi
+
+    sleep 5
+
+    docker restart xiaoya xiaoya-emby
 
     INFO "Emby安装完成！"
 
