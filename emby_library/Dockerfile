@@ -11,7 +11,8 @@ RUN set -ex && \
         tzdata \
         grep \
         sqlite \
-        docker
+        docker \
+        curl
 
 WORKDIR /app
 

@@ -28,7 +28,7 @@ function update_policy(){
     USER_URL="${EMBY_URL}/Users?api_key=${EMBY_API}"  
     response=$(curl -s "${USER_URL}")  
     USER_COUNT=$(echo "${response}" | jq '. | length')
-    for((i=0;i<$USER_COUNT;i++))
+    for(( i=0 ; i < $USER_COUNT ; i++ ))
     do
         read -r name <<< "$(echo "${response}" | jq -r ".[$i].Name")"  # 使用read命令读取名字  
         read -r id <<< "$(echo "${response}" | jq -r ".[$i].Id")"  # 使用read命令读取ID
@@ -74,19 +74,21 @@ function update_config(){
     while true; do
         line=$(docker logs --since "$SINCE_TIME" "$CONTAINER_NAME" | tail -n 1)
         echo $line
-		if [[ "$line" == *"$TARGET_LOG_LINE_OK"* ]]; then
-			echo -e "——————————————————————————————————————————————————————————————————————————————————"
-			INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
+        if [[ "$line" == *"$TARGET_LOG_LINE_OK"* ]]; then
+            echo -e "——————————————————————————————————————————————————————————————————————————————————"
+            INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
+            rm -f ${emby_config_data_new}/library_bak
             break
-		elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
-			echo -e "——————————————————————————————————————————————————————————————————————————————————"
-			WARN "EMBY启动失败"
+        elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
+            echo -e "——————————————————————————————————————————————————————————————————————————————————"
+            WARN "EMBY启动失败"
             INFO "正在恢复数据库并重启EMBY"
             docker stop ${EMBY_NAME}
             rm -f ${emby_config_data_new}/library.db*
             mv -f ${emby_config_data_new}/library_bak/library.db ${emby_config_data_new}/library.db
             mv -f ${emby_config_data_new}/library_bak/library.db-wal ${emby_config_data_new}/library.db-wal
             mv -f ${emby_config_data_new}/library_bak/library.db-shm ${emby_config_data_new}/library.db-shm
+            rm -f ${emby_config_data_new}/library_bak
             docker start ${EMBY_NAME}
             INFO "已恢复数据库"
             break
