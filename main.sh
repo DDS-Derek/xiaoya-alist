@@ -263,12 +263,10 @@ function uninstall_xiaoya_alist(){
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"  
     sleep 1;
     done
-	docker stop xiaoya-hostmode
-	docker rm xiaoya-hostmode
-	docker rmi xiaoyaliu/alist:hostmode
     docker stop xiaoya
     docker rm xiaoya
     docker rmi xiaoyaliu/alist:latest
+    docker rmi xiaoyaliu/alist:hostmode
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         rm -rf ${OLD_CONFIG_DIR}
