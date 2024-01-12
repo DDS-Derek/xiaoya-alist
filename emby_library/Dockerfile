@@ -17,7 +17,4 @@ WORKDIR /app
 
 COPY --chmod=755 . /app
 
-ENTRYPOINT [ "/entrypoint.sh" ]
-
-# docker run -d -v /ssd/data/docker/xiaoya/media:/data -v /var/run/docker.sock:/var/run/docker.sock:ro --net=host alpine:latest
-# EMBY_NAME EMBY_API EMBY_URL CRON
+ENTRYPOINT [ "/app/entrypoint.sh" ]

@@ -36,6 +36,9 @@ function update_config(){
     if [ -f /root/xiaoya_emby_library_user.sql ]; then
 	    rm -f /root/xiaoya_emby_library_user.sql
     fi
+    if [ ! -d ${emby_config_data_new} ]; then
+        mkdir -p ${emby_config_data_new}
+    fi
 	sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
 	rm -f ${emby_config_data_new}/library.db*
 	cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
