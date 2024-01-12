@@ -60,9 +60,7 @@ function update_config(){
         mkdir -p ${emby_config_data_new}/library_bak
     fi
     sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
-    mv -f ${emby_config_data_new}/library.db ${emby_config_data_new}/library_bak/library.db
-    mv -f ${emby_config_data_new}/library.db-wal ${emby_config_data_new}/library_bak/library.db-wal
-    mv -f ${emby_config_data_new}/library.db-shm ${emby_config_data_new}/library_bak/library.db-shm
+    mv -f ${emby_config_data_new}/library.db* ${emby_config_data_new}/library_bak/
     cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
     sqlite3 ${emby_config_data_new}/library.db "DROP TABLE IF EXISTS UserDatas;"
     sqlite3 ${emby_config_data_new}/library.db ".read /root/xiaoya_emby_library_user.sql"
@@ -88,9 +86,7 @@ function update_config(){
             INFO "正在恢复数据库并重启EMBY"
             docker stop ${EMBY_NAME}
             rm -f ${emby_config_data_new}/library.db*
-            mv -f ${emby_config_data_new}/library_bak/library.db ${emby_config_data_new}/library.db
-            mv -f ${emby_config_data_new}/library_bak/library.db-wal ${emby_config_data_new}/library.db-wal
-            mv -f ${emby_config_data_new}/library_bak/library.db-shm ${emby_config_data_new}/library.db-shm
+            mv -f ${emby_config_data_new}/library_bak/library.db* ${emby_config_data_new}/
             rm -rf ${emby_config_data_new}/library_bak
             docker start ${EMBY_NAME}
             INFO "已恢复数据库"
