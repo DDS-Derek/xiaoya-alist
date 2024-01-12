@@ -2,6 +2,11 @@ name: xiaoya emby library
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "emby_library/**"
 
 jobs:
   build:

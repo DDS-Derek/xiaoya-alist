@@ -55,6 +55,7 @@ function update_config(){
     fi
     if [ ! -d ${emby_config_data_new} ]; then
         mkdir -p ${emby_config_data_new}
+        cp -rf ${emby_config_data}/* ${emby_config_data_new}/
     fi
     if [ ! -d ${emby_config_data_new}/library_bak ]; then
         mkdir -p ${emby_config_data_new}/library_bak
