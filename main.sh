@@ -762,6 +762,9 @@ function install_emby_library(){
     if [[ ${REMOVE} == [Yy] ]]; then
         docker stop xiaoya-emby
         docker rm xiaoya-emby
+        if [ ! -d ${MEDIA_DIR}/config_data ]; then
+            mkdir -p ${MEDIA_DIR}/config_data
+        fi
         cp -rf ${MEDIA_DIR}/config/data/* ${MEDIA_DIR}/config_data/
         MOUNT="-v ${MEDIA_DIR}/config_data:/config/data"
         install_emby_xiaoya_all_emby
