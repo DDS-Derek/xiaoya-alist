@@ -21,10 +21,10 @@ emby_config_data=/data/config/data
 emby_config_data_new=/data/config_data
 
 function update_policy(){
-	clear
-	echo -e "——————————————————————————————————————————————————————————————————————————————————"
-	echo -e "开始获取EMBY用户信息"
-	echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    clear
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "开始获取EMBY用户信息"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
     USER_URL="${EMBY_URL}/Users?api_key=${EMBY_API}"  
     response=$(curl -s "${USER_URL}")  
     USER_COUNT=$(echo "${response}" | jq '. | length')
@@ -33,44 +33,44 @@ function update_policy(){
         read -r name <<< "$(echo "${response}" | jq -r ".[$i].Name")"  # 使用read命令读取名字  
         read -r id <<< "$(echo "${response}" | jq -r ".[$i].Id")"  # 使用read命令读取ID
         read -r policy <<< "$(echo "${response}" | jq -r ".[$i].Policy | to_entries | from_entries | tojson")"
-		USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_API}"
-		curl -i -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2"
-		echo -e "【$name】"用户策略更新成功！
-		echo -e ""
-		echo -e "——————————————————————————————————————————————————————————————————————————————————"
+        USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_API}"
+        curl -i -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2"
+        echo -e "【$name】"用户策略更新成功！
+        echo -e ""
+        echo -e "——————————————————————————————————————————————————————————————————————————————————"
     done
-	echo -e "所有用户策略更新成功！"
-	echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "所有用户策略更新成功！"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
 }
 
 function update_config(){
     clear
-	echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "小雅EMBY_CONFIG同步"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-	INFO "开始更新CONFIG"
-	docker stop ${EMBY_NAME}
+    INFO "开始更新CONFIG"
+    docker stop ${EMBY_NAME}
     if [ -f /root/xiaoya_emby_library_user.sql ]; then
-	    rm -f /root/xiaoya_emby_library_user.sql
+        rm -f /root/xiaoya_emby_library_user.sql
     fi
     if [ ! -d ${emby_config_data_new} ]; then
         mkdir -p ${emby_config_data_new}
     fi
-	sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
-	mv -f ${emby_config_data_new}/library.db ${emby_config_data_new}/library_bak/library.db
-	mv -f ${emby_config_data_new}/library.db-wal ${emby_config_data_new}/library_bak/library.db-wal
-	mv -f ${emby_config_data_new}/library.db-shm ${emby_config_data_new}/library_bak/library.db-shm
-	cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
-	sqlite3 ${emby_config_data_new}/library.db "DROP TABLE IF EXISTS UserDatas;"
-	sqlite3 ${emby_config_data_new}/library.db ".read /root/xiaoya_emby_library_user.sql"
-	chmod 777 ${emby_config_data_new}/library.db*
-	docker start ${EMBY_NAME}
-	echo -e "——————————————————————————————————————————————————————————————————————————————————"
-	echo -e "正在重启EMBY..."
-	SINCE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
-	CONTAINER_NAME=${EMBY_NAME}
-	TARGET_LOG_LINE_OK="All entry points have started"
-	TARGET_LOG_LINE_FAIL="sending all processes the KILL signal and exiting"
+    sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
+    mv -f ${emby_config_data_new}/library.db ${emby_config_data_new}/library_bak/library.db
+    mv -f ${emby_config_data_new}/library.db-wal ${emby_config_data_new}/library_bak/library.db-wal
+    mv -f ${emby_config_data_new}/library.db-shm ${emby_config_data_new}/library_bak/library.db-shm
+    cp -f ${emby_config_data}/library.db ${emby_config_data_new}/
+    sqlite3 ${emby_config_data_new}/library.db "DROP TABLE IF EXISTS UserDatas;"
+    sqlite3 ${emby_config_data_new}/library.db ".read /root/xiaoya_emby_library_user.sql"
+    chmod 777 ${emby_config_data_new}/library.db*
+    docker start ${EMBY_NAME}
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "正在重启EMBY..."
+    SINCE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
+    CONTAINER_NAME=${EMBY_NAME}
+    TARGET_LOG_LINE_OK="All entry points have started"
+    TARGET_LOG_LINE_FAIL="sending all processes the KILL signal and exiting"
     while true; do
         line=$(docker logs --since "$SINCE_TIME" "$CONTAINER_NAME" | tail -n 1)
         echo $line
@@ -93,7 +93,7 @@ function update_config(){
             INFO "已恢复数据库"
             break
         fi
-		sleep 3
+        sleep 3
     done
 }
 
