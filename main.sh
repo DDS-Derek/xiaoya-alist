@@ -782,7 +782,7 @@ function install_emby_library(){
         -e EMBY_NAME=${EMBY_NAME} \
         -e EMBY_API=${EMBY_API} \
         -e EMBY_URL=${EMBY_URL} \
-        -e CRON=${CRON} \
+        -e "CRON=${CRON}" \
         --restart=always \
         ddsderek/xiaoya-glue:emby-library
 
