@@ -56,6 +56,9 @@ function update_config(){
     if [ ! -d ${emby_config_data_new} ]; then
         mkdir -p ${emby_config_data_new}
     fi
+    if [ ! -d ${emby_config_data_new}/library_bak ]; then
+        mkdir -p ${emby_config_data_new}/library_bak
+    fi
     sqlite3 ${emby_config_data_new}/library.db ".dump UserDatas" > /root/xiaoya_emby_library_user.sql
     mv -f ${emby_config_data_new}/library.db ${emby_config_data_new}/library_bak/library.db
     mv -f ${emby_config_data_new}/library.db-wal ${emby_config_data_new}/library_bak/library.db-wal
