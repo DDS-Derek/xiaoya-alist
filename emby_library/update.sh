@@ -23,7 +23,7 @@ emby_config_data_new=/data/config_data
 function update_policy(){
     clear
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    echo -e "开始获取EMBY用户信息"
+    INFO "开始获取EMBY用户信息"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     USER_URL="${EMBY_URL}/Users?api_key=${EMBY_API}"  
     response=$(curl -s "${USER_URL}")  
@@ -35,18 +35,18 @@ function update_policy(){
         read -r policy <<< "$(echo "${response}" | jq -r ".[$i].Policy | to_entries | from_entries | tojson")"
         USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_API}"
         curl -i -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2"
-        echo -e "【$name】"用户策略更新成功！
+        INFO "【$name】"用户策略更新成功！
         echo -e ""
         echo -e "——————————————————————————————————————————————————————————————————————————————————"
     done
-    echo -e "所有用户策略更新成功！"
+    INFO "所有用户策略更新成功！"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
 }
 
 function update_config(){
     clear
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    echo -e "小雅EMBY_CONFIG同步"
+    INFO "小雅EMBY_CONFIG同步"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     INFO "开始更新CONFIG"
     docker stop ${EMBY_NAME}
@@ -67,7 +67,7 @@ function update_config(){
     chmod 777 ${emby_config_data_new}/library.db*
     docker start ${EMBY_NAME}
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    echo -e "正在重启EMBY..."
+    INFO "正在重启EMBY..."
     SINCE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
     CONTAINER_NAME=${EMBY_NAME}
     TARGET_LOG_LINE_OK="All entry points have started"
@@ -82,7 +82,7 @@ function update_config(){
             break
         elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
             echo -e "——————————————————————————————————————————————————————————————————————————————————"
-            WARN "EMBY启动失败"
+            ERROR "EMBY启动失败"
             INFO "正在恢复数据库并重启EMBY"
             docker stop ${EMBY_NAME}
             rm -f ${emby_config_data_new}/library.db*
