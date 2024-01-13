@@ -540,6 +540,22 @@ function install_amilys_embyserver(){
 
 }
 
+function choose_emby_image(){
+
+    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver ]（默认 2）"
+    read -ep "IMAGE:" IMAGE
+    [[ -z "${IMAGE}" ]] && IMAGE="2"
+    if [[ ${IMAGE} == [1] ]]; then
+        install_amilys_embyserver
+    elif [[ ${IMAGE} == [2] ]]; then
+        install_emby_embyserver
+    else
+        ERROR "输入无效，请重新选择"
+        choose_emby_image
+    fi
+
+}
+
 function install_emby_xiaoya_all_emby(){
 
     INFO "您的小雅容器和Emby是否在同一主机上？[Y/n]（默认 Y）"
@@ -554,17 +570,7 @@ function install_emby_xiaoya_all_emby(){
     if [ "$1" == "official" ]; then
         install_emby_embyserver
     else
-        INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver ]（默认 2）"
-        read -ep "IMAGE:" IMAGE
-        [[ -z "${IMAGE}" ]] && IMAGE="2"
-        if [[ ${IMAGE} == [1] ]]; then
-            install_amilys_embyserver
-        elif [[ ${IMAGE} == [2] ]]; then
-            install_emby_embyserver
-        else
-            ERROR "输入无效，请重新选择"
-            install_emby_xiaoya_all_emby
-        fi
+        choose_emby_image
     fi
 
     sleep 5
