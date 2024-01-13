@@ -271,8 +271,11 @@ function uninstall_xiaoya_alist(){
     done
     docker stop xiaoya
     docker rm xiaoya
-    docker rmi xiaoyaliu/alist:latest
-    docker rmi xiaoyaliu/alist:hostmode
+    if docker inspect xiaoyaliu/alist:latest >/dev/null 2>&1; then
+        docker rmi xiaoyaliu/alist:latest
+    elif docker inspect xiaoyaliu/alist:hostmode >/dev/null 2>&1; then
+        docker rmi xiaoyaliu/alist:hostmode
+    fi
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         rm -rf ${OLD_CONFIG_DIR}
@@ -341,11 +344,13 @@ function test_xiaoya_status(){
 
 function pull_run_glue(){
 
-	local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
-	remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-	if [ ! "$local_sha" == "$remote_sha" ]; then
-		docker rmi xiaoyaliu/glue:latest
-	fi
+    if docker inspect xiaoyaliu/glue:latest >/dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ ! "$local_sha" == "$remote_sha" ]; then
+            docker rmi xiaoyaliu/glue:latest
+        fi
+    fi
 
     docker run -it \
         --security-opt seccomp=unconfined \
@@ -363,11 +368,13 @@ function pull_run_glue(){
 
 function pull_run_ddsderek_glue(){
 
-	local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/xiaoya-glue:latest | cut -f2 -d:)
-	remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/xiaoya-glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-	if [ ! "$local_sha" == "$remote_sha" ]; then
-		docker rmi ddsderek/xiaoya-glue:latest
-	fi
+    if docker inspect ddsderek/xiaoya-glue:latest >/dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/xiaoya-glue:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/xiaoya-glue/tags/latest"| grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ ! "$local_sha" == "$remote_sha" ]; then
+            docker rmi ddsderek/xiaoya-glue:latest
+        fi
+    fi
 
     docker run -it \
         --security-opt seccomp=unconfined \
@@ -583,8 +590,11 @@ function uninstall_xiaoya_all_emby(){
     cpu_arch=$(uname -m)
     case $cpu_arch in
         "x86_64" | *"amd64"*)
-            docker rmi amilys/embyserver:4.8.0.56
-            docker rmi emby/embyserver:4.8.0.56
+            if docker inspect amilys/embyserver:4.8.0.56 >/dev/null 2>&1; then
+                docker rmi amilys/embyserver:4.8.0.56
+            elif docker inspect emby/embyserver:4.8.0.56 >/dev/null 2>&1; then
+                docker rmi emby/embyserver:4.8.0.56
+            fi
         ;;
         "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
             docker rmi emby/embyserver_arm64v8:4.8.0.56
