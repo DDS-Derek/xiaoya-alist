@@ -489,7 +489,7 @@ function install_emby_embyserver(){
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 ${MOUNT} \
-                --network=container:xiaoya \
+                ${NETWORK_MODE} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -501,7 +501,7 @@ function install_emby_embyserver(){
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 ${MOUNT} \
-                --network=container:xiaoya \
+                ${NETWORK_MODE} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -526,7 +526,7 @@ function install_amilys_embyserver(){
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 ${MOUNT} \
-                --network=container:xiaoya \
+                ${NETWORK_MODE} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -541,6 +541,15 @@ function install_amilys_embyserver(){
 }
 
 function install_emby_xiaoya_all_emby(){
+
+    INFO "您的小雅容器和Emby是否在同一主机上？[Y/n]（默认 Y）"
+    read -ep "HOST:" HOST
+    [[ -z "${HOST}" ]] && HOST="y"
+    if [[ ${HOST} == [Yy] ]]; then
+        NETWORK_MODE='--network=container:xiaoya'
+    elif [[ ${HOST} == [Nn] ]]; then
+        NETWORK_MODE='--net=host'
+    fi
 
     if [ "$1" == "official" ]; then
         install_emby_embyserver
