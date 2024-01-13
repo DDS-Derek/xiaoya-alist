@@ -1,16 +1,7 @@
-FROM scratch as emby
+FROM scratch
 
-COPY --from=amilys/embyserver:4.8.0.56 /bin /bin
-COPY --from=amilys/embyserver:4.8.0.56 /etc /etc
-COPY --from=amilys/embyserver:4.8.0.56 /usr /usr
-COPY --from=amilys/embyserver:4.8.0.56 /system /system
-COPY --from=amilys/embyserver:4.8.0.56 /share /share
-COPY --from=amilys/embyserver:4.8.0.56 /init /init
-COPY --from=amilys/embyserver:4.8.0.56 /lib /lib
-COPY --from=amilys/embyserver:4.8.0.56 /libexec /libexec
-COPY --from=amilys/embyserver:4.8.0.56 /licenses /licenses
-
-FROM alpine:3.19
+COPY --from=amilys/embyserver:4.8.0.56 / /
+COPY --from=alpine:3.19 / /
 
 ENV LANG=C.UTF-8 \
     PS1="\[\e[32m\][\[\e[m\]\[\e[36m\]\u \[\e[m\]\[\e[37m\]@ \[\e[m\]\[\e[34m\]\h\[\e[m\]\[\e[32m\]]\[\e[m\] \[\e[37;35m\]in\[\e[m\] \[\e[33m\]\w\[\e[m\] \[\e[32m\][\[\e[m\]\[\e[37m\]\d\[\e[m\] \[\e[m\]\[\e[37m\]\t\[\e[m\]\[\e[32m\]]\[\e[m\] \n\[\e[1;31m\]$ \[\e[0m\]" \
@@ -54,10 +45,9 @@ COPY --from=xiaoyaliu/alist:latest /opt/alist/alist /opt/alist/alist
 COPY --from=xiaoyaliu/alist:latest /var/lib/data.zip /var/lib/data.zip
 COPY --from=xiaoyaliu/alist:latest /entrypoint.sh /entrypoint.sh
 COPY --from=xiaoyaliu/alist:latest /updateall /updateall
-COPY --from=emby / /
 
 RUN echo "v."`date +%m%d.%H%M\(B\)` > /docker.version
 
 COPY --chmod=755 ./rootfs /
 
-ENTRYPOINT ["/init"]
+ENTRYPOINT [ "/init" ]
