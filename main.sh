@@ -223,6 +223,7 @@ function install_xiaoya_alist(){
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
+                -p 6908:6908 \
                 --env HTTP_PROXY="$proxy_url" \
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
@@ -235,6 +236,7 @@ function install_xiaoya_alist(){
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
+                -p 6908:6908 \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
                 --name=xiaoya \
