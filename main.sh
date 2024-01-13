@@ -560,6 +560,7 @@ function install_emby_xiaoya_all_emby(){
 
     sleep 5
 
+    INFO "重启小雅容器中..."
     docker restart xiaoya xiaoya-emby
 
     INFO "Emby安装完成！"
@@ -630,6 +631,7 @@ function install_resilio(){
 
     get_media_dir
 
+    INFO "开始安装resilio..."
     docker run -d \
         --name=xiaoya-resilio \
         -e PUID=0 \
@@ -784,6 +786,7 @@ function install_emby_library(){
         read -ep "按任意键继续..." abcdefg
     fi
 
+    INFO "开始安装xiaoya-emby-library-update..."
     docker run -itd \
         --name=xiaoya-emby-library-update \
         -v ${MEDIA_DIR}:/data \
