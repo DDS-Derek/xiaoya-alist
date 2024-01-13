@@ -201,14 +201,14 @@ function install_xiaoya_alist(){
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya-hostmode \
+                --name=xiaoya \
                 xiaoyaliu/alist:hostmode
         else
             docker run -itd \
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya-hostmode \
+                --name=xiaoya \
                 xiaoyaliu/alist:hostmode
         fi
     fi
