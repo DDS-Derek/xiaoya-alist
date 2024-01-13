@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - "glue/**"
+      - ".github/workflows/glue.yml"
 
 jobs:
   build:
@@ -52,3 +53,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - 
+        name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-glue
+          short-description: 小雅Alist的相关周边
+          readme-filepath: ./README.md
