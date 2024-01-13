@@ -797,7 +797,7 @@ function install_emby_library(){
         -e EMBY_URL=${EMBY_URL} \
         -e "CRON=${CRON}" \
         --restart=always \
-        ddsderek/xiaoya-glue:emby-library
+        ddsderek/xiaoya-emby-library:latest
 
     INFO "安装完成！"
 
@@ -812,7 +812,7 @@ function uninstall_emby_library(){
     done
     docker stop xiaoya-emby-library-update
     docker rm xiaoya-emby-library-update
-    docker ddsderek/xiaoya-glue:emby-library
+    docker ddsderek/xiaoya-emby-library:latest
     INFO "卸载成功！"
 
 }
