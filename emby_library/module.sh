@@ -96,7 +96,7 @@ function update_config(){
         echo $line
         if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
             echo -e "——————————————————————————————————————————————————————————————————————————————————"
-            INFO "更新CONFIG完成，请确认emby已经正常启动（根据机器性能启动可能需要一点时间）"
+            INFO "更新CONFIG完成"
             rm -rf ${emby_config_data_new}/library_bak
             break
         elif [[ "$line" == *"$TARGET_LOG_LINE_FAIL"* ]]; then
