@@ -12,10 +12,14 @@ RUN set -ex && \
         grep \
         sqlite \
         docker \
-        curl
+        curl \
+        tini && \
+    rm -rf \
+        /root/.cache \
+        /tmp/*
 
 WORKDIR /app
 
 COPY --chmod=755 . /app
 
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+ENTRYPOINT ["tini", "-g", "--", "/app/entrypoint.sh"]
