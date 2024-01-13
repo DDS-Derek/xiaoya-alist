@@ -1,5 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-cd /opt/alist
-
-bash /entrypoint.sh

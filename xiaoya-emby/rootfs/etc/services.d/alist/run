@@ -1,5 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-cd /opt/alist
-
-exec /opt/alist/alist server --no-prefix
