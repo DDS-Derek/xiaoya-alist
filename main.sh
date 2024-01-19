@@ -201,14 +201,14 @@ function install_xiaoya_alist(){
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya \
+                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
                 xiaoyaliu/alist:hostmode
         else
             docker run -itd \
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya \
+                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
                 xiaoyaliu/alist:hostmode
         fi
     fi
@@ -228,7 +228,7 @@ function install_xiaoya_alist(){
                 --env no_proxy="*.aliyundrive.com" \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya \
+                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
                 xiaoyaliu/alist:latest
         else
             docker run -itd \
@@ -237,7 +237,7 @@ function install_xiaoya_alist(){
                 -p 2346:2346 \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=xiaoya \
+                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
                 xiaoyaliu/alist:latest
         fi
     fi
@@ -258,7 +258,7 @@ function update_xiaoya_alist(){
         containrrr/watchtower:latest \
         --run-once \
         --cleanup \
-        xiaoya-hostmode xiaoya
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)
     docker rmi containrrr/watchtower:latest
     INFO "更新成功！"
 }
@@ -269,8 +269,8 @@ function uninstall_xiaoya_alist(){
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"  
     sleep 1;
     done
-    docker stop xiaoya
-    docker rm xiaoya
+    docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)
+    docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)
     if docker inspect xiaoyaliu/alist:latest >/dev/null 2>&1; then
         docker rmi xiaoyaliu/alist:latest
     elif docker inspect xiaoyaliu/alist:hostmode >/dev/null 2>&1; then
@@ -496,7 +496,7 @@ function install_emby_embyserver(){
     case $cpu_arch in
         "x86_64" | *"amd64"*)
             docker run -itd \
-                --name xiaoya-emby \
+                --name $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
@@ -510,7 +510,7 @@ function install_emby_embyserver(){
         ;;
         "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
             docker run -itd \
-                --name xiaoya-emby \
+                --name $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
@@ -537,7 +537,7 @@ function install_amilys_embyserver(){
     case $cpu_arch in
         "x86_64" | *"amd64"*)
             docker run -itd \
-                --name xiaoya-emby \
+                --name $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
@@ -593,7 +593,9 @@ function install_emby_xiaoya_all_emby(){
     sleep 5
 
     INFO "重启小雅容器中..."
-    docker restart xiaoya xiaoya-emby
+    docker restart \
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
 
     INFO "Emby安装完成！"
 
@@ -618,8 +620,8 @@ function uninstall_xiaoya_all_emby(){
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"  
     sleep 1;
     done
-	docker stop xiaoya-emby
-	docker rm xiaoya-emby
+	docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+	docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
     cpu_arch=$(uname -m)
     case $cpu_arch in
         "x86_64" | *"amd64"*)
@@ -665,7 +667,7 @@ function install_resilio(){
 
     INFO "开始安装resilio..."
     docker run -d \
-        --name=xiaoya-resilio \
+        --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
         -e PUID=0 \
         -e PGID=0 \
         -e TZ=Asia/Shanghai \
@@ -694,7 +696,7 @@ function update_resilio(){
         containrrr/watchtower:latest \
         --run-once \
         --cleanup \
-        xiaoya-resilio
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
     docker rmi containrrr/watchtower:latest
     INFO "更新成功！"
 
@@ -707,8 +709,8 @@ function unisntall_resilio(){
         echo -en "即将开始卸载Resilio-Sync${Blue} $i ${Font}\r"  
     sleep 1;
     done
-    docker stop xiaoya-resilio
-    docker rm xiaoya-resilio
+    docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
+    docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
     docker rmi linuxserver/resilio-sync:latest
     if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
@@ -792,9 +794,9 @@ function install_emby_library(){
 
     get_embyurl
 
-    INFO "请输入小雅Emby的容器名（默认 xiaoya-emby ）"
+    INFO "请输入小雅Emby的容器名（默认 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) ）"
     read -ep "EMBY_NAME:" EMBY_NAME
-    [[ -z "${EMBY_NAME}" ]] && EMBY_NAME="xiaoya-emby"
+    [[ -z "${EMBY_NAME}" ]] && EMBY_NAME="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
 
     INFO "请输入计划时间，例：30 6 * * *，这个代表每天6点30分，注意，数字和*之前都有空格，格式一定要正确！（默认 30 6 * * * ）"
     read -ep "CRON:" CRON
@@ -804,8 +806,8 @@ function install_emby_library(){
     read -ep "REMOVE:" REMOVE
     [[ -z "${REMOVE}" ]] && REMOVE="y"
     if [[ ${REMOVE} == [Yy] ]]; then
-        docker stop xiaoya-emby
-        docker rm xiaoya-emby
+        docker stop ${EMBY_NAME}
+        docker rm ${EMBY_NAME}
         if [ ! -d ${MEDIA_DIR}/config_data ]; then
             mkdir -p ${MEDIA_DIR}/config_data
         fi
@@ -1050,7 +1052,7 @@ function install_xiaoya_alist_tvbox(){
         -v ${CONFIG_DIR}:/data \
         ${MOUNT} \
         --restart=always \
-        --name=xiaoya-tvbox \
+        --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt) \
         haroldli/xiaoya-tvbox:latest
 
     INFO "安装完成！"
@@ -1070,7 +1072,7 @@ function update_xiaoya_alist_tvbox(){
         containrrr/watchtower:latest \
         --run-once \
         --cleanup \
-        xiaoya-tvbox
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
     docker rmi containrrr/watchtower:latest
     INFO "更新成功！"
 
@@ -1083,8 +1085,8 @@ function uninstall_xiaoya_alist_tvbox(){
         echo -en "即将开始卸载小雅Alist-TVBox${Blue} $i ${Font}\r"  
     sleep 1;
     done
-    docker stop xiaoya-tvbox
-    docker rm xiaoya-tvbox
+    docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
+    docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
     docker rmi haroldli/xiaoya-tvbox:latest
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
@@ -1158,7 +1160,7 @@ function install_onelist(){
         -e TZ=Asia/Shanghai \
         -v ${CONFIG_DIR}:/config \
         --restart=always \
-        --name=xiaoya-onelist \
+        --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt) \
         msterzhang/onelist:latest
 
     INFO "安装完成！"
@@ -1178,7 +1180,7 @@ function update_onelist(){
         containrrr/watchtower:latest \
         --run-once \
         --cleanup \
-        xiaoya-onelist
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
     docker rmi containrrr/watchtower:latest
     INFO "更新成功！"
 
@@ -1191,8 +1193,8 @@ function uninstall_onelist(){
         echo -en "即将开始卸载Onelist${Blue} $i ${Font}\r"  
     sleep 1;
     done
-    docker stop xiaoya-onelist
-    docker rm xiaoya-onelist
+    docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
+    docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
     docker rmi msterzhang/onelist:latest
     if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
