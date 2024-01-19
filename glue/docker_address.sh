@@ -26,7 +26,7 @@ function onCtrlC () {
 
 do_sth() {
     #运行的主程序
-    fdfind --extension strm --exec sed \-i "s#http://127.0.0.1:5678#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
+    fdfind --extension strm --exec sed \-i "s#http://xiaoya.host:5678#$docker_addr#g; s# #%20#g; s#|#%7C#g" {} \;
     chmod -R 777 *
 }
 
