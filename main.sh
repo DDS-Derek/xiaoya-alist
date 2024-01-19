@@ -1238,6 +1238,121 @@ function main_onelist(){
 
 }
 
+function change_container_name(){
+
+    INFO "请输入新的容器名称"
+    read -ep "Container name:" container_name
+    [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
+    echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
+
+}
+
+function container_name_settings(){
+
+    if [ ! -d ${DDSREM_CONFIG_DIR}/container_name ]; then
+        mkdir -p ${DDSREM_CONFIG_DIR}/container_name
+    fi
+
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt ]; then
+        xiaoya_alist_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)
+    else
+        echo 'xiaoya' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt
+        xiaoya_alist_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)
+    fi
+
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt ]; then
+        xiaoya_emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+    else
+        echo 'emby' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt
+        xiaoya_emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+    fi
+
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt ]; then
+        xiaoya_resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
+    else
+        echo 'resilio' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt
+        xiaoya_resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
+    fi
+
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt ]; then
+        xiaoya_tvbox_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
+    else
+        echo 'xiaoya-tvbox' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt
+        xiaoya_tvbox_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
+    fi
+
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt ]; then
+        xiaoya_onelist_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
+    else
+        echo 'onelist' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt
+        xiaoya_onelist_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
+    fi
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}容器名称设置${Font}\n"
+    echo -e "1、更改 小雅 容器名（当前：${Green}${xiaoya_alist_name}${Font}）"
+    echo -e "2、更改 小雅Emby 容器名（当前：${Green}${xiaoya_emby_name}${Font}）"
+    echo -e "3、更改 Resilio 容器名（当前：${Green}${xiaoya_resilio_name}${Font}）"
+    echo -e "4、更改 小雅Alist-TVBox 容器名（当前：${Green}${xiaoya_tvbox_name}${Font}）"
+    echo -e "5、更改 Onelist 容器名（当前：${Green}${xiaoya_onelist_name}${Font}）"
+    echo -e "6、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-6]:" num
+    case "$num" in
+        1)
+        change_container_name "xiaoya_alist_name"
+        ;;
+        2)
+        change_container_name "xiaoya_emby_name"
+        ;;
+        3)
+        change_container_name "xiaoya_resilio_name"
+        ;;
+        4)
+        change_container_name "xiaoya_tvbox_name"
+        ;;
+        5)
+        change_container_name "xiaoya_onelist_name"
+        ;;
+        6)
+        clear
+        main_advanced_configuration
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-6]'
+        container_name_settings
+        ;;
+        esac
+
+}
+
+function main_advanced_configuration(){
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}高级配置${Font}\n"
+    echo -e "1、容器名称设置"
+    echo -e "2、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-2]:" num
+    case "$num" in
+        1)
+        clear
+        container_name_settings
+        ;;
+        2)
+        clear
+        main_return
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-2]'
+        main_advanced_configuration
+        ;;
+        esac
+
+}
+
 function main_return(){
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
     echo -e "1、安装/更新/卸载 小雅Alist"
@@ -1245,9 +1360,10 @@ function main_return(){
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox"
     echo -e "5、安装/更新/卸载 Onelist"
-    echo -e "6、退出脚本"
+    echo -e "6、高级配置"
+    echo -e "7、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-6]:" num
+    read -ep "请输入数字 [1-7]:" num
     case "$num" in
         1)
         clear
@@ -1271,11 +1387,15 @@ function main_return(){
         ;;
         6)
         clear
+        main_advanced_configuration
+        ;;
+        7)
+        clear
         exit 0
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-6]'
+        ERROR '请输入正确数字 [1-7]'
         main_return
         ;;
         esac
