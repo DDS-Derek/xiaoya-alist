@@ -223,7 +223,6 @@ function install_xiaoya_alist(){
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
-                -p 6908:6908 \
                 --env HTTP_PROXY="$proxy_url" \
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
@@ -236,7 +235,6 @@ function install_xiaoya_alist(){
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
-                -p 6908:6908 \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
                 --name=xiaoya \
@@ -490,8 +488,10 @@ function install_emby_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                 ${MOUNT} \
-                ${NETWORK_MODE} \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -502,8 +502,10 @@ function install_emby_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                 ${MOUNT} \
-                ${NETWORK_MODE} \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -527,8 +529,10 @@ function install_amilys_embyserver(){
                 --name xiaoya-emby \
                 -v ${MEDIA_DIR}/config:/config \
                 -v ${MEDIA_DIR}/xiaoya:/media \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                 ${MOUNT} \
-                ${NETWORK_MODE} \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -560,13 +564,11 @@ function choose_emby_image(){
 
 function install_emby_xiaoya_all_emby(){
 
-    INFO "您的小雅容器和Emby是否在同一主机上？[Y/n]（默认 Y）"
-    read -ep "HOST:" HOST
-    [[ -z "${HOST}" ]] && HOST="y"
-    if [[ ${HOST} == [Yy] ]]; then
-        NETWORK_MODE='--network=container:xiaoya'
-    elif [[ ${HOST} == [Nn] ]]; then
-        NETWORK_MODE='--net=host'
+    if ! grep xiaoya.host /etc/hosts; then
+        echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
+        xiaoya_host="127.0.0.1"
+    else
+        xiaoya_host=$(grep xiaoya.host /etc/hosts |awk '{print $1}' |head -n1)	
     fi
 
     if [ "$1" == "official" ]; then
@@ -873,7 +875,7 @@ function main_xiaoya_all_emby(){
     echo -e "2、下载解压元数据"
     echo -e "3、解压元数据"
     echo -e "4、安装Emby（可选择版本）"
-    echo -e "5、替换DOCKER_ADDRESS"
+    echo -e "5、替换DOCKER_ADDRESS（已弃用）"
     echo -e "6、安装/卸载 自动同步Emby数据库"
     echo -e "7、安装/更新/卸载 Resilio-Sync"
     echo -e "8、卸载Emby全家桶"
