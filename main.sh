@@ -390,6 +390,19 @@ function pull_run_ddsderek_glue(){
 
 }
 
+function set_emby_server_infuse_api_key(){
+
+    if command -v ifconfig >/dev/null 2>&1; then
+        docker0=$(ifconfig docker0 | grep "inet " |awk '{print $2}'|tr -d "addr:" |head -n1)
+    else
+        docker0=$(ip addr show docker0 |grep "inet " |awk '{print $2}'|tr -d "addr:" |head -n1|cut -f1 -d/)
+    fi
+
+    echo "http://$docker0:6908" > ${CONFIG_DIR}/emby_server.txt
+    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+
+}
+
 function download_unzip_xiaoya_all_emby(){
 
     get_config_dir
@@ -423,9 +436,8 @@ function download_unzip_xiaoya_all_emby(){
     INFO "开始下载解压..."
 
     pull_run_glue '/update_all.sh'
-    
-    echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
-    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+
+    set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
     chmod -R 777 ${MEDIA_DIR}
@@ -468,8 +480,7 @@ function unzip_xiaoya_all_emby(){
 
     pull_run_glue '/unzip.sh'
     
-    echo "http://127.0.0.1:6908" > ${CONFIG_DIR}/emby_server.txt
-    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+    set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
     chmod -R 777 ${MEDIA_DIR}
@@ -576,6 +587,8 @@ function install_emby_xiaoya_all_emby(){
     else
         choose_emby_image
     fi
+
+    set_emby_server_infuse_api_key
 
     sleep 5
 
