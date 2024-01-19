@@ -1244,6 +1244,8 @@ function change_container_name(){
     read -ep "Container name:" container_name
     [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
     echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
+    clear
+    container_name_settings
 
 }
 
