@@ -1538,6 +1538,22 @@ function main(){
     main_return
 }
 
+function ci_test(){
+
+    docker pull xiaoyaliu/alist:latest
+    docker pull xiaoyaliu/alist:hostmode
+    docker pull xiaoyaliu/glue:latest
+    docker pull ddsderek/xiaoya-glue:latest
+    docker pull linuxserver/resilio-sync:latest
+    docker pull ddsderek/xiaoya-emby-library:latest
+    docker pull haroldli/xiaoya-tvbox:latest
+    docker pull msterzhang/onelist:latest
+    docker pull portainer/portainer-ce
+    docker pull amilys/embyserver:4.8.0.56
+    docker pull emby/embyserver:4.8.0.56
+
+}
+
 function first_init(){
 
     root_need
@@ -1557,6 +1573,7 @@ if [ ! $@ ]; then
     main
 elif [ "$@" == test ]; then
     INFO "Test"
+    ci_test
 else
     first_init
     $@
