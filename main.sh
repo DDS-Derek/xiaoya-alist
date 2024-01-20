@@ -1346,18 +1346,7 @@ function main_portainer(){
 
 }
 
-function change_container_name(){
-
-    INFO "请输入新的容器名称"
-    read -ep "Container name:" container_name
-    [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
-    echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
-    clear
-    container_name_settings
-
-}
-
-function container_name_settings(){
+function init_container_name(){
 
     if [ ! -d ${DDSREM_CONFIG_DIR}/container_name ]; then
         mkdir -p ${DDSREM_CONFIG_DIR}/container_name
@@ -1404,6 +1393,23 @@ function container_name_settings(){
         echo 'portainer' > ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt
         portainer_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
     fi
+
+}
+
+function change_container_name(){
+
+    INFO "请输入新的容器名称"
+    read -ep "Container name:" container_name
+    [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
+    echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
+    clear
+    container_name_settings
+
+}
+
+function container_name_settings(){
+
+    init_container_name
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}容器名称设置${Font}\n"
@@ -1542,6 +1548,8 @@ fi
 if [ -f /xiaoya_alist_media_dir.txt ]; then
     mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
 fi
+
+init_container_name
 
 if [ ! $@ ]; then
     main
