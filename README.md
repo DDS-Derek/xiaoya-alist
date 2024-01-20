@@ -10,6 +10,16 @@
 bash -c "$(curl -sL https://ddsrem.com/xiaoya_install.sh)"
 ```
 
+**备用地址**
+
+```shell
+bash -c "$(curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+```
+
+```shell
+bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
+```
+
 ## Address
 
 https://hub.docker.com/r/ddsderek/xiaoya-emby-library
