@@ -1357,6 +1357,12 @@ function main_advanced_configuration(){
 
 }
 
+function main_portainer(){
+
+TODO
+
+}
+
 function main_return(){
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
     echo -e "1、安装/更新/卸载 小雅Alist"
@@ -1364,10 +1370,11 @@ function main_return(){
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox"
     echo -e "5、安装/更新/卸载 Onelist"
-    echo -e "6、高级配置"
-    echo -e "7、退出脚本"
+    echo -e "6、安装/更新/卸载 Portainer"
+    echo -e "7、高级配置"
+    echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-7]:" num
+    read -ep "请输入数字 [1-8]:" num
     case "$num" in
         1)
         clear
@@ -1391,15 +1398,19 @@ function main_return(){
         ;;
         6)
         clear
-        main_advanced_configuration
+        main_portainer
         ;;
         7)
+        clear
+        main_advanced_configuration
+        ;;
+        8)
         clear
         exit 0
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-7]'
+        ERROR '请输入正确数字 [1-8]'
         main_return
         ;;
         esac
@@ -1411,4 +1422,8 @@ function main(){
     main_return
 }
 
-main
+if [ ! $@ ]; then
+    main
+else
+    $@
+fi
