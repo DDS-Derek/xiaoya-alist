@@ -1231,6 +1231,121 @@ function main_onelist(){
 
 }
 
+function install_portainer(){
+
+    if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
+        INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
+    else
+        INFO "请输入配置文件目录（默认 /etc/portainer ）"
+        read -ep "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/portainer"
+        touch ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
+        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
+    fi
+
+    INFO "请输入后台HTTP管理端口（默认 9000 ）"
+    read -ep "HTTP_PORT:" HTTP_PORT
+    [[ -z "${HTTP_PORT}" ]] && HTTP_PORT="9000"
+
+    INFO "请输入后台HTTP管理端口（默认 9443 ）"
+    read -ep "HTTPS_PORT:" HTTPS_PORT
+    [[ -z "${HTTPS_PORT}" ]] && HTTPS_PORT="9443"
+
+    INFO "请输入镜像TAG（默认 latest ）"
+    read -ep "TAG:" TAG
+    [[ -z "${TAG}" ]] && TAG="latest"
+
+    docker run -itd \
+        -p ${HTTPS_PORT}:9443 \
+        -p ${HTTP_PORT}:9000 \
+        --name $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt) \
+        -e TZ=Asia/Shanghai \
+        --restart=always \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v ${CONFIG_DIR}:/data \
+        portainer/portainer-ce:${TAG}
+
+    INFO "安装完成！"
+
+}
+
+function update_portainer(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始更新Portainer${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
+    docker rmi containrrr/watchtower:latest
+    INFO "更新成功！"
+
+}
+
+function uninstall_portainer(){
+
+    for i in `seq -w 3 -1 0`
+    do
+        echo -en "即将开始卸载Portainer${Blue} $i ${Font}\r"  
+    sleep 1;
+    done
+    docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
+    docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
+    docker rmi msterzhang/onelist:latest
+    if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
+        rm -rf ${OLD_CONFIG_DIR}
+    fi
+    INFO "卸载成功！"
+
+}
+
+function main_portainer(){
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Portainer${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "4、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-4]:" num
+    case "$num" in
+        1)
+        clear
+        install_portainer
+        ;;
+        2)
+        clear
+        update_portainer
+        ;;
+        3)
+        clear
+        uninstall_portainer
+        ;;
+        4)
+        clear
+        main_return
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-4]'
+        main_portainer
+        ;;
+        esac
+
+}
+
 function change_container_name(){
 
     INFO "请输入新的容器名称"
@@ -1283,6 +1398,13 @@ function container_name_settings(){
         xiaoya_onelist_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
     fi
 
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt ]; then
+        portainer_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
+    else
+        echo 'portainer' > ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt
+        portainer_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
+    fi
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}容器名称设置${Font}\n"
     echo -e "1、更改 小雅 容器名（当前：${Green}${xiaoya_alist_name}${Font}）"
@@ -1290,9 +1412,10 @@ function container_name_settings(){
     echo -e "3、更改 Resilio 容器名（当前：${Green}${xiaoya_resilio_name}${Font}）"
     echo -e "4、更改 小雅Alist-TVBox 容器名（当前：${Green}${xiaoya_tvbox_name}${Font}）"
     echo -e "5、更改 Onelist 容器名（当前：${Green}${xiaoya_onelist_name}${Font}）"
-    echo -e "6、返回上级"
+    echo -e "6、更改 Portainer 容器名（当前：${Green}${portainer_name}${Font}）"
+    echo -e "7、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-6]:" num
+    read -ep "请输入数字 [1-7]:" num
     case "$num" in
         1)
         change_container_name "xiaoya_alist_name"
@@ -1310,12 +1433,15 @@ function container_name_settings(){
         change_container_name "xiaoya_onelist_name"
         ;;
         6)
+        change_container_name "portainer_name"
+        ;;
+        7)
         clear
         main_advanced_configuration
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-6]'
+        ERROR '请输入正确数字 [1-7]'
         container_name_settings
         ;;
         esac
@@ -1345,12 +1471,6 @@ function main_advanced_configuration(){
         main_advanced_configuration
         ;;
         esac
-
-}
-
-function main_portainer(){
-
-TODO
 
 }
 
