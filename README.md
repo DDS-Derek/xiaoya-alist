@@ -22,11 +22,11 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 ## Address
 
-https://hub.docker.com/r/ddsderek/xiaoya-emby-library
+[https://hub.docker.com/r/ddsderek/xiaoya-emby-library](https://hub.docker.com/r/ddsderek/xiaoya-emby-library)
 
-https://hub.docker.com/r/ddsderek/xiaoya-glue
+[https://hub.docker.com/r/ddsderek/xiaoya-glue](https://hub.docker.com/r/ddsderek/xiaoya-glue)
 
-https://github.com/DDS-Derek/xiaoya-alist
+[https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
 
 ## Star History
 
