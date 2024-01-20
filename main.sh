@@ -494,6 +494,7 @@ function install_emby_embyserver(){
                 ${MOUNT} \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
+                --privileged=true \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -508,6 +509,7 @@ function install_emby_embyserver(){
                 ${MOUNT} \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
+                --privileged=true \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -535,6 +537,7 @@ function install_amilys_embyserver(){
                 ${MOUNT} \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
+                --privileged=true \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
