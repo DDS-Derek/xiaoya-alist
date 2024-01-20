@@ -62,15 +62,6 @@ echo -e "${WARN} ${1}"
 
 DDSREM_CONFIG_DIR=/etc/DDSRem
 
-if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
-    mkdir -p ${DDSREM_CONFIG_DIR}
-fi
-
-# Fix https://github.com/DDS-Derek/xiaoya-alist/commit/a246bc582393b618b564e3beca2b9e1d40800a5d 中media目录保存错误
-if [ -f /xiaoya_alist_media_dir.txt ]; then
-    mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
-fi
-
 function root_need(){
     if [[ $EUID -ne 0 ]]; then
         ERRO '此脚本必须以 root 身份运行！'
@@ -1417,10 +1408,20 @@ function main_return(){
 }
 
 function main(){
-    root_need
     clear
     main_return
 }
+
+root_need
+
+if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
+    mkdir -p ${DDSREM_CONFIG_DIR}
+fi
+
+# Fix https://github.com/DDS-Derek/xiaoya-alist/commit/a246bc582393b618b564e3beca2b9e1d40800a5d 中media目录保存错误
+if [ -f /xiaoya_alist_media_dir.txt ]; then
+    mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
+fi
 
 if [ ! $@ ]; then
     main
