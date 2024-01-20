@@ -657,6 +657,12 @@ function install_resilio(){
     read -ep "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
 
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        INFO "请输入其他参数（默认 无 ）"
+        read -ep "Extra parameters:" extra_parameters
+    fi
+
     get_media_dir
 
     INFO "开始安装resilio..."
@@ -670,6 +676,7 @@ function install_resilio(){
         -v ${CONFIG_DIR}:/config \
         -v ${CONFIG_DIR}/downloads:/downloads \
         -v ${MEDIA_DIR}:/sync \
+        ${extra_parameters} \
         --restart=always \
         linuxserver/resilio-sync:latest
 
