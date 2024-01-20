@@ -1459,24 +1459,36 @@ function container_name_settings(){
 
 function main_advanced_configuration(){
 
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}高级配置${Font}\n"
     echo -e "1、容器名称设置"
-    echo -e "2、返回上级"
+    echo -e "2、是否开启容器运行额外参数添加（当前：${Green}${container_run_extra_parameters}${Font}）"
+    echo -e "3、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-2]:" num
+    read -ep "请输入数字 [1-3]:" num
     case "$num" in
         1)
         clear
         container_name_settings
         ;;
         2)
+        if [ "${container_run_extra_parameters}" == "false" ]; then
+            echo 'true' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
+        else
+            echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
+        fi
+        clear
+        main_advanced_configuration
+        ;;
+        3)
         clear
         main_return
         ;;
         *)
         clear
-        ERROR '请输入正确数字 [1-2]'
+        ERROR '请输入正确数字 [1-3]'
         main_advanced_configuration
         ;;
         esac
@@ -1568,6 +1580,10 @@ function first_init(){
         mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
     fi
     init_container_name
+
+    if [ ! -f ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt ]; then
+        echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
+    fi
 
 }
 
