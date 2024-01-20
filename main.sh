@@ -1538,21 +1538,26 @@ function main(){
     main_return
 }
 
-root_need
+function first_init(){
 
-if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
-    mkdir -p ${DDSREM_CONFIG_DIR}
-fi
+    root_need
+    if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
+        mkdir -p ${DDSREM_CONFIG_DIR}
+    fi
+    # Fix https://github.com/DDS-Derek/xiaoya-alist/commit/a246bc582393b618b564e3beca2b9e1d40800a5d 中media目录保存错误
+    if [ -f /xiaoya_alist_media_dir.txt ]; then
+        mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
+    fi
+    init_container_name
 
-# Fix https://github.com/DDS-Derek/xiaoya-alist/commit/a246bc582393b618b564e3beca2b9e1d40800a5d 中media目录保存错误
-if [ -f /xiaoya_alist_media_dir.txt ]; then
-    mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
-fi
-
-init_container_name
+}
 
 if [ ! $@ ]; then
+    first_init
     main
+elif [ "$@" == test ]; then
+    INFO "Test"
 else
+    first_init
     $@
 fi
