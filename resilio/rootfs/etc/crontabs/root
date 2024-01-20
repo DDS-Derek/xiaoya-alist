@@ -1,0 +1,2 @@
+# min   hour    day     month   weekday command
+0       6       */3     *       *       bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s /sync
