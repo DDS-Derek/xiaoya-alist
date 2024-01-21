@@ -516,6 +516,46 @@ function download_xiaoya_emby(){
 
 }
 
+function unzip_xiaoya_emby(){
+
+    get_config_dir
+
+    get_media_dir
+
+    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+	free_size=$((free_size))
+    free_size_G=$((free_size/1024/1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+	mkdir -p ${MEDIA_DIR}/xiaoya
+	mkdir -p ${MEDIA_DIR}/config
+	chmod 755 ${MEDIA_DIR}
+	chown root:root ${MEDIA_DIR}
+
+    INFO "开始下载 ${1} ..."
+
+    docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+
+    if [ "${1}" == "config.mp4" ]; then
+        extra_parameters="--workdir=/media"
+
+        pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
+
+        INFO "设置目录权限..."
+        chmod 777 ${MEDIA_DIR}/config
+    else
+        extra_parameters="--workdir=/media/xiaoya"
+
+        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1}
+
+        INFO "设置目录权限..."
+        chmod 777 ${MEDIA_DIR}/xiaoya
+    fi
+
+    INFO "下载完成！"
+
+}
+
 function main_download_unzip_xiaoya_emby(){
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -546,7 +586,7 @@ function main_download_unzip_xiaoya_emby(){
         ;;
         4)
         clear
-        TODO
+        unzip_xiaoya_emby "all.mp4"
         ;;
         5)
         clear
@@ -554,7 +594,7 @@ function main_download_unzip_xiaoya_emby(){
         ;;
         6)
         clear
-        TODO
+        unzip_xiaoya_emby "config.mp4"
         ;;
         7)
         clear
@@ -562,7 +602,7 @@ function main_download_unzip_xiaoya_emby(){
         ;;
         8)
         clear
-        TODO
+        unzip_xiaoya_emby "pikpak.mp4"
         ;;
         9)
         clear
