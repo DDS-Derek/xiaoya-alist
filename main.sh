@@ -349,6 +349,7 @@ function pull_run_glue(){
         --net=host \
         -v ${MEDIA_DIR}:/media \
         -v ${CONFIG_DIR}:/etc/xiaoya \
+        ${extra_parameters} \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest \
         ${@}
@@ -373,6 +374,7 @@ function pull_run_ddsderek_glue(){
         --net=host \
         -v ${MEDIA_DIR}:/media \
         -v ${CONFIG_DIR}:/etc/xiaoya \
+        ${extra_parameters} \
         -e LANG=C.UTF-8 \
         ddsderek/xiaoya-glue:latest \
         ${@}
@@ -477,6 +479,105 @@ function unzip_xiaoya_all_emby(){
     chmod -R 777 ${MEDIA_DIR}
 
     INFO "解压完成！"
+
+}
+
+function download_xiaoya_emby(){
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p ${MEDIA_DIR}/temp
+    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+	free_size=$((free_size))
+    free_size_G=$((free_size/1024/1024))
+    if [ "$free_size" -le 63886080  ]; then
+        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+        exit 1
+    else
+        INFO "磁盘容量：${free_size_G}G"
+    fi    
+	mkdir -p ${MEDIA_DIR}/xiaoya
+	mkdir -p ${MEDIA_DIR}/config
+	chmod 755 ${MEDIA_DIR}
+	chown root:root ${MEDIA_DIR}
+
+    INFO "开始下载 ${1} ..."
+
+    docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+
+    extra_parameters="--workdir=/media/temp"
+
+    pull_run_glue aria2c -o ${1} --auto-file-renaming=false -c -x6 "${docker_addr}/d/元数据/${1}"
+
+    INFO "设置目录权限..."
+    chmod 777 ${MEDIA_DIR}/temp/${1}
+
+    INFO "下载完成！"
+
+}
+
+function main_download_unzip_xiaoya_emby(){
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}下载/解压 元数据${Font}\n"
+    echo -e "1、下载并解压 全部元数据"
+    echo -e "2、解压 全部元数据"
+    echo -e "3、下载 all.pm4"
+    echo -e "4、解压 all.pm4"
+    echo -e "5、下载 config.pm4"
+    echo -e "6、解压 config.pm4"
+    echo -e "7、下载 pikpak.mp4"
+    echo -e "8、解压 pikpak.mp4"
+    echo -e "9、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -ep "请输入数字 [1-9]:" num
+    case "$num" in
+        1)
+        clear
+        download_unzip_xiaoya_all_emby
+        ;;
+        2)
+        clear
+        unzip_xiaoya_all_emby
+        ;;
+        3)
+        clear
+        download_xiaoya_emby "all.mp4"
+        ;;
+        4)
+        clear
+        TODO
+        ;;
+        5)
+        clear
+        download_xiaoya_emby "config.pm4"
+        ;;
+        6)
+        clear
+        TODO
+        ;;
+        7)
+        clear
+        download_xiaoya_emby "pikpak.mp4"
+        ;;
+        8)
+        clear
+        TODO
+        ;;
+        9)
+        clear
+        main_xiaoya_all_emby
+        ;;
+        *)
+        clear
+        ERROR '请输入正确数字 [1-9]'
+        main_download_unzip_xiaoya_emby
+        ;;
+        esac
 
 }
 
@@ -888,16 +989,15 @@ function main_xiaoya_all_emby(){
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Emby全家桶${Font}\n"
     echo -e "1、一键安装Emby全家桶"
-    echo -e "2、下载解压元数据"
-    echo -e "3、解压元数据"
-    echo -e "4、安装Emby（可选择版本）"
-    echo -e "5、替换DOCKER_ADDRESS（已弃用）"
-    echo -e "6、安装/卸载 自动同步Emby数据库"
-    echo -e "7、安装/更新/卸载 Resilio-Sync"
-    echo -e "8、卸载Emby全家桶"
-    echo -e "9、返回上级"
+    echo -e "2、下载/解压 元数据"
+    echo -e "3、安装Emby（可选择版本）"
+    echo -e "4、替换DOCKER_ADDRESS（已弃用）"
+    echo -e "5、安装/卸载 自动同步Emby数据库"
+    echo -e "6、安装/更新/卸载 Resilio-Sync"
+    echo -e "7、卸载Emby全家桶"
+    echo -e "8、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-9]:" num
+    read -ep "请输入数字 [1-8]:" num
     case "$num" in
         1)
         clear
@@ -906,34 +1006,30 @@ function main_xiaoya_all_emby(){
         ;;
         2)
         clear
-        download_unzip_xiaoya_all_emby
+        main_download_unzip_xiaoya_emby
         ;;
         3)
-        clear
-        unzip_xiaoya_all_emby
-        ;;
-        4)
         clear
         get_media_dir
         install_emby_xiaoya_all_emby
         ;;
-        5)
+        4)
         clear
         docker_address_xiaoya_all_emby
         ;;
-        6)
+        5)
         clear
         main_emby_library
         ;;
-        7)
+        6)
         clear
         main_resilio
         ;;
-        8)
+        7)
         clear
         uninstall_xiaoya_all_emby
         ;;
-        9)
+        8)
         clear
         main_return
         ;;
