@@ -532,7 +532,7 @@ function unzip_xiaoya_emby(){
 	chmod 755 ${MEDIA_DIR}
 	chown root:root ${MEDIA_DIR}
 
-    INFO "开始下载 ${1} ..."
+    INFO "开始解压 ${1} ..."
 
     docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
 
@@ -552,7 +552,7 @@ function unzip_xiaoya_emby(){
         chmod 777 ${MEDIA_DIR}/xiaoya
     fi
 
-    INFO "下载完成！"
+    INFO "解压完成！"
 
 }
 
