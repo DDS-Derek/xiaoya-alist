@@ -34,6 +34,10 @@
 #
 # bash -c "$(curl http://docker.xiaoya.pro/emby.sh)" -s /媒体库目录
 #
+# bash -c "$(curl http://docker.xiaoya.pro/resilio.sh)" -s /媒体库目录
+#
+# 0 6 * * * bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s /媒体库目录
+#
 # ——————————————————————————————————————————————————————————————————————————————————
 #
 # The functions that the script can call are 'INFO' 'WARN' 'ERROR'
