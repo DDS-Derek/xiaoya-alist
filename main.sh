@@ -825,10 +825,10 @@ function install_resilio(){
 
     if command -v crontab >/dev/null 2>&1; then
         crontab -l |grep -v sync_emby_config > /tmp/cronjob.tmp
-        echo -e "0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config_test.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" >> /tmp/cronjob.tmp
+        echo -e "0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config_test.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" >> /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
         INFO '已经添加下面的记录到crontab定时任务，每三天更新一次config'
-        INFO "0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config_test.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+        INFO "0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config_test.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         rm -rf /tmp/cronjob.tmp
     fi
 
