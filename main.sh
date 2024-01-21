@@ -494,12 +494,8 @@ function download_xiaoya_emby(){
     free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
 	free_size=$((free_size))
     free_size_G=$((free_size/1024/1024))
-    if [ "$free_size" -le 63886080  ]; then
-        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
-        exit 1
-    else
-        INFO "磁盘容量：${free_size_G}G"
-    fi    
+    INFO "磁盘容量：${free_size_G}G"
+
 	mkdir -p ${MEDIA_DIR}/xiaoya
 	mkdir -p ${MEDIA_DIR}/config
 	chmod 755 ${MEDIA_DIR}
@@ -554,7 +550,7 @@ function main_download_unzip_xiaoya_emby(){
         ;;
         5)
         clear
-        download_xiaoya_emby "config.pm4"
+        download_xiaoya_emby "config.mp4"
         ;;
         6)
         clear
