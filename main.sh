@@ -351,7 +351,7 @@ function pull_run_glue(){
         -v ${CONFIG_DIR}:/etc/xiaoya \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest \
-        ${1}
+        ${@}
 
     docker rmi xiaoyaliu/glue:latest
 
@@ -375,7 +375,7 @@ function pull_run_ddsderek_glue(){
         -v ${CONFIG_DIR}:/etc/xiaoya \
         -e LANG=C.UTF-8 \
         ddsderek/xiaoya-glue:latest \
-        ${1}
+        ${@}
 
     docker rmi ddsderek/xiaoya-glue:latest
 
