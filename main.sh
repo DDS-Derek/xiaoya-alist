@@ -44,7 +44,12 @@
 #                 INFO function use(log output): INFO "xxxx"
 #                 WARN function use(log output): WARN "xxxx"
 #                 ERROR function use(log output): ERROR "xxxx"
-
+#
+# ——————————————————————————————————————————————————————————————————————————————————
+#
+DATE_VERSION="v1.0.0-2024_01_26_18_21"
+#
+# ——————————————————————————————————————————————————————————————————————————————————
 
 Blue="\033[34m"
 Green="\033[32m"
@@ -1537,7 +1542,7 @@ function main_advanced_configuration(){
 }
 
 function main_return(){
-    curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
+    curl -sL https://ddsrem.com/xiaoya/xiaoya_alist | sed "s/DATE_VERSION/${DATE_VERSION}/g"
     echo -e "1、安装/更新/卸载 小雅Alist"
     echo -e "2、安装/卸载 小雅Emby全家桶"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
