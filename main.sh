@@ -47,7 +47,7 @@
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.0-2024_01_26_20_24"
+DATE_VERSION="v1.0.0-2024_01_26_22_07"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1102,7 +1102,7 @@ function install_xiaoya_alist_tvbox(){
         -v ${CONFIG_DIR}:/data \
         ${MOUNT} \
         --restart=always \
-        --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt) \
+        --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt) \
         haroldli/xiaoya-tvbox:latest
 
     INFO "安装完成！"
