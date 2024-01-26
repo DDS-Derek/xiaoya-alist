@@ -1552,14 +1552,14 @@ function main_advanced_configuration(){
 }
 
 function main_return(){
-    curl -sL https://ddsrem.com/xiaoya/xiaoya_alist | sed "s/DATE_VERSION/${DATE_VERSION}/g"
+    curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
     echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container ${xiaoya_alist_name})"
     echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container ${xiaoya_emby_name})"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）   当前状态：$(judgment_container xiaoyakeeper)"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container ${xiaoya_tvbox_name})"
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container ${xiaoya_onelist_name})"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container ${portainer_name})"
-    echo -e "7、高级配置"
+    echo -e "7、高级配置 | Script info: ${DATE_VERSION};$(uname -s)"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -ep "请输入数字 [1-8]:" num
