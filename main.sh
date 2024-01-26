@@ -636,6 +636,7 @@ function install_emby_embyserver(){
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -651,6 +652,7 @@ function install_emby_embyserver(){
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -679,6 +681,7 @@ function install_amilys_embyserver(){
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -715,6 +718,12 @@ function install_emby_xiaoya_all_emby(){
         xiaoya_host="127.0.0.1"
     else
         xiaoya_host=$(grep xiaoya.host /etc/hosts |awk '{print $1}' |head -n1)	
+    fi
+
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        INFO "请输入其他参数（默认 无 ）"
+        read -ep "Extra parameters:" extra_parameters
     fi
 
     if [ "$1" == "official" ]; then
