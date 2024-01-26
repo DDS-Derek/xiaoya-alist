@@ -47,7 +47,7 @@
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.0-2024_01_26_18_21"
+DATE_VERSION="v1.0.0-2024_01_26_20_19"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1553,12 +1553,12 @@ function judgment_container(){
 
 function main_return(){
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist | sed "s/DATE_VERSION/${DATE_VERSION}/g"
-    echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container $(xiaoya_alist_name))"
-    echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container $(xiaoya_emby_name))"
+    echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container ${xiaoya_alist_name})"
+    echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container ${xiaoya_emby_name})"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）"
-    echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container $(xiaoya_tvbox_name))"
-    echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container $(xiaoya_onelist_name))"
-    echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container $(portainer_name))"
+    echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container ${xiaoya_tvbox_name})"
+    echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container ${xiaoya_onelist_name})"
+    echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container ${portainer_name})"
     echo -e "7、高级配置"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
