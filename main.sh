@@ -274,6 +274,11 @@ function update_xiaoya_alist(){
 }
 
 function uninstall_xiaoya_alist(){
+
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -ep "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in `seq -w 3 -1 0`
     do
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"  
@@ -286,9 +291,12 @@ function uninstall_xiaoya_alist(){
     elif docker inspect xiaoyaliu/alist:hostmode >/dev/null 2>&1; then
         docker rmi xiaoyaliu/alist:hostmode
     fi
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-        rm -rf ${OLD_CONFIG_DIR}
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            rm -rf ${OLD_CONFIG_DIR}
+        fi
     fi
     INFO "卸载成功！"
 }
@@ -774,6 +782,10 @@ function docker_address_xiaoya_all_emby(){
 
 function uninstall_xiaoya_all_emby(){
 
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -ep "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in `seq -w 3 -1 0`
     do
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"  
@@ -794,9 +806,12 @@ function uninstall_xiaoya_all_emby(){
             docker rmi emby/embyserver_arm64v8:4.8.0.56
         ;;
     esac
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
-        OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
-        rm -rf ${OLD_MEDIA_DIR}
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+            OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
+            rm -rf ${OLD_MEDIA_DIR}
+        fi
     fi
     INFO "卸载成功！"
 
@@ -1130,6 +1145,10 @@ function update_xiaoya_alist_tvbox(){
 
 function uninstall_xiaoya_alist_tvbox(){
 
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -ep "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in `seq -w 3 -1 0`
     do
         echo -en "即将开始卸载小雅Alist-TVBox${Blue} $i ${Font}\r"  
@@ -1138,9 +1157,12 @@ function uninstall_xiaoya_alist_tvbox(){
     docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
     docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)
     docker rmi haroldli/xiaoya-tvbox:latest
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
-        rm -rf ${OLD_CONFIG_DIR}
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
+            rm -rf ${OLD_CONFIG_DIR}
+        fi
     fi
     INFO "卸载成功！"
 
@@ -1238,6 +1260,10 @@ function update_onelist(){
 
 function uninstall_onelist(){
 
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -ep "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in `seq -w 3 -1 0`
     do
         echo -en "即将开始卸载Onelist${Blue} $i ${Font}\r"  
@@ -1246,9 +1272,12 @@ function uninstall_onelist(){
     docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
     docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)
     docker rmi msterzhang/onelist:latest
-    if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
-        rm -rf ${OLD_CONFIG_DIR}
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
+            rm -rf ${OLD_CONFIG_DIR}
+        fi
     fi
     INFO "卸载成功！"
 
@@ -1353,6 +1382,10 @@ function update_portainer(){
 
 function uninstall_portainer(){
 
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -ep "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in `seq -w 3 -1 0`
     do
         echo -en "即将开始卸载Portainer${Blue} $i ${Font}\r"  
@@ -1361,9 +1394,12 @@ function uninstall_portainer(){
     docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
     docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
     docker rmi msterzhang/onelist:latest
-    if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
-        rm -rf ${OLD_CONFIG_DIR}
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
+            rm -rf ${OLD_CONFIG_DIR}
+        fi
     fi
     INFO "卸载成功！"
 
