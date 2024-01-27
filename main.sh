@@ -47,7 +47,7 @@
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.2-2024_01_27_11_01"
+DATE_VERSION="v1.0.3-2024_01_27_11_44"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1589,7 +1589,9 @@ function main_advanced_configuration(){
 
 function main_return(){
 
-    if [ $(uname -s) == "Darwin" ]; then
+    _os=$(uname -s)
+    _os_all=$(uname -a)
+    if [ ${_os} == "Darwin" ]; then
         OSNAME='macos'
     elif [ -f /etc/synoinfo.conf ]; then
         OSNAME='synology'
@@ -1599,7 +1601,7 @@ function main_return(){
         OSNAME='qnap'
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
-    elif echo -e $(uname -a) | grep -Eqi "UnRaid"; then
+    elif echo -e ${_os_all} | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
@@ -1635,7 +1637,7 @@ function main_return(){
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container ${xiaoya_tvbox_name})"
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container ${xiaoya_onelist_name})"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container ${portainer_name})"
-    echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; $(uname -s) ; ${OSNAME}"
+    echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; ${_os} ; ${OSNAME}"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -ep "请输入数字 [1-8]:" num
