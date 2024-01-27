@@ -1740,8 +1740,12 @@ function main_advanced_configuration() {
 function main_return() {
 
     get_os
-
-    curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
+    
+    if ! curl -sL https://ddsrem.com/xiaoya/xiaoya_alist; then
+        if ! curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist; then
+            curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist
+        fi
+    fi
 
     echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container "${xiaoya_alist_name}")"
     echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container "${xiaoya_emby_name}")"
