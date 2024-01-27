@@ -254,14 +254,14 @@ function install_xiaoya_alist() {
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
                 --network=host \
-                -v "${CONFIG_DIR}":/data \
+                -v "${CONFIG_DIR}:/data" \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
         else
             docker run -itd \
                 --network=host \
-                -v "${CONFIG_DIR}":/data \
+                -v "${CONFIG_DIR}:/data" \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
@@ -281,7 +281,7 @@ function install_xiaoya_alist() {
                 --env HTTP_PROXY="$proxy_url" \
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
-                -v "${CONFIG_DIR}":/data \
+                -v "${CONFIG_DIR}:/data" \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
@@ -290,7 +290,7 @@ function install_xiaoya_alist() {
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
-                -v "${CONFIG_DIR}":/data \
+                -v "${CONFIG_DIR}:/data" \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
@@ -413,16 +413,28 @@ function pull_run_glue() {
         fi
     fi
 
-    docker run -it \
-        --security-opt seccomp=unconfined \
-        --rm \
-        --net=host \
-        -v "${MEDIA_DIR}":/media \
-        -v "${CONFIG_DIR}":/etc/xiaoya \
-        "${extra_parameters}" \
-        -e LANG=C.UTF-8 \
-        xiaoyaliu/glue:latest \
-        "${@}"
+    if [ -n "${extra_parameters}" ]; then
+        docker run -it \
+            --security-opt seccomp=unconfined \
+            --rm \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            "${extra_parameters}" \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}"
+    else
+        docker run -it \
+            --security-opt seccomp=unconfined \
+            --rm \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}"
+    fi
 
     docker rmi xiaoyaliu/glue:latest
 
@@ -438,16 +450,28 @@ function pull_run_ddsderek_glue() {
         fi
     fi
 
-    docker run -it \
-        --security-opt seccomp=unconfined \
-        --rm \
-        --net=host \
-        -v "${MEDIA_DIR}":/media \
-        -v "${CONFIG_DIR}":/etc/xiaoya \
-        "${extra_parameters}" \
-        -e LANG=C.UTF-8 \
-        ddsderek/xiaoya-glue:latest \
-        "${@}"
+    if [ -n "${extra_parameters}" ]; then
+        docker run -it \
+            --security-opt seccomp=unconfined \
+            --rm \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            "${extra_parameters}" \
+            -e LANG=C.UTF-8 \
+            ddsderek/xiaoya-glue:latest \
+            "${@}"
+    else
+        docker run -it \
+            --security-opt seccomp=unconfined \
+            --rm \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            -e LANG=C.UTF-8 \
+            ddsderek/xiaoya-glue:latest \
+            "${@}"
+    fi
 
     docker rmi ddsderek/xiaoya-glue:latest
 
@@ -474,8 +498,8 @@ function download_unzip_xiaoya_all_emby() {
 
     test_xiaoya_status
 
-    mkdir -p "${MEDIA_DIR}"/temp
-    rm -rf "${MEDIA_DIR}"/config
+    mkdir -p "${MEDIA_DIR}/temp"
+    rm -rf "${MEDIA_DIR}/config"
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
     free_size=$((free_size))
     free_size_G=$((free_size / 1024 / 1024))
@@ -485,8 +509,8 @@ function download_unzip_xiaoya_all_emby() {
     else
         INFO "磁盘容量：${free_size_G}G"
     fi
-    mkdir -p "${MEDIA_DIR}"/xiaoya
-    mkdir -p "${MEDIA_DIR}"/config
+    mkdir -p "${MEDIA_DIR}/xiaoya"
+    mkdir -p "${MEDIA_DIR}/config"
     chmod 755 "${MEDIA_DIR}"
     chown root:root "${MEDIA_DIR}"
 
@@ -693,36 +717,64 @@ function install_emby_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        docker run -itd \
-            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -v "${MEDIA_DIR}"/config:/config \
-            -v "${MEDIA_DIR}"/xiaoya:/media \
-            -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-            "${MOUNT}" \
-            --add-host="xiaoya.host:$xiaoya_host" \
-            --net=host \
-            --privileged=true \
-            "${extra_parameters}" \
-            -e PUID=0 \
-            -e PGID=0 \
-            --restart=always \
-            emby/embyserver:4.8.0.56
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                "${extra_parameters}" \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver:4.8.0.56
+        else
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver:4.8.0.56
+        fi
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        docker run -itd \
-            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -v "${MEDIA_DIR}"/config:/config \
-            -v "${MEDIA_DIR}"/xiaoya:/media \
-            -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-            "${MOUNT}" \
-            --add-host="xiaoya.host:$xiaoya_host" \
-            --net=host \
-            --privileged=true \
-            "${extra_parameters}" \
-            -e PUID=0 \
-            -e PGID=0 \
-            --restart=always \
-            emby/embyserver_arm64v8:4.8.0.56
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                "${extra_parameters}" \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver_arm64v8:4.8.0.56
+        else
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                emby/embyserver_arm64v8:4.8.0.56
+        fi
         ;;
     *)
         ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
@@ -738,20 +790,34 @@ function install_amilys_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        docker run -itd \
-            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -v "${MEDIA_DIR}"/config:/config \
-            -v "${MEDIA_DIR}"/xiaoya:/media \
-            -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-            "${MOUNT}" \
-            --add-host="xiaoya.host:$xiaoya_host" \
-            --net=host \
-            --privileged=true \
-            "${extra_parameters}" \
-            -e PUID=0 \
-            -e PGID=0 \
-            --restart=always \
-            amilys/embyserver:4.8.0.56
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                "${extra_parameters}" \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                amilys/embyserver:4.8.0.56
+        else
+            docker run -itd \
+                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                --net=host \
+                --privileged=true \
+                -e PUID=0 \
+                -e PGID=0 \
+                --restart=always \
+                amilys/embyserver:4.8.0.56
+        fi
         ;;
     *)
         ERROR "目前只支持amd64架构，你的架构是：$cpu_arch"
@@ -894,19 +960,34 @@ function install_resilio() {
     fi
 
     INFO "开始安装resilio..."
-    docker run -d \
-        --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
-        -e PUID=0 \
-        -e PGID=0 \
-        -e TZ=Asia/Shanghai \
-        -p "${HT_PORT}":8888 \
-        -p 55555:55555 \
-        -v "${CONFIG_DIR}":/config \
-        -v "${CONFIG_DIR}"/downloads:/downloads \
-        -v "${MEDIA_DIR}":/sync \
-        "${extra_parameters}" \
-        --restart=always \
-        linuxserver/resilio-sync:latest
+    if [ -n "${extra_parameters}" ]; then
+        docker run -d \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
+            -e PUID=0 \
+            -e PGID=0 \
+            -e TZ=Asia/Shanghai \
+            -p "${HT_PORT}":8888 \
+            -p 55555:55555 \
+            -v "${CONFIG_DIR}:/config" \
+            -v "${CONFIG_DIR}/downloads:/downloads" \
+            -v "${MEDIA_DIR}:/sync" \
+            "${extra_parameters}" \
+            --restart=always \
+            linuxserver/resilio-sync:latest
+    else
+        docker run -d \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
+            -e PUID=0 \
+            -e PGID=0 \
+            -e TZ=Asia/Shanghai \
+            -p "${HT_PORT}":8888 \
+            -p 55555:55555 \
+            -v "${CONFIG_DIR}:/config" \
+            -v "${CONFIG_DIR}/downloads:/downloads" \
+            -v "${MEDIA_DIR}:/sync" \
+            --restart=always \
+            linuxserver/resilio-sync:latest
+    fi
 
     CRON="0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> ${CONFIG_DIR}/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
@@ -1145,16 +1226,12 @@ function install_xiaoya_alist_tvbox() {
     read -erp "MEM_OPT:" MEM_OPT
     [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
 
-    INFO "请输入其他挂载参数（默认 无 ）"
-    read -erp "MOUNT:" MOUNT
-
     docker run -itd \
         -p "${HT_PORT}":4567 \
         -p "${ALIST_PORT}":80 \
         -e ALIST_PORT="${ALIST_PORT}" \
         -e MEM_OPT="${MEM_OPT}" \
-        -v "${CONFIG_DIR}":/data \
-        "${MOUNT}" \
+        -v "${CONFIG_DIR}:/data" \
         --restart=always \
         --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
         haroldli/xiaoya-tvbox:latest
@@ -1267,7 +1344,7 @@ function install_onelist() {
         -e PGID=0 \
         -e UMASK=022 \
         -e TZ=Asia/Shanghai \
-        -v "${CONFIG_DIR}":/config \
+        -v "${CONFIG_DIR}:/config" \
         --restart=always \
         --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)" \
         msterzhang/onelist:latest
@@ -1389,7 +1466,7 @@ function install_portainer() {
         -e TZ=Asia/Shanghai \
         --restart=always \
         -v /var/run/docker.sock:/var/run/docker.sock \
-        -v "${CONFIG_DIR}":/data \
+        -v "${CONFIG_DIR}:/data" \
         portainer/portainer-ce:"${TAG}"
 
     INFO "安装完成！"
