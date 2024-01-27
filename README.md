@@ -27,7 +27,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 **普通功能**
 
-```
+```shell
 安装 小雅Alist -> 11
 更新 小雅Alist -> 12
 卸载 小雅Alist -> 13
@@ -51,7 +51,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 **高级功能**
 
-```
+```shell
 Docker启动容器名称设置 -> 71
 是否开启容器运行额外参数添加 -> 72
 ```
