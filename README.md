@@ -7,6 +7,7 @@
 - [使用](#使用)
 - [功能列表](#功能列表)
 - [地址](#地址)
+- [免责声明](#免责声明)
 - [Star History](#star-history)
 - [感谢](#感谢)
 
@@ -84,13 +85,20 @@ Docker启动容器名称设置 -> 71
 
 [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
 
+## 免责声明
+
+- 请勿将 小雅系列软件 用于商业用途。
+- 请勿将 小雅系列软件 用于任何违反法律法规的行为。
+- 本仓库所有脚本都基于官方脚本制作，使用请自行承担数据损失但不限于此的风险。
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=DDS-Derek/xiaoya-alist&type=Date)](https://star-history.com/#DDS-Derek/xiaoya-alist)
 
 ## 感谢
 
-- xiaoyaLiu
+- [xiaoyaLiu](http://alist.xiaoya.pro/)
 - heiheigui
+- [alist-tvbox](https://github.com/power721/alist-tvbox)
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
