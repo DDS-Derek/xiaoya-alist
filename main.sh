@@ -1597,6 +1597,10 @@ function main_return(){
         OSNAME='openwrt'
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
+    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        OSNAME='openmediavault'
+    elif echo -e $(uname -a) | grep -Eqi "UnRaid"; then
+        OSNAME='unraid'
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
     elif grep -Eqi "FreeBSD" /etc/*-release; then
@@ -1617,10 +1621,8 @@ function main_return(){
         OSNAME='debian'
     elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
         OSNAME='ubuntu'
-    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
-        OSNAME='openmediavault'
-    elif echo -e $(uname -a) | grep -Eqi "UnRaid"; then
-        OSNAME='unraid'
+    elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
+        OSNAME='alpine'
     else
         OSNAME='unknow'
     fi
