@@ -38,7 +38,14 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 更新 小雅Alist -> 12
 卸载 小雅Alist -> 13
 一键安装 Emby全家桶 -> 21
-单独 下载/解压元数据 -> 22
+单独 下载并解压 全部元数据 -> 221
+单独 解压 全部元数据 -> 222
+单独 下载 all.mp4 -> 223
+单独 解压 all.mp4 -> 224
+单独 下载 config.mp4 -> 225
+单独 解压 config.mp4 -> 226
+单独 下载 pikpak.mp4 -> 227
+单独 解压 pikpak.mp4 -> 228
 单独 安装Emby（可选择版本）-> 23
 单独 安装/更新/卸载Resilio-Sync -> 25
 卸载 Emby全家桶 -> 26
