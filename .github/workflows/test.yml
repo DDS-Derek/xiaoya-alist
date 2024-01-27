@@ -37,8 +37,11 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
 
-      - name: shfmt
+      - name: Prepare
         run: |
             wget https://github.com/mvdan/sh/releases/download/v3.3.1/shfmt_v3.3.1_linux_amd64 -O ./shfmt
             chmod +x shfmt
+
+      - name: shfmt
+        run: |
             ./shfmt -d -i 4 -sr main.sh
