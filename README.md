@@ -35,10 +35,15 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 **普通功能**
 
 ```shell
+———————————————————————————————————————安装———————————————————————————————————————
 安装 小雅Alist -> 11
-更新 小雅Alist -> 12
-卸载 小雅Alist -> 13
-一键安装 Emby全家桶 -> 21
+安装 小雅Alist-TVBox -> 41
+安装/更新 小雅助手（xiaoyahelper）-> 31
+安装 Onelist -> 51
+安装 Portainer -> 61
+安装 Emby全家桶（一键） -> 21
+安装 Resilio-Sync（单独） -> 251
+————————————————————————————————手动全家桶配置————————————————————————————————————
 单独 下载并解压 全部元数据 -> 221
 单独 解压 全部元数据 -> 222
 单独 下载 all.mp4 -> 223
@@ -48,18 +53,19 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 单独 下载 pikpak.mp4 -> 227
 单独 解压 pikpak.mp4 -> 228
 单独 安装Emby（可选择版本）-> 23
-单独 安装/更新/卸载Resilio-Sync -> 25
-卸载 Emby全家桶 -> 26
-安装/更新 小雅助手（xiaoyahelper）-> 31
-卸载 小雅助手（xiaoyahelper）-> 32
-安装 小雅Alist-TVBox -> 41
+———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 42
-卸载 小雅Alist-TVBox -> 43
-安装 Onelist -> 51
+更新 小雅Alist -> 12
+更新 Resilio-Sync（单独） -> 252
 更新 Onelist -> 52
-卸载 Onelist -> 53
-安装 Portainer -> 61
 更新 Portainer -> 62
+———————————————————————————————————————卸载———————————————————————————————————————
+卸载 小雅Alist -> 13
+卸载 Emby全家桶 -> 26
+卸载 Resilio-Sync（单独） -> 253
+卸载 小雅助手（xiaoyahelper）-> 32
+卸载 小雅Alist-TVBox -> 43
+卸载 Onelist -> 53
 卸载 Portainer -> 63
 ```
 
