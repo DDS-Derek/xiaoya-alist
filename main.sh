@@ -1226,15 +1226,34 @@ function install_xiaoya_alist_tvbox() {
     read -erp "MEM_OPT:" MEM_OPT
     [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
 
-    docker run -itd \
-        -p "${HT_PORT}":4567 \
-        -p "${ALIST_PORT}":80 \
-        -e ALIST_PORT="${ALIST_PORT}" \
-        -e MEM_OPT="${MEM_OPT}" \
-        -v "${CONFIG_DIR}:/data" \
-        --restart=always \
-        --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
-        haroldli/xiaoya-tvbox:latest
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        INFO "请输入其他参数（默认 无 ）"
+        read -erp "Extra parameters:" extra_parameters
+    fi
+
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            -p "${HT_PORT}":4567 \
+            -p "${ALIST_PORT}":80 \
+            -e ALIST_PORT="${ALIST_PORT}" \
+            -e MEM_OPT="${MEM_OPT}" \
+            -v "${CONFIG_DIR}:/data" \
+            "${extra_parameters}" \
+            --restart=always \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
+            haroldli/xiaoya-tvbox:latest
+    else
+        docker run -itd \
+            -p "${HT_PORT}":4567 \
+            -p "${ALIST_PORT}":80 \
+            -e ALIST_PORT="${ALIST_PORT}" \
+            -e MEM_OPT="${MEM_OPT}" \
+            -v "${CONFIG_DIR}:/data" \
+            --restart=always \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
+            haroldli/xiaoya-tvbox:latest
+    fi
 
     INFO "安装完成！"
 
@@ -1503,7 +1522,7 @@ function uninstall_portainer() {
     done
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)"
-    docker rmi msterzhang/onelist:latest
+    docker image rm "$(docker image ls --filter=reference="portainer/portainer-ce" -q)"
     if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
