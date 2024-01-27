@@ -1735,10 +1735,10 @@ function first_init(){
 
 }
 
-if [ ! "$@" ]; then
+if [ ! "$*" ]; then
     first_init
     main
-elif [ "$@" == test ]; then
+elif [ "$*" == test ]; then
     INFO "Test"
     ci_test
 else
