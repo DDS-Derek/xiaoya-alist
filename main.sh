@@ -1106,7 +1106,7 @@ function main_xiaoya_all_emby() {
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
-    echo -e "5、安装/更新/卸载 Resilio-Sync"
+    echo -e "5、安装/更新/卸载 Resilio-Sync   当前状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、卸载Emby全家桶"
     echo -e "7、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
