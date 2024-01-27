@@ -836,8 +836,8 @@ function uninstall_xiaoya_all_emby(){
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"  
     sleep 1;
     done
-	docker stop $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
-	docker rm $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+	docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+	docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
     cpu_arch=$(uname -m)
     case $cpu_arch in
         "x86_64" | *"amd64"*)
