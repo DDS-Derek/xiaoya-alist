@@ -28,7 +28,8 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 ## 功能列表
 
-> 数字代表先选x，再选x，再选x 
+> 数字代表先选x，再选x，再选x
+> 
 > PS: 25代表先选2，再选5
 
 **普通功能**
