@@ -1588,14 +1588,52 @@ function main_advanced_configuration(){
 }
 
 function main_return(){
+
+    if [ $(uname -s) == "Darwin" ]; then
+        OSNAME='macos'
+    elif [ -f /etc/synoinfo.conf ]; then
+        OSNAME='synology'
+    elif [ -f /etc/openwrt_release ]; then
+        OSNAME='openwrt'
+    elif grep -Eqi "QNAP" /etc/issue; then
+        OSNAME='qnap'
+    elif grep -Eqi "openSUSE" /etc/*-release; then
+        OSNAME='opensuse'
+    elif grep -Eqi "FreeBSD" /etc/*-release; then
+        OSNAME='freebsd'
+    elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+        OSNAME='euler'
+    elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+        OSNAME='amazon'
+    elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
+        OSNAME='debian'
+    elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
+        OSNAME='ubuntu'
+    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        OSNAME='openmediavault'
+    elif echo -e $(uname -a) | grep -Eqi "UnRaid"; then
+        OSNAME='unraid'
+    else
+        OSNAME='unknow'
+    fi
+
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
+
     echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container ${xiaoya_alist_name})"
     echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container ${xiaoya_emby_name})"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）   当前状态：$(judgment_container xiaoyakeeper)"
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container ${xiaoya_tvbox_name})"
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container ${xiaoya_onelist_name})"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container ${portainer_name})"
-    echo -e "7、高级配置 | Script info: ${DATE_VERSION};$(uname -s)"
+    echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; $(uname -s) ; ${OSNAME}"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -ep "请输入数字 [1-8]:" num
