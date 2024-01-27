@@ -4,6 +4,12 @@
 
 ![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/image-1.png)
 
+- [Use](#use)
+- [功能列表](#功能列表)
+- [Address](#address)
+- [Star History](#star-history)
+- [Thanks](#thanks)
+
 ## Use
 
 ```shell
