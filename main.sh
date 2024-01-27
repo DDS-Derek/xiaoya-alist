@@ -1740,7 +1740,7 @@ function main_advanced_configuration() {
 function main_return() {
 
     get_os
-    
+
     if ! curl -sL https://ddsrem.com/xiaoya/xiaoya_alist; then
         if ! curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist; then
             curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist
