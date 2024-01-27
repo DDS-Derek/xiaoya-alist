@@ -15,4 +15,5 @@ jobs:
 
       - name: Test
         run: |
+            shellcheck main.sh
             bash main.sh test
