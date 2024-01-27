@@ -4,13 +4,13 @@
 
 ![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/image-1.png)
 
-- [Use](#use)
+- [使用](#使用)
 - [功能列表](#功能列表)
-- [Address](#address)
+- [地址](#地址)
 - [Star History](#star-history)
-- [Thanks](#thanks)
+- [感谢](#感谢)
 
-## Use
+## 使用
 
 ```shell
 bash -c "$(curl -sL https://ddsrem.com/xiaoya_install.sh)"
@@ -76,7 +76,7 @@ Docker启动容器名称设置 -> 71
 是否开启容器运行额外参数添加 -> 72
 ```
 
-## Address
+## 地址
 
 [https://hub.docker.com/r/ddsderek/xiaoya-emby-library](https://hub.docker.com/r/ddsderek/xiaoya-emby-library)
 
@@ -88,6 +88,9 @@ Docker启动容器名称设置 -> 71
 
 [![Star History Chart](https://api.star-history.com/svg?repos=DDS-Derek/xiaoya-alist&type=Date)](https://star-history.com/#DDS-Derek/xiaoya-alist)
 
-## Thanks
+## 感谢
+
+- xiaoyaLiu
+- heiheigui
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
