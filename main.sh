@@ -179,19 +179,19 @@ function install_xiaoya_alist(){
 
     get_config_dir
 
-    if [ ! -d ${CONFIG_DIR} ]; then
-        mkdir -p ${CONFIG_DIR}
+    if [ ! -d "${CONFIG_DIR}" ]; then
+        mkdir -p "${CONFIG_DIR}"
     else
-        if [ -d ${CONFIG_DIR}/mytoken.txt ]; then
-            rm -rf ${CONFIG_DIR}/mytoken.txt
+        if [ -d "${CONFIG_DIR}"/mytoken.txt ]; then
+            rm -rf "${CONFIG_DIR}"/mytoken.txt
         fi
     fi
 
-    touch ${CONFIG_DIR}/mytoken.txt
-    touch ${CONFIG_DIR}/myopentoken.txt
-    touch ${CONFIG_DIR}/temp_transfer_folder_id.txt
+    touch "${CONFIG_DIR}"/mytoken.txt
+    touch "${CONFIG_DIR}"/myopentoken.txt
+    touch "${CONFIG_DIR}"/temp_transfer_folder_id.txt
 
-    mytokenfilesize=$(cat ${CONFIG_DIR}/mytoken.txt)
+    mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
     mytokenstringsize=${#mytokenfilesize}
     if [ "$mytokenstringsize" -le 31 ]; then
         INFO "输入你的阿里云盘 Token（32位长）"
@@ -202,11 +202,11 @@ function install_xiaoya_alist(){
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo "$token" > ${CONFIG_DIR}/mytoken.txt
+            echo "$token" > "${CONFIG_DIR}"/mytoken.txt
         fi
     fi
 
-    myopentokenfilesize=$(cat ${CONFIG_DIR}/myopentoken.txt)
+    myopentokenfilesize=$(cat "${CONFIG_DIR}"/myopentoken.txt)
     myopentokenstringsize=${#myopentokenfilesize}
     if [ "$myopentokenstringsize" -le 279 ]; then
         INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
@@ -217,11 +217,11 @@ function install_xiaoya_alist(){
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo "$opentoken" > ${CONFIG_DIR}/myopentoken.txt
+            echo "$opentoken" > "${CONFIG_DIR}"/myopentoken.txt
         fi
     fi
 
-    folderidfilesize=$(cat ${CONFIG_DIR}/temp_transfer_folder_id.txt)
+    folderidfilesize=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
     folderidstringsize=${#folderidfilesize}
     if [ "$folderidstringsize" -le 39 ]; then
         INFO "输入你的阿里云盘转存目录folder id"
@@ -232,48 +232,48 @@ function install_xiaoya_alist(){
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo "$folderid" > ${CONFIG_DIR}/temp_transfer_folder_id.txt
+            echo "$folderid" > "${CONFIG_DIR}"/temp_transfer_folder_id.txt
         fi
     fi
 
-    localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:" | head -n1 | cut -f1 -d"/")
+    localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' |  sed 's/addr://' | head -n1 | cut -f1 -d"/")
     INFO "本地IP：${localip}"
 
     INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
     read -erp "NET_MODE:" NET_MODE
     [[ -z "${NET_MODE}" ]] && NET_MODE="n"
     if [[ ${NET_MODE} == [Yy] ]]; then
-        if [ ! -s ${CONFIG_DIR}/docker_address.txt ]; then
-            echo "http://$localip:5678" > ${CONFIG_DIR}/docker_address.txt
+        if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
+            echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
         fi
         docker pull xiaoyaliu/alist:hostmode
         if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
-            proxy_url=$(head -n1 ${CONFIG_DIR}/proxy.txt)
+            proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
             docker run -itd \
                 --env HTTP_PROXY="$proxy_url" \
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
                 --network=host \
-                -v ${CONFIG_DIR}:/data \
+                -v "${CONFIG_DIR}":/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
         else
             docker run -itd \
                 --network=host \
-                -v ${CONFIG_DIR}:/data \
+                -v "${CONFIG_DIR}":/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
         fi
     fi
     if [[ ${NET_MODE} == [Nn] ]]; then
-        if [ ! -s ${CONFIG_DIR}/docker_address.txt ]; then
-                echo "http://$localip:5678" > ${CONFIG_DIR}/docker_address.txt
+        if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
+                echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
         fi
         docker pull xiaoyaliu/alist:latest
         if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
-            proxy_url=$(head -n1 ${CONFIG_DIR}/proxy.txt)
+            proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
             docker run -itd \
                 -p 5678:80 \
                 -p 2345:2345 \
@@ -281,7 +281,7 @@ function install_xiaoya_alist(){
                 --env HTTP_PROXY="$proxy_url" \
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
-                -v ${CONFIG_DIR}:/data \
+                -v "${CONFIG_DIR}":/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
@@ -290,7 +290,7 @@ function install_xiaoya_alist(){
                 -p 5678:80 \
                 -p 2345:2345 \
                 -p 2346:2346 \
-                -v ${CONFIG_DIR}:/data \
+                -v "${CONFIG_DIR}":/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
@@ -302,7 +302,7 @@ function install_xiaoya_alist(){
 
 function update_xiaoya_alist(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始更新小雅Alist${Blue} $i ${Font}\r"  
     sleep 1;
@@ -324,7 +324,7 @@ function uninstall_xiaoya_alist(){
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"  
     sleep 1;
@@ -340,7 +340,7 @@ function uninstall_xiaoya_alist(){
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-            rm -rf ${OLD_CONFIG_DIR}
+            rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
     INFO "卸载成功！"
@@ -384,8 +384,8 @@ function main_xiaoya_alist(){
 
 function test_xiaoya_status(){
 
-    if [ -s ${CONFIG_DIR}/docker_address.txt ]; then
-        docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+    if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
+        docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
     else
         ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
         exit 1
@@ -458,13 +458,13 @@ function pull_run_ddsderek_glue(){
 function set_emby_server_infuse_api_key(){
 
     if command -v ifconfig >/dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | grep "inet " |awk '{print $2}'|tr -d "addr:" |head -n1)
+        docker0=$(ifconfig docker0 | grep "inet " |awk '{print $2}'| sed 's/addr://' |head -n1)
     else
-        docker0=$(ip addr show docker0 |grep "inet " |awk '{print $2}'|tr -d "addr:" |head -n1|cut -f1 -d/)
+        docker0=$(ip addr show docker0 |grep "inet " |awk '{print $2}'| sed 's/addr://' |head -n1|cut -f1 -d/)
     fi
 
-    echo "http://$docker0:6908" > ${CONFIG_DIR}/emby_server.txt
-    echo "e825ed6f7f8f44ffa0563cddaddce14d" > ${CONFIG_DIR}/infuse_api_key.txt
+    echo "http://$docker0:6908" > "${CONFIG_DIR}"/emby_server.txt
+    echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
 
 }
 
@@ -476,9 +476,9 @@ function download_unzip_xiaoya_all_emby(){
 
     test_xiaoya_status
 
-    mkdir -p ${MEDIA_DIR}/temp
-	rm -rf ${MEDIA_DIR}/config
-    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+    mkdir -p "${MEDIA_DIR}"/temp
+	rm -rf "${MEDIA_DIR}"/config
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
 	free_size=$((free_size))
     free_size_G=$((free_size/1024/1024))
     if [ "$free_size" -le 63886080  ]; then
@@ -487,15 +487,15 @@ function download_unzip_xiaoya_all_emby(){
     else
         INFO "磁盘容量：${free_size_G}G"
     fi
-	mkdir -p ${MEDIA_DIR}/xiaoya
-	mkdir -p ${MEDIA_DIR}/config
-	chmod 755 ${MEDIA_DIR}
-	chown root:root ${MEDIA_DIR}
+	mkdir -p "${MEDIA_DIR}"/xiaoya
+	mkdir -p "${MEDIA_DIR}"/config
+	chmod 755 "${MEDIA_DIR}"
+	chown root:root "${MEDIA_DIR}"
 
 	if command -v ifconfig >/dev/null 2>&1; then
-		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1)
+		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' |  sed 's/addr://' | head -n1)
 	else
-		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1 | cut -f1 -d/)
+		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' |  sed 's/addr://' | head -n1 | cut -f1 -d/)
 	fi
 
     INFO "开始下载解压..."
@@ -505,7 +505,7 @@ function download_unzip_xiaoya_all_emby(){
     set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
-    chmod -R 777 ${MEDIA_DIR}
+    chmod -R 777 "${MEDIA_DIR}"
 
     INFO "下载解压完成！"
 
@@ -519,9 +519,9 @@ function unzip_xiaoya_all_emby(){
 
     test_xiaoya_status
 
-    mkdir -p ${MEDIA_DIR}/temp
-	rm -rf ${MEDIA_DIR}/config
-    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+    mkdir -p "${MEDIA_DIR}"/temp
+	rm -rf "${MEDIA_DIR}"/config
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
 	free_size=$((free_size))
     free_size_G=$((free_size/1024/1024))
     if [ "$free_size" -le 63886080  ]; then
@@ -530,15 +530,15 @@ function unzip_xiaoya_all_emby(){
     else
         INFO "磁盘容量：${free_size_G}G"
     fi
-	mkdir -p ${MEDIA_DIR}/xiaoya
-	mkdir -p ${MEDIA_DIR}/config
-	chmod 755 ${MEDIA_DIR}
-	chown root:root ${MEDIA_DIR}
+	mkdir -p "${MEDIA_DIR}"/xiaoya
+	mkdir -p "${MEDIA_DIR}"/config
+	chmod 755 "${MEDIA_DIR}"
+	chown root:root "${MEDIA_DIR}"
 
 	if command -v ifconfig >/dev/null 2>&1; then
-		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1)
+		docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' |  sed 's/addr://' | head -n1)
 	else
-		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | tr -d "addr:" | head -n1 | cut -f1 -d/)
+		docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' |  sed 's/addr://' | head -n1 | cut -f1 -d/)
 	fi
 
     INFO "开始解压..."
@@ -548,7 +548,7 @@ function unzip_xiaoya_all_emby(){
     set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
-    chmod -R 777 ${MEDIA_DIR}
+    chmod -R 777 "${MEDIA_DIR}"
 
     INFO "解压完成！"
 
@@ -562,27 +562,27 @@ function download_xiaoya_emby(){
 
     test_xiaoya_status
 
-    mkdir -p ${MEDIA_DIR}/temp
-    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+    mkdir -p "${MEDIA_DIR}"/temp
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
 	free_size=$((free_size))
     free_size_G=$((free_size/1024/1024))
     INFO "磁盘容量：${free_size_G}G"
 
-	mkdir -p ${MEDIA_DIR}/xiaoya
-	mkdir -p ${MEDIA_DIR}/config
-	chmod 755 ${MEDIA_DIR}
-	chown root:root ${MEDIA_DIR}
+	mkdir -p "${MEDIA_DIR}"/xiaoya
+	mkdir -p "${MEDIA_DIR}"/config
+	chmod 755 "${MEDIA_DIR}"
+	chown root:root "${MEDIA_DIR}"
 
     INFO "开始下载 ${1} ..."
 
-    docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+    docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
 
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue aria2c -o ${1} --auto-file-renaming=false -c -x6 "${docker_addr}/d/元数据/${1}"
+    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false -c -x6 "${docker_addr}/d/元数据/${1}"
 
     INFO "设置目录权限..."
-    chmod 777 ${MEDIA_DIR}/temp/${1}
+    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
 
     INFO "下载完成！"
 
@@ -594,19 +594,19 @@ function unzip_xiaoya_emby(){
 
     get_media_dir
 
-    free_size=$(df -P ${MEDIA_DIR} | tail -n1 | awk '{print $4}')
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
 	free_size=$((free_size))
     free_size_G=$((free_size/1024/1024))
     INFO "磁盘容量：${free_size_G}G"
 
-	mkdir -p ${MEDIA_DIR}/xiaoya
-	mkdir -p ${MEDIA_DIR}/config
-	chmod 755 ${MEDIA_DIR}
-	chown root:root ${MEDIA_DIR}
+	mkdir -p "${MEDIA_DIR}"/xiaoya
+	mkdir -p "${MEDIA_DIR}"/config
+	chmod 755 "${MEDIA_DIR}"
+	chown root:root "${MEDIA_DIR}"
 
     INFO "开始解压 ${1} ..."
 
-    docker_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+    docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
 
     if [ "${1}" == "config.mp4" ]; then
         extra_parameters="--workdir=/media"
@@ -614,14 +614,14 @@ function unzip_xiaoya_emby(){
         pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
 
         INFO "设置目录权限..."
-        chmod 777 ${MEDIA_DIR}/config
+        chmod 777 "${MEDIA_DIR}"/config
     else
         extra_parameters="--workdir=/media/xiaoya"
 
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1}
+        pull_run_glue 7z x -aoa -mmt=16 /media/temp/"${1}"
 
         INFO "设置目录权限..."
-        chmod 777 ${MEDIA_DIR}/xiaoya
+        chmod 777 "${MEDIA_DIR}"/xiaoya
     fi
 
     INFO "解压完成！"
@@ -697,14 +697,14 @@ function install_emby_embyserver(){
         "x86_64" | *"amd64"*)
             docker run -itd \
                 --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v ${MEDIA_DIR}/config:/config \
-                -v ${MEDIA_DIR}/xiaoya:/media \
+                -v "${MEDIA_DIR}"/config:/config \
+                -v "${MEDIA_DIR}"/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                ${MOUNT} \
+                "${MOUNT}" \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                ${extra_parameters} \
+                "${extra_parameters}" \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -713,14 +713,14 @@ function install_emby_embyserver(){
         "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
             docker run -itd \
                 --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v ${MEDIA_DIR}/config:/config \
-                -v ${MEDIA_DIR}/xiaoya:/media \
+                -v "${MEDIA_DIR}"/config:/config \
+                -v "${MEDIA_DIR}"/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                ${MOUNT} \
+                "${MOUNT}" \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                ${extra_parameters} \
+                "${extra_parameters}" \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -742,14 +742,14 @@ function install_amilys_embyserver(){
         "x86_64" | *"amd64"*)
             docker run -itd \
                 --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v ${MEDIA_DIR}/config:/config \
-                -v ${MEDIA_DIR}/xiaoya:/media \
+                -v "${MEDIA_DIR}"/config:/config \
+                -v "${MEDIA_DIR}"/xiaoya:/media \
                 -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                ${MOUNT} \
+                "${MOUNT}" \
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                ${extra_parameters} \
+                "${extra_parameters}" \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -831,7 +831,7 @@ function uninstall_xiaoya_all_emby(){
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"  
     sleep 1;
@@ -855,7 +855,7 @@ function uninstall_xiaoya_all_emby(){
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
             OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
-            rm -rf ${OLD_MEDIA_DIR}
+            rm -rf "${OLD_MEDIA_DIR}"
         fi
     fi
     INFO "卸载成功！"
@@ -869,13 +869,13 @@ function install_resilio(){
         INFO "已读取Resilio-Sync配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/xiaoya/resilio ）"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya/resilio"
         touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     fi
 
     INFO "请输入后台管理端口（默认 8888 ）"
@@ -890,10 +890,10 @@ function install_resilio(){
 
     get_media_dir
 
-    if [ ! -d ${MEDIA_DIR}/config_sync ]; then
-        mkdir -p ${MEDIA_DIR}/config_sync
-        chmod 777 ${MEDIA_DIR}/config_sync
-        cp -r ${MEDIA_DIR}/config/* ${MEDIA_DIR}/config_sync/
+    if [ ! -d "${MEDIA_DIR}"/config_sync ]; then
+        mkdir -p "${MEDIA_DIR}"/config_sync
+        chmod 777 "${MEDIA_DIR}"/config_sync
+        cp -r "${MEDIA_DIR}"/config/* "${MEDIA_DIR}"/config_sync/
     fi
 
     INFO "开始安装resilio..."
@@ -902,12 +902,12 @@ function install_resilio(){
         -e PUID=0 \
         -e PGID=0 \
         -e TZ=Asia/Shanghai \
-        -p ${HT_PORT}:8888 \
+        -p "${HT_PORT}":8888 \
         -p 55555:55555 \
-        -v ${CONFIG_DIR}:/config \
-        -v ${CONFIG_DIR}/downloads:/downloads \
-        -v ${MEDIA_DIR}:/sync \
-        ${extra_parameters} \
+        -v "${CONFIG_DIR}":/config \
+        -v "${CONFIG_DIR}"/downloads:/downloads \
+        -v "${MEDIA_DIR}":/sync \
+        "${extra_parameters}" \
         --restart=always \
         linuxserver/resilio-sync:latest
 
@@ -927,7 +927,7 @@ function install_resilio(){
 
 function update_resilio(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始更新Resilio-Sync${Blue} $i ${Font}\r"  
     sleep 1;
@@ -946,7 +946,7 @@ function update_resilio(){
 
 function unisntall_resilio(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载Resilio-Sync${Blue} $i ${Font}\r"  
     sleep 1;
@@ -956,7 +956,7 @@ function unisntall_resilio(){
     docker rmi linuxserver/resilio-sync:latest
     if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
-        rm -rf ${OLD_CONFIG_DIR}
+        rm -rf "${OLD_CONFIG_DIR}"
     fi
     crontab -l > /tmp/cronjob.tmp
     grep -n "sync_emby_config" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
@@ -1067,10 +1067,10 @@ function install_xiaoyahelper() {
     read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s ${MODE} -tg
+        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s "${MODE}" -tg
     fi
     if [[ ${TG} == [Nn] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s ${MODE}
+        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s "${MODE}"
     fi
     INFO "安装完成！"
 
@@ -1078,7 +1078,7 @@ function install_xiaoyahelper() {
 
 function uninstall_xiaoyahelper() {
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载小雅助手（xiaoyahelper）${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1130,13 +1130,13 @@ function install_xiaoya_alist_tvbox(){
         INFO "已读取小雅Alist-TVBox配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
     fi
 
     INFO "请输入Alist端口（默认 5344 ）"
@@ -1155,12 +1155,12 @@ function install_xiaoya_alist_tvbox(){
     read -erp "MOUNT:" MOUNT
 
     docker run -itd \
-        -p ${HT_PORT}:4567 \
-        -p ${ALIST_PORT}:80 \
-        -e ALIST_PORT=${ALIST_PORT} \
+        -p "${HT_PORT}":4567 \
+        -p "${ALIST_PORT}":80 \
+        -e ALIST_PORT="${ALIST_PORT}" \
         -e MEM_OPT="${MEM_OPT}" \
-        -v ${CONFIG_DIR}:/data \
-        ${MOUNT} \
+        -v "${CONFIG_DIR}":/data \
+        "${MOUNT}" \
         --restart=always \
         --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
         haroldli/xiaoya-tvbox:latest
@@ -1171,7 +1171,7 @@ function install_xiaoya_alist_tvbox(){
 
 function update_xiaoya_alist_tvbox(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始更新小雅Alist-TVBox${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1194,7 +1194,7 @@ function uninstall_xiaoya_alist_tvbox(){
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载小雅Alist-TVBox${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1206,7 +1206,7 @@ function uninstall_xiaoya_alist_tvbox(){
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
-            rm -rf ${OLD_CONFIG_DIR}
+            rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
     INFO "卸载成功！"
@@ -1256,13 +1256,13 @@ function install_onelist(){
         INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/onelist ）"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/onelist"
         touch ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
     fi
 
     INFO "请输入后台管理端口（默认 5245 ）"
@@ -1270,12 +1270,12 @@ function install_onelist(){
     [[ -z "${HT_PORT}" ]] && HT_PORT="5245"
 
     docker run -itd \
-        -p ${HT_PORT}:5245 \
+        -p "${HT_PORT}":5245 \
         -e PUID=0 \
         -e PGID=0 \
         -e UMASK=022 \
         -e TZ=Asia/Shanghai \
-        -v ${CONFIG_DIR}:/config \
+        -v "${CONFIG_DIR}":/config \
         --restart=always \
         --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)" \
         msterzhang/onelist:latest
@@ -1286,7 +1286,7 @@ function install_onelist(){
 
 function update_onelist(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始更新Onelist${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1309,7 +1309,7 @@ function uninstall_onelist(){
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载Onelist${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1321,7 +1321,7 @@ function uninstall_onelist(){
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
-            rm -rf ${OLD_CONFIG_DIR}
+            rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
     INFO "卸载成功！"
@@ -1371,13 +1371,13 @@ function install_portainer(){
         INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/portainer ）"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/portainer"
         touch ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
     fi
 
     INFO "请输入后台HTTP管理端口（默认 9000 ）"
@@ -1393,14 +1393,14 @@ function install_portainer(){
     [[ -z "${TAG}" ]] && TAG="latest"
 
     docker run -itd \
-        -p ${HTTPS_PORT}:9443 \
-        -p ${HTTP_PORT}:9000 \
+        -p "${HTTPS_PORT}":9443 \
+        -p "${HTTP_PORT}":9000 \
         --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)" \
         -e TZ=Asia/Shanghai \
         --restart=always \
         -v /var/run/docker.sock:/var/run/docker.sock \
-        -v ${CONFIG_DIR}:/data \
-        portainer/portainer-ce:${TAG}
+        -v "${CONFIG_DIR}":/data \
+        portainer/portainer-ce:"${TAG}"
 
     INFO "安装完成！"
 
@@ -1408,7 +1408,7 @@ function install_portainer(){
 
 function update_portainer(){
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始更新Portainer${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1431,7 +1431,7 @@ function uninstall_portainer(){
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
-    for i in `seq -w 3 -1 0`
+    for i in $(seq -w 3 -1 0)
     do
         echo -en "即将开始卸载Portainer${Blue} $i ${Font}\r"  
     sleep 1;
@@ -1443,7 +1443,7 @@ function uninstall_portainer(){
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
-            rm -rf ${OLD_CONFIG_DIR}
+            rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
     INFO "卸载成功！"
@@ -1540,8 +1540,8 @@ function change_container_name(){
 
     INFO "请输入新的容器名称"
     read -erp "Container name:" container_name
-    [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
-    echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
+    [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/"${1}".txt)
+    echo "${container_name}" > ${DDSREM_CONFIG_DIR}/container_name/"${1}".txt
     clear
     container_name_settings
 
@@ -1638,12 +1638,12 @@ function main_return(){
 
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
 
-    echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container ${xiaoya_alist_name})"
-    echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container ${xiaoya_emby_name})"
+    echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container "${xiaoya_alist_name}")"
+    echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container "${xiaoya_emby_name}")"
     echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）   当前状态：$(judgment_container xiaoyakeeper)"
-    echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container ${xiaoya_tvbox_name})"
-    echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container ${xiaoya_onelist_name})"
-    echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container ${portainer_name})"
+    echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container "${xiaoya_tvbox_name}")"
+    echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container "${xiaoya_onelist_name}")"
+    echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; ${_os} ; ${OSNAME}"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
