@@ -48,7 +48,7 @@
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.5-2024_01_27_17_58"
+DATE_VERSION="v1.0.6-2024_01_27_21_25"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1115,6 +1115,7 @@ function main_xiaoya_all_emby() {
         clear
         download_unzip_xiaoya_all_emby
         install_emby_xiaoya_all_emby "official"
+        install_resilio
         ;;
     2)
         clear
