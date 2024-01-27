@@ -78,6 +78,50 @@ function root_need(){
     fi
 }
 
+function get_os(){
+
+    _os=$(uname -s)
+    _os_all=$(uname -a)
+    if [ ${_os} == "Darwin" ]; then
+        OSNAME='macos'
+    elif [ -f /etc/synoinfo.conf ]; then
+        OSNAME='synology'
+    elif [ -f /etc/openwrt_release ]; then
+        OSNAME='openwrt'
+    elif grep -Eqi "QNAP" /etc/issue; then
+        OSNAME='qnap'
+    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        OSNAME='openmediavault'
+    elif echo -e ${_os_all} | grep -Eqi "UnRaid"; then
+        OSNAME='unraid'
+    elif grep -Eqi "openSUSE" /etc/*-release; then
+        OSNAME='opensuse'
+    elif grep -Eqi "FreeBSD" /etc/*-release; then
+        OSNAME='freebsd'
+    elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+        OSNAME='euler'
+    elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+        OSNAME='rhel'
+    elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+        OSNAME='amazon'
+    elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
+        OSNAME='debian'
+    elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
+        OSNAME='ubuntu'
+    elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
+        OSNAME='alpine'
+    else
+        OSNAME='unknow'
+    fi
+
+}
+
 function TODO(){
     WARN "此功能未完成，请耐心等待开发者开发"
 }
@@ -1589,45 +1633,7 @@ function main_advanced_configuration(){
 
 function main_return(){
 
-    _os=$(uname -s)
-    _os_all=$(uname -a)
-    if [ ${_os} == "Darwin" ]; then
-        OSNAME='macos'
-    elif [ -f /etc/synoinfo.conf ]; then
-        OSNAME='synology'
-    elif [ -f /etc/openwrt_release ]; then
-        OSNAME='openwrt'
-    elif grep -Eqi "QNAP" /etc/issue; then
-        OSNAME='qnap'
-    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
-        OSNAME='openmediavault'
-    elif echo -e ${_os_all} | grep -Eqi "UnRaid"; then
-        OSNAME='unraid'
-    elif grep -Eqi "openSUSE" /etc/*-release; then
-        OSNAME='opensuse'
-    elif grep -Eqi "FreeBSD" /etc/*-release; then
-        OSNAME='freebsd'
-    elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
-        OSNAME='euler'
-    elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
-        OSNAME='rhel'
-    elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-        OSNAME='rhel'
-    elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-        OSNAME='rhel'
-    elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-        OSNAME='rhel'
-    elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
-        OSNAME='amazon'
-    elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
-        OSNAME='debian'
-    elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
-        OSNAME='ubuntu'
-    elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
-        OSNAME='alpine'
-    else
-        OSNAME='unknow'
-    fi
+    get_os
 
     curl -sL https://ddsrem.com/xiaoya/xiaoya_alist
 
