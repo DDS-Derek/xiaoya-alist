@@ -52,6 +52,7 @@ DATE_VERSION="v1.0.6-2024_01_27_21_25"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
+Sky_Blue="\e[36m"
 Blue="\033[34m"
 Green="\033[32m"
 Red="\033[31m"
@@ -1749,7 +1750,7 @@ function main_return() {
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "7、高级配置 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME}"
-    echo -e "8、退出脚本 | Docker version: $(docker -v | sed "s/Docker version //g")"
+    echo -e "8、退出脚本 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1) | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [1-8]:" num
     case "$num" in
