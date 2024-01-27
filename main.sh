@@ -83,7 +83,7 @@ function get_os(){
 
     _os=$(uname -s)
     _os_all=$(uname -a)
-    if [ ${_os} == "Darwin" ]; then
+    if [ "${_os}" == "Darwin" ]; then
         OSNAME='macos'
     elif [ -f /etc/synoinfo.conf ]; then
         OSNAME='synology'
@@ -93,7 +93,7 @@ function get_os(){
         OSNAME='qnap'
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
-    elif echo -e ${_os_all} | grep -Eqi "UnRaid"; then
+    elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
@@ -129,7 +129,7 @@ function TODO(){
 
 function judgment_container(){
 
-    if docker container inspect ${1} >/dev/null 2>&1; then
+    if docker container inspect "${1}" >/dev/null 2>&1; then
         echo -e "${Green}已安装${Font}"
     else
         echo -e "${Red}未安装${Font}"
@@ -142,15 +142,15 @@ function get_config_dir(){
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
-        echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
     fi
 
 }
@@ -160,15 +160,15 @@ function get_media_dir(){
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
         OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
         INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "MEDIA_DIR:" MEDIA_DIR
+        read -erp "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
-        echo ${MEDIA_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
+        echo "${MEDIA_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
     else
         INFO "请输入媒体库目录（默认 /opt/media ）"
-        read -ep "MEDIA_DIR:" MEDIA_DIR
+        read -erp "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/etc/xiaoya"
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
-        echo ${MEDIA_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
+        echo "${MEDIA_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
     fi
 
 }
@@ -193,46 +193,46 @@ function install_xiaoya_alist(){
 
     mytokenfilesize=$(cat ${CONFIG_DIR}/mytoken.txt)
     mytokenstringsize=${#mytokenfilesize}
-    if [ $mytokenstringsize -le 31 ]; then
+    if [ "$mytokenstringsize" -le 31 ]; then
         INFO "输入你的阿里云盘 Token（32位长）"
-        read -ep "TOKEN:" token
+        read -erp "TOKEN:" token
         token_len=${#token}
-        if [ $token_len -ne 32 ]; then
+        if [ "$token_len" -ne 32 ]; then
             ERROR "长度不对,阿里云盘 Token是32位长"
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo $token > ${CONFIG_DIR}/mytoken.txt
+            echo "$token" > ${CONFIG_DIR}/mytoken.txt
         fi
     fi
 
     myopentokenfilesize=$(cat ${CONFIG_DIR}/myopentoken.txt)
     myopentokenstringsize=${#myopentokenfilesize}
-    if [ $myopentokenstringsize -le 279 ]; then
+    if [ "$myopentokenstringsize" -le 279 ]; then
         INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
-        read -ep "OPENTOKEN:" opentoken
+        read -erp "OPENTOKEN:" opentoken
         opentoken_len=${#opentoken}
-        if [[ $opentoken_len -ne 280 ]] && [[ $opentoken_len -ne 335 ]]; then
+        if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
             ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo $opentoken > ${CONFIG_DIR}/myopentoken.txt
+            echo "$opentoken" > ${CONFIG_DIR}/myopentoken.txt
         fi
     fi
 
     folderidfilesize=$(cat ${CONFIG_DIR}/temp_transfer_folder_id.txt)
     folderidstringsize=${#folderidfilesize}
-    if [ $folderidstringsize -le 39 ]; then
+    if [ "$folderidstringsize" -le 39 ]; then
         INFO "输入你的阿里云盘转存目录folder id"
-        read -p "FOLDERID:" folderid
+        read -erp "FOLDERID:" folderid
         folder_id_len=${#folderid}
-        if [ $folder_id_len -ne 40 ]; then
+        if [ "$folder_id_len" -ne 40 ]; then
             ERROR "长度不对,阿里云盘 folder id是40位长"
             ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             exit 1
         else
-            echo $folderid > ${CONFIG_DIR}/temp_transfer_folder_id.txt
+            echo "$folderid" > ${CONFIG_DIR}/temp_transfer_folder_id.txt
         fi
     fi
 
@@ -240,7 +240,7 @@ function install_xiaoya_alist(){
     INFO "本地IP：${localip}"
 
     INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
-    read -ep "NET_MODE:" NET_MODE
+    read -erp "NET_MODE:" NET_MODE
     [[ -z "${NET_MODE}" ]] && NET_MODE="n"
     if [[ ${NET_MODE} == [Yy] ]]; then
         if [ ! -s ${CONFIG_DIR}/docker_address.txt ]; then
@@ -256,14 +256,14 @@ function install_xiaoya_alist(){
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
         else
             docker run -itd \
                 --network=host \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
         fi
     fi
@@ -283,7 +283,7 @@ function install_xiaoya_alist(){
                 --env no_proxy="*.aliyundrive.com" \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
         else
             docker run -itd \
@@ -292,7 +292,7 @@ function install_xiaoya_alist(){
                 -p 2346:2346 \
                 -v ${CONFIG_DIR}:/data \
                 --restart=always \
-                --name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
         fi
     fi
@@ -321,7 +321,7 @@ function update_xiaoya_alist(){
 function uninstall_xiaoya_alist(){
 
     INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
-    read -ep "Clean config:" CLEAN_CONFIG
+    read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in `seq -w 3 -1 0`
@@ -355,7 +355,7 @@ function main_xiaoya_alist(){
     echo -e "3、卸载"
     echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
         1)
         clear
@@ -424,7 +424,7 @@ function pull_run_glue(){
         ${extra_parameters} \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest \
-        ${@}
+        "${@}"
 
     docker rmi xiaoyaliu/glue:latest
 
@@ -449,7 +449,7 @@ function pull_run_ddsderek_glue(){
         ${extra_parameters} \
         -e LANG=C.UTF-8 \
         ddsderek/xiaoya-glue:latest \
-        ${@}
+        "${@}"
 
     docker rmi ddsderek/xiaoya-glue:latest
 
@@ -642,7 +642,7 @@ function main_download_unzip_xiaoya_emby(){
     echo -e "8、解压 pikpak.mp4"
     echo -e "9、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-9]:" num
+    read -erp "请输入数字 [1-9]:" num
     case "$num" in
         1)
         clear
@@ -766,7 +766,7 @@ function install_amilys_embyserver(){
 function choose_emby_image(){
 
     INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver ]（默认 2）"
-    read -ep "IMAGE:" IMAGE
+    read -erp "IMAGE:" IMAGE
     [[ -z "${IMAGE}" ]] && IMAGE="2"
     if [[ ${IMAGE} == [1] ]]; then
         install_amilys_embyserver
@@ -791,7 +791,7 @@ function install_emby_xiaoya_all_emby(){
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         INFO "请输入其他参数（默认 无 ）"
-        read -ep "Extra parameters:" extra_parameters
+        read -erp "Extra parameters:" extra_parameters
     fi
 
     if [ "$1" == "official" ]; then
@@ -828,7 +828,7 @@ function docker_address_xiaoya_all_emby(){
 function uninstall_xiaoya_all_emby(){
 
     INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
-    read -ep "Clean config:" CLEAN_CONFIG
+    read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in `seq -w 3 -1 0`
@@ -867,25 +867,25 @@ function install_resilio(){
     if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
         INFO "已读取Resilio-Sync配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/xiaoya/resilio ）"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya/resilio"
         touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     fi
 
     INFO "请输入后台管理端口（默认 8888 ）"
-    read -ep "HT_PORT:" HT_PORT
+    read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         INFO "请输入其他参数（默认 无 ）"
-        read -ep "Extra parameters:" extra_parameters
+        read -erp "Extra parameters:" extra_parameters
     fi
 
     get_media_dir
@@ -975,7 +975,7 @@ function main_resilio(){
     echo -e "3、卸载"
     echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
         1)
         clear
@@ -1014,7 +1014,7 @@ function main_xiaoya_all_emby(){
     echo -e "6、卸载Emby全家桶"
     echo -e "7、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-7]:" num
+    read -erp "请输入数字 [1-7]:" num
     case "$num" in
         1)
         clear
@@ -1060,11 +1060,11 @@ function install_xiaoyahelper() {
     INFO "小白全部回车即可完成安装！"
 
     INFO "选择模式：模式3（定时运行小雅转存清理并升级小雅镜像）或模式5（只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3）[3/5]（默认 3）"
-    read -ep "MODE:" MODE
+    read -erp "MODE:" MODE
     [[ -z "${MODE}" ]] && MODE="3"
 
     INFO "是否使用Telegram通知 [Y/n]（默认 n 不使用）"
-    read -ep "TG:" TG
+    read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
         bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s ${MODE} -tg
@@ -1098,7 +1098,7 @@ function main_xiaoyahelper(){
     echo -e "2、卸载"
     echo -e "3、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-3]:" num
+    read -erp "请输入数字 [1-3]:" num
     case "$num" in
         1)
         clear
@@ -1128,31 +1128,31 @@ function install_xiaoya_alist_tvbox(){
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
         INFO "已读取小雅Alist-TVBox配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
     fi
 
     INFO "请输入Alist端口（默认 5344 ）"
-    read -ep "ALIST_PORT:" ALIST_PORT
+    read -erp "ALIST_PORT:" ALIST_PORT
     [[ -z "${ALIST_PORT}" ]] && ALIST_PORT="5344"
 
     INFO "请输入后台管理端口（默认 4567 ）"
-    read -ep "HT_PORT:" HT_PORT
+    read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="4567"
 
     INFO "请输入内存限制（默认 -Xmx512M ）"
-    read -ep "MEM_OPT:" MEM_OPT
+    read -erp "MEM_OPT:" MEM_OPT
     [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
 
     INFO "请输入其他挂载参数（默认 无 ）"
-    read -ep "MOUNT:" MOUNT
+    read -erp "MOUNT:" MOUNT
 
     docker run -itd \
         -p ${HT_PORT}:4567 \
@@ -1191,7 +1191,7 @@ function update_xiaoya_alist_tvbox(){
 function uninstall_xiaoya_alist_tvbox(){
 
     INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
-    read -ep "Clean config:" CLEAN_CONFIG
+    read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in `seq -w 3 -1 0`
@@ -1222,7 +1222,7 @@ function main_xiaoya_alist_tvbox(){
     echo -e "3、卸载"
     echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
         1)
         clear
@@ -1254,19 +1254,19 @@ function install_onelist(){
     if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt)
         INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/onelist ）"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/onelist"
         touch ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt
     fi
 
     INFO "请输入后台管理端口（默认 5245 ）"
-    read -ep "HT_PORT:" HT_PORT
+    read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="5245"
 
     docker run -itd \
@@ -1306,7 +1306,7 @@ function update_onelist(){
 function uninstall_onelist(){
 
     INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
-    read -ep "Clean config:" CLEAN_CONFIG
+    read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in `seq -w 3 -1 0`
@@ -1337,7 +1337,7 @@ function main_onelist(){
     echo -e "3、卸载"
     echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
         1)
         clear
@@ -1369,27 +1369,27 @@ function install_portainer(){
     if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
         INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
     else
         INFO "请输入配置文件目录（默认 /etc/portainer ）"
-        read -ep "CONFIG_DIR:" CONFIG_DIR
+        read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/portainer"
         touch ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
         echo ${CONFIG_DIR} > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
     fi
 
     INFO "请输入后台HTTP管理端口（默认 9000 ）"
-    read -ep "HTTP_PORT:" HTTP_PORT
+    read -erp "HTTP_PORT:" HTTP_PORT
     [[ -z "${HTTP_PORT}" ]] && HTTP_PORT="9000"
 
     INFO "请输入后台HTTP管理端口（默认 9443 ）"
-    read -ep "HTTPS_PORT:" HTTPS_PORT
+    read -erp "HTTPS_PORT:" HTTPS_PORT
     [[ -z "${HTTPS_PORT}" ]] && HTTPS_PORT="9443"
 
     INFO "请输入镜像TAG（默认 latest ）"
-    read -ep "TAG:" TAG
+    read -erp "TAG:" TAG
     [[ -z "${TAG}" ]] && TAG="latest"
 
     docker run -itd \
@@ -1428,7 +1428,7 @@ function update_portainer(){
 function uninstall_portainer(){
 
     INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
-    read -ep "Clean config:" CLEAN_CONFIG
+    read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in `seq -w 3 -1 0`
@@ -1459,7 +1459,7 @@ function main_portainer(){
     echo -e "3、卸载"
     echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
         1)
         clear
@@ -1539,7 +1539,7 @@ function init_container_name(){
 function change_container_name(){
 
     INFO "请输入新的容器名称"
-    read -ep "Container name:" container_name
+    read -erp "Container name:" container_name
     [[ -z "${container_name}" ]] && container_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/${1}.txt)
     echo ${container_name} > ${DDSREM_CONFIG_DIR}/container_name/${1}.txt
     clear
@@ -1561,7 +1561,7 @@ function container_name_settings(){
     echo -e "6、更改 Portainer 容器名（当前：${Green}${portainer_name}${Font}）"
     echo -e "7、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-7]:" num
+    read -erp "请输入数字 [1-7]:" num
     case "$num" in
         1)
         change_container_name "xiaoya_alist_name"
@@ -1604,7 +1604,7 @@ function main_advanced_configuration(){
     echo -e "2、是否开启容器运行额外参数添加（当前：${Green}${container_run_extra_parameters}${Font}）"
     echo -e "3、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-3]:" num
+    read -erp "请输入数字 [1-3]:" num
     case "$num" in
         1)
         clear
@@ -1647,7 +1647,7 @@ function main_return(){
     echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; ${_os} ; ${OSNAME}"
     echo -e "8、退出脚本"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -ep "请输入数字 [1-8]:" num
+    read -erp "请输入数字 [1-8]:" num
     case "$num" in
         1)
         clear
@@ -1743,5 +1743,5 @@ elif [ "$@" == test ]; then
     ci_test
 else
     first_init
-    $@
+    "$@"
 fi
