@@ -79,6 +79,25 @@ function root_need() {
     fi
 }
 
+function packages_need() {
+
+    if ! which docker; then
+        ERROR "docker 未安装，请手动安装！"
+        exit 1
+    fi
+
+    if ! which curl; then
+        ERROR "curl 未安装，请手动安装！"
+        exit 1
+    fi
+
+    if ! which wget; then
+        ERROR "wget 未安装，请手动安装！"
+        exit 1
+    fi
+
+}
+
 function get_os() {
 
     _os=$(uname -s)
@@ -1729,7 +1748,7 @@ function main_return() {
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "7、高级配置 | Script info: ${DATE_VERSION} ; ${_os} ; ${OSNAME}"
-    echo -e "8、退出脚本"
+    echo -e "8、退出脚本 | Docker version: $(docker -v | sed "s/Docker version //g")"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [1-8]:" num
     case "$num" in
@@ -1821,11 +1840,13 @@ function first_init() {
 
 if [ ! "$*" ]; then
     first_init
+    packages_need
     main
 elif [ "$*" == test ]; then
     INFO "Test"
     ci_test
 else
     first_init
+    packages_need
     "$@"
 fi
