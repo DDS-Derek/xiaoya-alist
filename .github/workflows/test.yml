@@ -15,5 +15,16 @@ jobs:
 
       - name: Test
         run: |
-            shellcheck main.sh
             bash main.sh test
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    name: Shellcheck
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Shellcheck
+        run: |
+            shellcheck main.sh
