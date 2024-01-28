@@ -101,6 +101,7 @@ function packages_need() {
 
 function get_os() {
 
+    is64bit=$(getconf LONG_BIT)
     _os=$(uname -s)
     _os_all=$(uname -a)
     if [ "${_os}" == "Darwin" ]; then
@@ -1755,7 +1756,7 @@ function main_return() {
     echo -e "4、安装/更新/卸载 小雅Alist-TVBox   当前状态：$(judgment_container "${xiaoya_tvbox_name}")"
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "6、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
-    echo -e "7、高级配置 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME}"
+    echo -e "7、高级配置 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}bit"
     echo -e "8、退出脚本 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1) | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [1-8]:" num
