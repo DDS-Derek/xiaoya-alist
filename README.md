@@ -41,7 +41,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 安装 小雅Alist-TVBox -> 41
 安装/更新 小雅助手（xiaoyahelper）-> 31
 安装 Onelist -> 51
-安装 Portainer -> 61
+安装 Portainer -> 611
 安装 Emby全家桶（一键） -> 21
 安装 Resilio-Sync（单独） -> 251
 ————————————————————————————————手动全家桶配置————————————————————————————————————
@@ -59,7 +59,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 更新 小雅Alist -> 12
 更新 Resilio-Sync（单独） -> 252
 更新 Onelist -> 52
-更新 Portainer -> 62
+更新 Portainer -> 612
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 13
 卸载 Emby全家桶 -> 26
@@ -67,7 +67,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 卸载 小雅助手（xiaoyahelper）-> 32
 卸载 小雅Alist-TVBox -> 43
 卸载 Onelist -> 53
-卸载 Portainer -> 63
+卸载 Portainer -> 613
 ```
 
 **高级功能**
