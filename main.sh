@@ -408,23 +408,46 @@ function main_xiaoya_alist() {
 
 }
 
-function test_xiaoya_status() {
+function get_docker0_url() {
 
-    if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
-        docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
+    if command -v ifconfig >/dev/null 2>&1; then
+        docker0=$(ifconfig docker0 | awk '/inet / {print $2}'|tr -d "addr:")
     else
-        ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
-        exit 1
+        docker0=$(ip addr show docker0 | awk '/inet / {print $2}' | cut -d '/' -f 1)
     fi
 
+}
+
+function test_xiaoya_status() {
+
+    get_docker0_url
+
     INFO "测试xiaoya的联通性.......尝试连接 ${docker_addr}"
-    wget -4 -q -T 5 -O /tmp/test.md "${docker_addr}/README.md"
-    test_size=$(du -k /tmp/test.md | cut -f1)
+    wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://127.0.0.1:5678/d/README.md"
+    test_size=$(du -k /tmp/test.md |cut -f1)
     if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
-        ERROR "请检查xiaoya是否正常运行后再试"
-        exit 1
+        wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://$docker0:5678/d/README.md"
+        test_size=$(du -k /tmp/test.md |cut -f1)
+        if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
+            if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
+                docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
+            else
+                ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
+                exit 1
+            fi
+            wget -4 -q -T 10 -t 3 -O /tmp/test.md "$docker_addr/d/README.md"
+            test_size=$(du -k /tmp/test.md |cut -f1)
+            if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
+                ERROR "请检查xiaoya是否正常运行后再试"
+                exit 1
+            else
+                xiaoya_addr=$docker_addr
+            fi
+        else
+            xiaoya_addr="http://$docker0:5678"
+        fi
     else
-        INFO "xiaoya容器正常工作"
+        xiaoya_addr="http://127.0.0.1:5678"
     fi
 
     rm -rf /tmp/test.md
@@ -451,7 +474,7 @@ function pull_run_glue() {
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
-            "${@}"
+            "${*}"
     else
         docker run -it \
             --security-opt seccomp=unconfined \
@@ -461,7 +484,7 @@ function pull_run_glue() {
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
-            "${@}"
+            "${*}"
     fi
 
     docker rmi xiaoyaliu/glue:latest
@@ -488,7 +511,7 @@ function pull_run_ddsderek_glue() {
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:latest \
-            "${@}"
+            "${*}"
     else
         docker run -it \
             --security-opt seccomp=unconfined \
@@ -498,7 +521,7 @@ function pull_run_ddsderek_glue() {
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:latest \
-            "${@}"
+            "${*}"
     fi
 
     docker rmi ddsderek/xiaoya-glue:latest
@@ -507,11 +530,7 @@ function pull_run_ddsderek_glue() {
 
 function set_emby_server_infuse_api_key() {
 
-    if command -v ifconfig > /dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1)
-    else
-        docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d/)
-    fi
+    get_docker0_url
 
     echo "http://$docker0:6908" > "${CONFIG_DIR}"/emby_server.txt
     echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
@@ -542,15 +561,9 @@ function download_unzip_xiaoya_all_emby() {
     chmod 755 "${MEDIA_DIR}"
     chown root:root "${MEDIA_DIR}"
 
-    if command -v ifconfig > /dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1)
-    else
-        docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d/)
-    fi
-
     INFO "开始下载解压..."
 
-    pull_run_glue '/update_all.sh'
+    pull_run_glue "/update_all.sh" "$xiaoya_addr"
 
     set_emby_server_infuse_api_key
 
@@ -585,15 +598,9 @@ function unzip_xiaoya_all_emby() {
     chmod 755 "${MEDIA_DIR}"
     chown root:root "${MEDIA_DIR}"
 
-    if command -v ifconfig > /dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1)
-    else
-        docker0=$(ip addr show docker0 | grep "inet " | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d/)
-    fi
-
     INFO "开始解压..."
 
-    pull_run_glue '/unzip.sh'
+    pull_run_glue "/unzip.sh" "$xiaoya_addr"
 
     set_emby_server_infuse_api_key
 
@@ -625,11 +632,9 @@ function download_xiaoya_emby() {
 
     INFO "开始下载 ${1} ..."
 
-    docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
-
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false -c -x6 "${docker_addr}/d/元数据/${1}"
+    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
@@ -655,8 +660,6 @@ function unzip_xiaoya_emby() {
     chown root:root "${MEDIA_DIR}"
 
     INFO "开始解压 ${1} ..."
-
-    docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
 
     if [ "${1}" == "config.mp4" ]; then
         extra_parameters="--workdir=/media"
@@ -873,6 +876,8 @@ function choose_emby_image() {
 
 function install_emby_xiaoya_all_emby() {
 
+    get_docker0_url
+
     if ! grep xiaoya.host /etc/hosts; then
         echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
         xiaoya_host="127.0.0.1"
@@ -896,10 +901,10 @@ function install_emby_xiaoya_all_emby() {
 
     sleep 5
 
-    INFO "重启小雅容器中..."
-    docker restart \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+    if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
+        INFO "重启小雅容器中..."
+        docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+    fi
 
     INFO "Emby安装完成！"
 
