@@ -1629,7 +1629,7 @@ function install_auto_symlink() {
             --restart always \
             --log-opt max-size=10m \
             --log-opt max-file=3 \
-            "${volumes}" \
+            ${volumes} \
             shenxianmq/auto_symlink:latest
     else
         docker run -d \
