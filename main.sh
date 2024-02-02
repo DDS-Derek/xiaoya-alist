@@ -340,7 +340,7 @@ function update_xiaoya_alist() {
 
 function uninstall_xiaoya_alist() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
@@ -912,7 +912,7 @@ function docker_address_xiaoya_all_emby() {
 
 function uninstall_xiaoya_all_emby() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
@@ -1303,7 +1303,7 @@ function update_xiaoya_alist_tvbox() {
 
 function uninstall_xiaoya_alist_tvbox() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
@@ -1416,7 +1416,7 @@ function update_onelist() {
 
 function uninstall_onelist() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
@@ -1536,7 +1536,7 @@ function update_portainer() {
 
 function uninstall_portainer() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
@@ -1664,7 +1664,7 @@ function update_auto_symlink() {
 
 function uninstall_auto_symlink() {
 
-    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    INFO "是否${Red}删除${Font}配置文件 [Y/n]（默认 Y 删除）"
     read -erp "Clean config:" CLEAN_CONFIG
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
