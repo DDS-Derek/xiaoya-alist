@@ -1478,7 +1478,7 @@ function install_portainer() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt)
-        INFO "已读取Onelist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        INFO "已读取Portainer配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt
@@ -1583,12 +1583,140 @@ function main_portainer() {
         ;;
     4)
         clear
-        main_return
+        main_other_tools
         ;;
     *)
         clear
         ERROR '请输入正确数字 [1-4]'
         main_portainer
+        ;;
+    esac
+
+}
+
+function install_auto_symlink() {
+
+    if [ -f ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt ]; then
+        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt)
+        INFO "已读取Auto_Symlink配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -erp "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt
+    else
+        INFO "请输入配置文件目录（默认 /etc/auto_symlink ）"
+        read -erp "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/auto_symlink"
+        touch ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt
+    fi
+
+    INFO "请输入后台管理端口（默认 8095 ）"
+    read -erp "PORT:" HTTP_PORT
+    [[ -z "${PORT}" ]] && PORT="8095"
+
+    INFO "请输入挂载目录（可设置多个）（PS：-v /media:/media）"
+    read -erp "Volumes:" volumes
+
+    if [ -n "${volumes}" ]; then
+        docker run -d \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)" \
+            -e TZ=Asia/Shanghai \
+            -v "${CONFIG_DIR}:/app/config" \
+            -p "${PORT}":8095 \
+            --restart always \
+            --log-opt max-size=10m \
+            --log-opt max-file=3 \
+            "${volumes}" \
+            shenxianmq/auto_symlink:latest
+    else
+        docker run -d \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)" \
+            -e TZ=Asia/Shanghai \
+            -v "${CONFIG_DIR}:/app/config" \
+            -p "${PORT}":8095 \
+            --restart always \
+            --log-opt max-size=10m \
+            --log-opt max-file=3 \
+            shenxianmq/auto_symlink:latest
+    fi
+
+    INFO "安装完成！"
+
+}
+
+function update_auto_symlink() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新Auto_Symlink${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
+    docker rmi containrrr/watchtower:latest
+    INFO "更新成功！"
+
+}
+
+function uninstall_auto_symlink() {
+
+    INFO "是否删除配置文件 [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载Auto_Symlink${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
+    docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
+    docker image rm shenxianmq/auto_symlink:latest
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/auto_symlink_config_dir.txt)
+            rm -rf "${OLD_CONFIG_DIR}"
+        fi
+    fi
+    INFO "卸载成功！"
+
+}
+
+function main_auto_symlink() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Auto_Symlink${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "4、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [1-4]:" num
+    case "$num" in
+    1)
+        clear
+        install_auto_symlink
+        ;;
+    2)
+        clear
+        update_auto_symlink
+        ;;
+    3)
+        clear
+        uninstall_auto_symlink
+        ;;
+    4)
+        clear
+        main_other_tools
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [1-4]'
+        main_auto_symlink
         ;;
     esac
 
@@ -1642,6 +1770,13 @@ function init_container_name() {
         portainer_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)
     fi
 
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt ]; then
+        auto_symlink_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)
+    else
+        echo 'auto_symlink' > ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt
+        auto_symlink_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)
+    fi
+
 }
 
 function change_container_name() {
@@ -1667,9 +1802,10 @@ function container_name_settings() {
     echo -e "4、更改 小雅Alist-TVBox 容器名（当前：${Green}${xiaoya_tvbox_name}${Font}）"
     echo -e "5、更改 Onelist 容器名（当前：${Green}${xiaoya_onelist_name}${Font}）"
     echo -e "6、更改 Portainer 容器名（当前：${Green}${portainer_name}${Font}）"
-    echo -e "7、返回上级"
+    echo -e "7、更改 Auto_Symlink 容器名（当前：${Green}${auto_symlink_name}${Font}）"
+    echo -e "8、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-7]:" num
+    read -erp "请输入数字 [1-8]:" num
     case "$num" in
     1)
         change_container_name "xiaoya_alist_name"
@@ -1690,12 +1826,15 @@ function container_name_settings() {
         change_container_name "portainer_name"
         ;;
     7)
+        change_container_name "auto_symlink_name"
+        ;;
+    8)
         clear
         main_advanced_configuration
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-7]'
+        ERROR '请输入正确数字 [1-8]'
         container_name_settings
         ;;
     esac
@@ -1745,9 +1884,10 @@ function main_other_tools() {
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}其他工具${Font}\n"
     echo -e "1、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
-    echo -e "2、返回上级"
+    echo -e "2、安装/更新/卸载 Auto_Symlink   当前状态：$(judgment_container "${auto_symlink_name}")"
+    echo -e "3、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-2]:" num
+    read -erp "请输入数字 [1-3]:" num
     case "$num" in
     1)
         clear
@@ -1755,11 +1895,15 @@ function main_other_tools() {
         ;;
     2)
         clear
+        main_auto_symlink
+        ;;
+    3)
+        clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-2]'
+        ERROR '请输入正确数字 [1-3]'
         main_other_tools
         ;;
     esac
