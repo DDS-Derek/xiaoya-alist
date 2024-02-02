@@ -411,7 +411,7 @@ function main_xiaoya_alist() {
 function get_docker0_url() {
 
     if command -v ifconfig > /dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | awk '/inet / {print $2}' | tr -d "addr:")
+        docker0=$(ifconfig docker0 | awk '/inet / {print $2}' | sed 's/addr://')
     else
         docker0=$(ip addr show docker0 | awk '/inet / {print $2}' | cut -d '/' -f 1)
     fi
