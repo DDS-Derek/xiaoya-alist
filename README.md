@@ -7,6 +7,7 @@
 - [使用](#使用)
 - [功能列表](#功能列表)
 - [地址](#地址)
+- [兼容性测试报告](#兼容性测试报告)
 - [免责声明](#免责声明)
 - [Star History](#star-history)
 - [感谢](#感谢)
@@ -87,6 +88,32 @@ Docker启动容器名称设置 -> 71
 [https://hub.docker.com/r/ddsderek/xiaoya-glue](https://hub.docker.com/r/ddsderek/xiaoya-glue)
 
 [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
+
+## 兼容性测试报告
+
+|    系统名称     | 安装 |
+| :-------------: | :--: |
+|   CentOS 7.9    |  ✅   |
+|   CentOS 8.4    |  ✅   |
+| CentOS 8 Stream |  ✅   |
+| CentOS 9 Stream |  ✅   |
+|   Debian 10.3   |  ✅   |
+|   Debian 11.3   |  ✅   |
+|   Debian 12.0   |  ✅   |
+|  Ubuntu 18.04   |  ✅   |
+|  Ubuntu 20.04   |  ✅   |
+|  Ubuntu 22.04   |  ✅   |
+|    Fedora 31    |  ✅   |
+|    Fedora 32    |  ✅   |
+|   AlmaLinux 9   |  ✅   |
+| RockyLinux 8.6  |  ✅   |
+|   Arch Linux    |  ✅   |
+|  openSUSE 15.4  |  ✅   |
+|     UnRaid      |  ✅   |
+| OpenMediaVault  |  ✅   |
+|      QNAP       |  ✅   |
+|     OpenWRT     |  ✅   |
+|    Synology     |  ✅   |
 
 ## 免责声明
 
