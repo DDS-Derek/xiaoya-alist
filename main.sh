@@ -474,7 +474,7 @@ function pull_run_glue() {
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
-            "${*}"
+            "${@}"
     else
         docker run -it \
             --security-opt seccomp=unconfined \
@@ -484,7 +484,7 @@ function pull_run_glue() {
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
-            "${*}"
+            "${@}"
     fi
 
     docker rmi xiaoyaliu/glue:latest
@@ -511,7 +511,7 @@ function pull_run_ddsderek_glue() {
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:latest \
-            "${*}"
+            "${@}"
     else
         docker run -it \
             --security-opt seccomp=unconfined \
@@ -521,7 +521,7 @@ function pull_run_ddsderek_glue() {
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:latest \
-            "${*}"
+            "${@}"
     fi
 
     docker rmi ddsderek/xiaoya-glue:latest
