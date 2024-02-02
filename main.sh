@@ -1989,6 +1989,7 @@ function ci_test() {
     docker pull portainer/portainer-ce
     docker pull amilys/embyserver:4.8.0.56
     docker pull emby/embyserver:4.8.0.56
+    docker pull shenxianmq/auto_symlink:latest
 
 }
 

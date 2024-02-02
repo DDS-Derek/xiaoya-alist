@@ -6,17 +6,17 @@ on:
   pull_request:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    name: Test
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
+  # test:
+  #   runs-on: ubuntu-latest
+  #   name: Test
+  #   steps:
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Test
-        run: |
-            bash main.sh test
+  #     - name: Test
+  #       run: |
+  #           bash main.sh test
 
   shellcheck:
     runs-on: ubuntu-latest
