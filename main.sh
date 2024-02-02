@@ -410,8 +410,8 @@ function main_xiaoya_alist() {
 
 function get_docker0_url() {
 
-    if command -v ifconfig >/dev/null 2>&1; then
-        docker0=$(ifconfig docker0 | awk '/inet / {print $2}'|tr -d "addr:")
+    if command -v ifconfig > /dev/null 2>&1; then
+        docker0=$(ifconfig docker0 | awk '/inet / {print $2}' | tr -d "addr:")
     else
         docker0=$(ip addr show docker0 | awk '/inet / {print $2}' | cut -d '/' -f 1)
     fi
@@ -424,10 +424,10 @@ function test_xiaoya_status() {
 
     INFO "测试xiaoya的联通性.......尝试连接 ${docker_addr}"
     wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://127.0.0.1:5678/d/README.md"
-    test_size=$(du -k /tmp/test.md |cut -f1)
+    test_size=$(du -k /tmp/test.md | cut -f1)
     if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
         wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://$docker0:5678/d/README.md"
-        test_size=$(du -k /tmp/test.md |cut -f1)
+        test_size=$(du -k /tmp/test.md | cut -f1)
         if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
             if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
                 docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
@@ -436,7 +436,7 @@ function test_xiaoya_status() {
                 exit 1
             fi
             wget -4 -q -T 10 -t 3 -O /tmp/test.md "$docker_addr/d/README.md"
-            test_size=$(du -k /tmp/test.md |cut -f1)
+            test_size=$(du -k /tmp/test.md | cut -f1)
             if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
                 ERROR "请检查xiaoya是否正常运行后再试"
                 exit 1
