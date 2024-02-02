@@ -999,7 +999,7 @@ function install_emby_xiaoya_all_emby() {
             xiaoya_host="$docker0"
         fi
     else
-        xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)	
+        xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
     fi
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
