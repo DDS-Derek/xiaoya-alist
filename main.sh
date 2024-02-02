@@ -1,5 +1,6 @@
 #!/bin/bash
 # shellcheck shell=bash
+# shellcheck disable=SC2086
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -443,7 +444,7 @@ function pull_run_glue() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            "${extra_parameters}" \
+            ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}"
@@ -480,7 +481,7 @@ function pull_run_ddsderek_glue() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            "${extra_parameters}" \
+            ${extra_parameters} \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:latest \
             "${@}"
@@ -749,7 +750,7 @@ function install_emby_embyserver() {
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                "${extra_parameters}" \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -779,7 +780,7 @@ function install_emby_embyserver() {
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                "${extra_parameters}" \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -822,7 +823,7 @@ function install_amilys_embyserver() {
                 --add-host="xiaoya.host:$xiaoya_host" \
                 --net=host \
                 --privileged=true \
-                "${extra_parameters}" \
+                ${extra_parameters} \
                 -e PUID=0 \
                 -e PGID=0 \
                 --restart=always \
@@ -994,7 +995,7 @@ function install_resilio() {
             -v "${CONFIG_DIR}:/config" \
             -v "${CONFIG_DIR}/downloads:/downloads" \
             -v "${MEDIA_DIR}:/sync" \
-            "${extra_parameters}" \
+            ${extra_parameters} \
             --restart=always \
             linuxserver/resilio-sync:latest
     else
@@ -1265,7 +1266,7 @@ function install_xiaoya_alist_tvbox() {
             -e ALIST_PORT="${ALIST_PORT}" \
             -e MEM_OPT="${MEM_OPT}" \
             -v "${CONFIG_DIR}:/data" \
-            "${extra_parameters}" \
+            ${extra_parameters} \
             --restart=always \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
             haroldli/xiaoya-tvbox:latest
