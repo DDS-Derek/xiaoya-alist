@@ -1,5 +1,7 @@
 #!/bin/bash
 # shellcheck shell=bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 # __   ___                                    _ _     _
