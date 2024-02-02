@@ -104,7 +104,7 @@ function packages_need() {
 
 function get_os() {
 
-    if which getconf; then
+    if which getconf > /dev/null 2>&1; then
         is64bit="$(getconf LONG_BIT)bit"
     else
         is64bit="unknow"
