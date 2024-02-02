@@ -1016,7 +1016,24 @@ function install_emby_xiaoya_all_emby() {
 
     set_emby_server_infuse_api_key
 
-    sleep 5
+    start_time=$(date +%s)
+    CONTAINER_NAME=$(cat "${DDSREM_CONFIG_DIR}"/container_name/xiaoya_emby_name.txt)
+    TARGET_LOG_LINE_SUCCESS="All entry points have started"
+    while true; do
+        line=$(docker logs "$CONTAINER_NAME" 2>&1| tail -n 10)
+        echo "$line"
+        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
+            break
+        fi
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if (( elapsed_time >= 300 )); then
+            break
+        fi
+        sleep 3
+    done
+
+    sleep 2
 
     if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
         INFO "重启小雅容器中..."
