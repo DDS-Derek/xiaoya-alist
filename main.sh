@@ -748,63 +748,125 @@ function install_emby_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                ${extra_parameters} \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                emby/embyserver:4.8.0.56
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                emby/embyserver:4.8.0.56
+        if [ "$MODE" == "host" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver:4.8.0.56
+            else
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver:4.8.0.56
+            fi
+        elif [ "$MODE" == "bridge" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver:4.8.0.56
+            else
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver:4.8.0.56
+            fi
         fi
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                ${extra_parameters} \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                emby/embyserver_arm64v8:4.8.0.56
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                emby/embyserver_arm64v8:4.8.0.56
+        if [ "$MODE" == "host" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver_arm64v8:4.8.0.56
+            else
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver_arm64v8:4.8.0.56
+            fi
+        elif [ "$MODE" == "bridge" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver_arm64v8:4.8.0.56
+            else
+                docker run -itd \
+                    --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    emby/embyserver_arm64v8:4.8.0.56
+            fi
         fi
         ;;
     *)
@@ -821,33 +883,64 @@ function install_amilys_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                ${extra_parameters} \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                amilys/embyserver:4.8.0.56
-        else
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v /etc/nsswitch.conf:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                --net=host \
-                --privileged=true \
-                -e PUID=0 \
-                -e PGID=0 \
-                --restart=always \
-                amilys/embyserver:4.8.0.56
+        if [ "$MODE" == "host" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    amilys/embyserver:4.8.0.56
+            else
+                docker run -itd \
+                    --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    --net=host \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    amilys/embyserver:4.8.0.56
+            fi
+        elif [ "$MODE" == "bridge" ]; then
+            if [ -n "${extra_parameters}" ]; then
+                docker run -itd \
+                    --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    ${extra_parameters} \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    amilys/embyserver:4.8.0.56
+            else
+                docker run -itd \
+                    --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                    -v "${MEDIA_DIR}/config:/config" \
+                    -v "${MEDIA_DIR}/xiaoya:/media" \
+                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    --add-host="xiaoya.host:$xiaoya_host" \
+                    -p 6908:6908 \
+                    --privileged=true \
+                    -e PUID=0 \
+                    -e PGID=0 \
+                    --restart=always \
+                    amilys/embyserver:4.8.0.56
+            fi
         fi
         ;;
     *)
@@ -855,6 +948,22 @@ function install_amilys_embyserver() {
         exit 1
         ;;
     esac
+
+}
+
+function choose_network_mode() {
+
+    INFO "请选择使用的网络模式 [ 1:host | 2:bridge ]（默认 1）"
+    read -erp "Net:" MODE
+    [[ -z "${MODE}" ]] && MODE="1"
+    if [[ ${MODE} == [1] ]]; then
+        MODE=host
+    elif [[ ${MODE} == [2] ]]; then
+        MODE=bridge
+    else
+        ERROR "输入无效，请重新选择"
+        choose_network_mode
+    fi
 
 }
 
@@ -878,11 +987,19 @@ function install_emby_xiaoya_all_emby() {
 
     get_docker0_url
 
+    choose_network_mode
+
     if ! grep xiaoya.host /etc/hosts; then
-        echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
-        xiaoya_host="127.0.0.1"
+        if [ "$MODE" == "host" ]; then
+            echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
+            xiaoya_host="127.0.0.1"
+        fi
+        if [ "$MODE" == "bridge" ]; then
+            echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
+            xiaoya_host="$docker0"
+        fi
     else
-        xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
+        xiaoya_host=$(grep xiaoya.host /etc/hosts |awk '{print $1}' |head -n1)	
     fi
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
@@ -1137,6 +1254,7 @@ function main_xiaoya_all_emby() {
         ;;
     3)
         clear
+        get_config_dir
         get_media_dir
         install_emby_xiaoya_all_emby
         ;;
