@@ -72,6 +72,8 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 卸载 Onelist -> 53
 卸载 Portainer -> 613
 卸载 Auto_Symlink -> 623
+——————————————————————————————————————系统工具——————————————————————————————————————
+查看系统磁盘挂载 -> 63
 ```
 
 **高级功能**

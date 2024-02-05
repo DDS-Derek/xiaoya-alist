@@ -2134,9 +2134,10 @@ function main_other_tools() {
     echo -e "${Blue}其他工具${Font}\n"
     echo -e "1、安装/更新/卸载 Portainer   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "2、安装/更新/卸载 Auto_Symlink   当前状态：$(judgment_container "${auto_symlink_name}")"
-    echo -e "3、返回上级"
+    echo -e "3、查看系统磁盘挂载"
+    echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-3]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
     1)
         clear
@@ -2148,11 +2149,20 @@ function main_other_tools() {
         ;;
     3)
         clear
+        INFO "系统磁盘挂载情况:"
+        df -BG | grep -E -v "Avail|loop|boot|overlay|tmpfs|0%|proc" | sort -nr -k 4
+        INFO "按任意键返回菜单"
+        read -rs -n 1 -p ""
+        clear
+        main_other_tools
+        ;;
+    4)
+        clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-3]'
+        ERROR '请输入正确数字 [1-4]'
         main_other_tools
         ;;
     esac
