@@ -305,8 +305,6 @@ function get_media_dir() {
 
 function install_xiaoya_alist() {
 
-    INFO "小白全部回车即可完成安装！"
-
     get_config_dir
 
     if [ ! -d "${CONFIG_DIR}" ]; then
@@ -1402,8 +1400,6 @@ function main_xiaoya_all_emby() {
 
 function install_xiaoyahelper() {
 
-    INFO "小白全部回车即可完成安装！"
-
     INFO "选择模式：[3/5]（默认 3）"
     INFO "模式3: 定时运行小雅转存清理并升级小雅镜像"
     INFO "模式5: 只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3"
@@ -1468,8 +1464,6 @@ function main_xiaoyahelper() {
 }
 
 function install_xiaoya_alist_tvbox() {
-
-    INFO "小白全部回车即可完成安装！"
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
