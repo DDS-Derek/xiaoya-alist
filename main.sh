@@ -194,22 +194,28 @@ function get_os() {
     _os_all=$(uname -a)
     if [ "${_os}" == "Darwin" ]; then
         OSNAME='macos'
+        packages_need
     elif [ -f /etc/synoinfo.conf ]; then
         OSNAME='synology'
+        packages_need
     elif [ -f /etc/openwrt_release ]; then
         OSNAME='openwrt'
+        packages_need
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
+        packages_need
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
         packages_need "apt"
     elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
+        packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
         packages_need "zypper"
     elif grep -Eqi "FreeBSD" /etc/*-release; then
         OSNAME='freebsd'
+        packages_need
     elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
         OSNAME='euler'
         packages_need "yum"
@@ -239,6 +245,7 @@ function get_os() {
         packages_need "apk_alpine"
     else
         OSNAME='unknow'
+        packages_need
     fi
 
 }
