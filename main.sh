@@ -210,7 +210,7 @@ function get_os() {
     elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
         packages_need
-    elif grep -Eqi "TrueNAS" /etc/version; then
+    elif grep -Eqi "TrueNAS" /etc/*version; then
         OSNAME='truenas'
         packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
