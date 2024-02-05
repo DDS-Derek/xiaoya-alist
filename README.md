@@ -114,6 +114,7 @@ Docker启动容器名称设置 -> 71
 |      QNAP       |  ✅   |
 |     OpenWRT     |  ✅   |
 |    Synology     |  ✅   |
+|    TrueNAS      |  ✅   |
 
 ## 免责声明
 
