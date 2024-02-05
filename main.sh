@@ -994,7 +994,6 @@ function install_amilys_embyserver() {
                     -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
-                    --privileged=true \
                     ${extra_parameters} \
                     -e PUID=0 \
                     -e PGID=0 \
@@ -1008,7 +1007,6 @@ function install_amilys_embyserver() {
                     -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
-                    --privileged=true \
                     -e PUID=0 \
                     -e PGID=0 \
                     --restart=always \
@@ -1023,7 +1021,6 @@ function install_amilys_embyserver() {
                     -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
-                    --privileged=true \
                     ${extra_parameters} \
                     -e PUID=0 \
                     -e PGID=0 \
@@ -1037,7 +1034,6 @@ function install_amilys_embyserver() {
                     -v /etc/nsswitch.conf:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
-                    --privileged=true \
                     -e PUID=0 \
                     -e PGID=0 \
                     --restart=always \
@@ -1106,8 +1102,9 @@ function install_emby_xiaoya_all_emby() {
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
-        INFO "请输入其他参数（默认 无 ）"
+        INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
         read -erp "Extra parameters:" extra_parameters
+        [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
     fi
 
     if [ "$1" == "official" ]; then
