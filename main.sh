@@ -85,18 +85,99 @@ function root_need() {
 
 function packages_need() {
 
+    if [ "$1" == "apt" ]; then
+        if ! which curl; then
+            WARN "curl 未安装，脚本尝试自动安装..."
+            apt update -y
+            if apt install -y curl; then
+                INFO "curl 安装成功！"
+            else
+                ERROR "curl 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which wget; then
+            WARN "wget 未安装，脚本尝试自动安装..."
+            apt update -y
+            if apt install -y wget; then
+                INFO "wget 安装成功！"
+            else
+                ERROR "wget 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+    elif [ "$1" == "yum" ]; then
+        if ! which curl; then
+            WARN "curl 未安装，脚本尝试自动安装..."
+            if yum install -y curl; then
+                INFO "curl 安装成功！"
+            else
+                ERROR "curl 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which wget; then
+            WARN "wget 未安装，脚本尝试自动安装..."
+            if yum install -y wget; then
+                INFO "wget 安装成功！"
+            else
+                ERROR "wget 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+    elif [ "$1" == "zypper" ]; then
+        if ! which curl; then
+            WARN "curl 未安装，脚本尝试自动安装..."
+            zypper refresh
+            if zypper install curl; then
+                INFO "curl 安装成功！"
+            else
+                ERROR "curl 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which wget; then
+            WARN "wget 未安装，脚本尝试自动安装..."
+            zypper refresh
+            if zypper install wget; then
+                INFO "wget 安装成功！"
+            else
+                ERROR "wget 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+    elif [ "$1" == "apk_alpine" ]; then
+        if ! which curl; then
+            WARN "curl 未安装，脚本尝试自动安装..."
+            if apk add curl; then
+                INFO "curl 安装成功！"
+            else
+                ERROR "curl 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which wget; then
+            WARN "wget 未安装，脚本尝试自动安装..."
+            if apk add wget; then
+                INFO "wget 安装成功！"
+            else
+                ERROR "wget 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+    else
+        if ! which curl; then
+            ERROR "curl 未安装，请手动安装！"
+            exit 1
+        fi
+        if ! which wget; then
+            ERROR "wget 未安装，请手动安装！"
+            exit 1
+        fi
+    fi
+
     if ! which docker; then
         ERROR "docker 未安装，请手动安装！"
-        exit 1
-    fi
-
-    if ! which curl; then
-        ERROR "curl 未安装，请手动安装！"
-        exit 1
-    fi
-
-    if ! which wget; then
-        ERROR "wget 未安装，请手动安装！"
         exit 1
     fi
 
@@ -121,30 +202,41 @@ function get_os() {
         OSNAME='qnap'
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
+        packages_need "apt"
     elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
+        packages_need "zypper"
     elif grep -Eqi "FreeBSD" /etc/*-release; then
         OSNAME='freebsd'
     elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
         OSNAME='euler'
+        packages_need "yum"
     elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
         OSNAME='rhel'
+        packages_need "yum"
     elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
         OSNAME='rhel'
+        packages_need "yum"
     elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
         OSNAME='rhel'
+        packages_need "yum"
     elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
         OSNAME='rhel'
+        packages_need "yum"
     elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
         OSNAME='amazon'
+        packages_need "yum"
     elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
         OSNAME='debian'
+        packages_need "apt"
     elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
         OSNAME='ubuntu'
+        packages_need "apt"
     elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
         OSNAME='alpine'
+        packages_need "apk_alpine"
     else
         OSNAME='unknow'
     fi
@@ -2167,13 +2259,11 @@ function first_init() {
 
 if [ ! "$*" ]; then
     first_init
-    packages_need
     main
 elif [ "$*" == test ]; then
     INFO "Test"
     ci_test
 else
     first_init
-    packages_need
     "$@"
 fi
