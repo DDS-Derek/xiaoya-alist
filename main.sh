@@ -131,6 +131,16 @@ function packages_need() {
                 exit 1
             fi
         fi
+        if ! which docker; then
+            WARN "docker 未安装，脚本尝试自动安装..."
+            wget -qO- get.docker.com | bash
+            if which docker; then
+                INFO "docker 安装成功！"
+            else
+                ERROR "docker 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
     elif [ "$1" == "yum" ]; then
         if ! which curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
@@ -149,6 +159,10 @@ function packages_need() {
                 ERROR "wget 安装失败，请手动安装！"
                 exit 1
             fi
+        fi
+        if ! which docker; then
+            ERROR "docker 未安装，请手动安装！"
+            exit 1
         fi
     elif [ "$1" == "zypper" ]; then
         if ! which curl; then
@@ -171,6 +185,10 @@ function packages_need() {
                 exit 1
             fi
         fi
+        if ! which docker; then
+            ERROR "docker 未安装，请手动安装！"
+            exit 1
+        fi
     elif [ "$1" == "apk_alpine" ]; then
         if ! which curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
@@ -190,6 +208,15 @@ function packages_need() {
                 exit 1
             fi
         fi
+        if ! which docker; then
+            WARN "docker 未安装，脚本尝试自动安装..."
+            if apk add docker; then
+                INFO "docker 安装成功！"
+            else
+                ERROR "docker 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
     else
         if ! which curl; then
             ERROR "curl 未安装，请手动安装！"
@@ -199,11 +226,10 @@ function packages_need() {
             ERROR "wget 未安装，请手动安装！"
             exit 1
         fi
-    fi
-
-    if ! which docker; then
-        ERROR "docker 未安装，请手动安装！"
-        exit 1
+        if ! which docker; then
+            ERROR "docker 未安装，请手动安装！"
+            exit 1
+        fi
     fi
 
 }
@@ -1436,6 +1462,8 @@ function main_xiaoya_all_emby() {
 
 function install_xiaoyahelper() {
 
+    XIAOYAHELPER_URL="https://xiaoyahelper.zngle.cf/aliyun_clear.sh"
+
     INFO "选择模式：[3/5]（默认 3）"
     INFO "模式3: 定时运行小雅转存清理并升级小雅镜像"
     INFO "模式5: 只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3"
@@ -1446,10 +1474,10 @@ function install_xiaoyahelper() {
     read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s "${MODE}" -tg
+        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" -tg
     fi
     if [[ ${TG} == [Nn] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s "${MODE}"
+        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}"
     fi
     INFO "安装完成！"
 
