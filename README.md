@@ -4,6 +4,8 @@
 
 ![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/image-1.png)
 
+![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/image-2.png)
+
 - [使用](#使用)
 - [功能列表](#功能列表)
 - [地址](#地址)

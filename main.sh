@@ -27,8 +27,6 @@ export PATH
 # | awk '{gsub("emby/embyserver_arm64v8:4.8.0.56", "amilys/embyserver:4.8.0.56"); print}' \
 # | awk '{gsub("--name emby", "--name xiaoya-emby"); print}')"
 #
-# bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh| tail -n +2)" -s 3 -tg
-#
 # docker run -d -p 4567:4567 -p 5344:80 -e ALIST_PORT=5344 --restart=always -v /etc/xiaoya:/data --name=xiaoya-tvbox haroldli/xiaoya-tvbox
 # bash -c "$(curl -fsSL https://d.har01d.cn/update_xiaoya.sh)"
 #
@@ -41,6 +39,33 @@ export PATH
 # bash -c "$(curl http://docker.xiaoya.pro/resilio.sh)" -s /媒体库目录
 #
 # 0 6 * * * bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s /媒体库目录
+#
+# bash -c "$(curl http://docker.xiaoya.pro/emby_new.sh)" -s --config_dir=xiaoya配置目录 --action=generate_config
+#
+# bash -c "$(curl http://docker.xiaoya.pro/emby_new.sh)" -s --config_dir=xiaoya配置目录
+#
+# 模式0：每天自动清理一次。如果系统重启需要手动重新运行或把命令加入系统启动。
+# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 0 -tg
+# 模式1：一次性清理，一般用于测试效果。
+# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 1 -tg
+# 模式2：已废弃，不再支持
+# 模式3：创建一个名为 xiaoyakeeper 的docker定时运行小雅转存清理并升级小雅镜像
+# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 3 -tg
+# 模式4：同模式3
+# 模式5：与模式3的区别是实时清理，只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3
+# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 5 -tg
+# 签到功能说明：
+# 1、执行时机和清理缓存完全相同
+# 2、可以手动创建/etc/xiaoya/mycheckintoken.txt，定义多个网盘签到的32位refresh token，每行一个，不添加文件就是默认小雅转存的网盘签到。
+# 3、自动刷新/etc/xiaoya/mycheckintoken.txt、/etc/xiaoya/mytoken.txt（可能可以延长refresh token时效，待观察）
+# 关于模式0/3/4/5定时运行的说明：
+# 1、默认从运行脚本的下一分钟开始，每天运行一次
+# 2、运行的时间也可以通过手动创建/etc/xiaoya/myruntime.txt修改，比如06:00,18:00就是每天早晚6点各运行一次
+# 关于自动升级:
+# 1、定时升级的命令保存在/etc/xiaoya/mycmd.txt中，删除该文件变成定时重启小雅
+# 2、完成清理和签到后自动执行/etc/xiaoya/mycmd.txt中的命令，该文件中的内容默认升级小雅镜像，可以修改该文件改编脚本的行为，不建议修改。
+# 关于tg推送：
+# 所有模式加上-tg功能均可绑定消息推送的TG账号，只有第1次运行需要加-tg参数
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
