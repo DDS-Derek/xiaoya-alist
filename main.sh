@@ -730,6 +730,7 @@ function download_unzip_xiaoya_all_emby() {
     set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
+    INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
 
     INFO "下载解压完成！"
@@ -767,6 +768,7 @@ function unzip_xiaoya_all_emby() {
     set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
+    INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
 
     INFO "解压完成！"
@@ -1281,6 +1283,8 @@ function install_resilio() {
     get_media_dir
 
     if [ ! -d "${MEDIA_DIR}"/config_sync ]; then
+        INFO "复制 config 文件夹到 config_sync 中..."
+        INFO "这可能需要一定时间，请耐心等待！"
         mkdir -p "${MEDIA_DIR}"/config_sync
         chmod 777 "${MEDIA_DIR}"/config_sync
         cp -r "${MEDIA_DIR}"/config/* "${MEDIA_DIR}"/config_sync/
