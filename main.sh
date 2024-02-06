@@ -220,12 +220,25 @@ function get_os() {
     if [ "${_os}" == "Darwin" ]; then
         OSNAME='macos'
         packages_need
-    elif [ -f /etc/synoinfo.conf ]; then
-        OSNAME='synology'
-        packages_need
-    # 绿联NAS基于OpenWRT，所以先判断是不是绿联NAS系统
+    # 必须先判断的系统
+    # 绿联NAS 基于 OpenWRT
     elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
         OSNAME='ugreen'
+        packages_need
+    # OpenMediaVault 基于 Debian
+    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        OSNAME='openmediavault'
+        packages_need "apt"
+    # FreeNAS（TrueNAS CORE）基于 FreeBSD
+    elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
+        OSNAME='truenas core'
+        packages_need
+    # TrueNAS SCALE 基于 Debian
+    elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
+        OSNAME='truenas scale'
+        packages_need
+    elif [ -f /etc/synoinfo.conf ]; then
+        OSNAME='synology'
         packages_need
     elif [ -f /etc/openwrt_release ]; then
         OSNAME='openwrt'
@@ -233,20 +246,8 @@ function get_os() {
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
         packages_need
-    # OpenMediaVault基于Debian，所以先判断是不是OpenMediaVault
-    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
-        OSNAME='openmediavault'
-        packages_need "apt"
     elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
-        packages_need
-    # FreeNAS（TrueNAS CORE）基于FreeBSD，所以先判断是不是FreeNAS（TrueNAS CORE）
-    elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
-        OSNAME='truenas core'
-        packages_need
-    # TrueNAS SCALE基于Debian，所以先判断是不是TrueNAS SCALE
-    elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
-        OSNAME='truenas scale'
         packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
