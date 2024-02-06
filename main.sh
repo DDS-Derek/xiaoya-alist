@@ -223,12 +223,17 @@ function get_os() {
     elif [ -f /etc/synoinfo.conf ]; then
         OSNAME='synology'
         packages_need
+    # 绿联NAS基于OpenWRT，所以先判断是不是绿联NAS系统
+    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        OSNAME='ugreen'
+        packages_need
     elif [ -f /etc/openwrt_release ]; then
         OSNAME='openwrt'
         packages_need
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
         packages_need
+    # OpenMediaVault基于Debian，所以先判断是不是OpenMediaVault
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
         packages_need "apt"
@@ -237,9 +242,6 @@ function get_os() {
         packages_need
     elif grep -Eqi "TrueNAS" /etc/*version; then
         OSNAME='truenas'
-        packages_need
-    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
-        OSNAME='ugreen'
         packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
