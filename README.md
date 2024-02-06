@@ -113,12 +113,17 @@ Docker启动容器名称设置 -> 71
 | RockyLinux 8.6  |  ✅   |
 |   Arch Linux    |  ✅   |
 |  openSUSE 15.4  |  ✅   |
+|     FreeBSD     |  ✅   |
+|     EulerOS     |  ✅   |
+|  Amazon Linux   |  ✅   |
+|     Alpine      |  ✅   |
 |     UnRaid      |  ✅   |
 | OpenMediaVault  |  ✅   |
 |      QNAP       |  ✅   |
 |     OpenWRT     |  ✅   |
 |    Synology     |  ✅   |
 |    TrueNAS      |  ✅   |
+|     UGREEN      |  ✅   |
 
 ## 免责声明
 

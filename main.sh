@@ -238,6 +238,9 @@ function get_os() {
     elif grep -Eqi "TrueNAS" /etc/*version; then
         OSNAME='truenas'
         packages_need
+    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        OSNAME='ugreen'
+        packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
         packages_need "zypper"
