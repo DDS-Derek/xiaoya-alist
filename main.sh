@@ -240,8 +240,13 @@ function get_os() {
     elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
         OSNAME='unraid'
         packages_need
-    elif grep -Eqi "TrueNAS" /etc/*version; then
-        OSNAME='truenas'
+    # FreeNAS（TrueNAS CORE）基于FreeBSD，所以先判断是不是FreeNAS（TrueNAS CORE）
+    elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
+        OSNAME='truenas core'
+        packages_need
+    # TrueNAS SCALE基于FreeBSD，所以先判断是不是TrueNAS SCALE
+    elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
+        OSNAME='truenas scale'
         packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
