@@ -244,7 +244,7 @@ function get_os() {
     elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
         OSNAME='truenas core'
         packages_need
-    # TrueNAS SCALE基于FreeBSD，所以先判断是不是TrueNAS SCALE
+    # TrueNAS SCALE基于Debian，所以先判断是不是TrueNAS SCALE
     elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
         OSNAME='truenas scale'
         packages_need
