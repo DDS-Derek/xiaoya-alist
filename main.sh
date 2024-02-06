@@ -1446,10 +1446,10 @@ function install_xiaoyahelper() {
     read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s "${MODE}" -tg
+        bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s "${MODE}" -tg
     fi
     if [[ ${TG} == [Nn] ]]; then
-        bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s "${MODE}"
+        bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s "${MODE}"
     fi
     INFO "安装完成！"
 
