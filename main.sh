@@ -918,7 +918,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
@@ -932,7 +932,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
@@ -947,7 +947,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
@@ -961,7 +961,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
@@ -979,7 +979,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
@@ -993,7 +993,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
@@ -1008,7 +1008,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
@@ -1022,7 +1022,7 @@ function install_emby_embyserver() {
                     --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
@@ -1053,7 +1053,7 @@ function install_amilys_embyserver() {
                     --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     ${extra_parameters} \
@@ -1066,7 +1066,7 @@ function install_amilys_embyserver() {
                     --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     -e PUID=0 \
@@ -1080,7 +1080,7 @@ function install_amilys_embyserver() {
                     --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     ${extra_parameters} \
@@ -1093,7 +1093,7 @@ function install_amilys_embyserver() {
                     --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
                     -v "${MEDIA_DIR}/config:/config" \
                     -v "${MEDIA_DIR}/xiaoya:/media" \
-                    -v /etc/nsswitch.conf:/etc/nsswitch.conf \
+                    -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     -e PUID=0 \
@@ -1168,6 +1168,15 @@ function install_emby_xiaoya_all_emby() {
         INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
         read -erp "Extra parameters:" extra_parameters
         [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
+    fi
+
+    if [ -f /etc/nsswitch.conf ]; then
+        NSSWITCH=/etc/nsswitch.conf
+    else
+        CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        echo -e "hosts:\tfiles dns" > ${CONFIG_DIR}/nsswitch.conf
+        echo -e "networks:\tfiles" >> ${CONFIG_DIR}/nsswitch.conf
+        NSSWITCH=${CONFIG_DIR}/nsswitch.conf
     fi
 
     if [ "$1" == "official" ]; then
