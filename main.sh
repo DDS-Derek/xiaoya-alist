@@ -2210,7 +2210,7 @@ function main_other_tools() {
     3)
         clear
         INFO "系统磁盘挂载情况:"
-        df -BG | grep -E -v "Avail|loop|boot|overlay|tmpfs|0%|proc" | sort -nr -k 4
+        df -h | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | sort -nr -k 4
         INFO "按任意键返回菜单"
         read -rs -n 1 -p ""
         clear
