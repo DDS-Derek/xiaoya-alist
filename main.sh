@@ -935,8 +935,8 @@ function install_emby_embyserver() {
                     --net=host \
                     --privileged=true \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver:4.8.0.56
             else
@@ -948,8 +948,8 @@ function install_emby_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver:4.8.0.56
             fi
@@ -964,8 +964,8 @@ function install_emby_embyserver() {
                     -p 6908:6908 \
                     --privileged=true \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver:4.8.0.56
             else
@@ -977,8 +977,8 @@ function install_emby_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver:4.8.0.56
             fi
@@ -996,8 +996,8 @@ function install_emby_embyserver() {
                     --net=host \
                     --privileged=true \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver_arm64v8:4.8.0.56
             else
@@ -1009,8 +1009,8 @@ function install_emby_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     --privileged=true \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver_arm64v8:4.8.0.56
             fi
@@ -1025,8 +1025,8 @@ function install_emby_embyserver() {
                     -p 6908:6908 \
                     --privileged=true \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver_arm64v8:4.8.0.56
             else
@@ -1038,8 +1038,8 @@ function install_emby_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     --privileged=true \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     emby/embyserver_arm64v8:4.8.0.56
             fi
@@ -1069,8 +1069,8 @@ function install_amilys_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     amilys/embyserver:4.8.0.56
             else
@@ -1081,8 +1081,8 @@ function install_amilys_embyserver() {
                     -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     --net=host \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     amilys/embyserver:4.8.0.56
             fi
@@ -1096,8 +1096,8 @@ function install_amilys_embyserver() {
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
                     ${extra_parameters} \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     amilys/embyserver:4.8.0.56
             else
@@ -1108,8 +1108,8 @@ function install_amilys_embyserver() {
                     -v ${NSSWITCH}:/etc/nsswitch.conf \
                     --add-host="xiaoya.host:$xiaoya_host" \
                     -p 6908:6908 \
-                    -e PUID=0 \
-                    -e PGID=0 \
+                    -e UID=0 \
+                    -e GID=0 \
                     --restart=always \
                     amilys/embyserver:4.8.0.56
             fi
