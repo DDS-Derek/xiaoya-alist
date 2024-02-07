@@ -161,8 +161,14 @@ function packages_need() {
             fi
         fi
         if ! which docker; then
-            ERROR "docker 未安装，请手动安装！"
-            exit 1
+            WARN "docker 未安装，脚本尝试自动安装..."
+            wget -qO- get.docker.com | bash
+            if which docker; then
+                INFO "docker 安装成功！"
+            else
+                ERROR "docker 安装失败，请手动安装！"
+                exit 1
+            fi
         fi
     elif [ "$1" == "zypper" ]; then
         if ! which curl; then
