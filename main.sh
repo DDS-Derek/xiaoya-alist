@@ -319,6 +319,12 @@ function TODO() {
     WARN "此功能未完成，请耐心等待开发者开发"
 }
 
+function show_disk_mount() {
+
+    df -h | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | sort -nr -k 4
+
+}
+
 function judgment_container() {
 
     if docker container inspect "${1}" > /dev/null 2>&1; then
@@ -2144,7 +2150,7 @@ function main_other_tools() {
     3)
         clear
         INFO "系统磁盘挂载情况:"
-        df -h | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | sort -nr -k 4
+        show_disk_mount
         INFO "按任意键返回菜单"
         read -rs -n 1 -p ""
         clear
