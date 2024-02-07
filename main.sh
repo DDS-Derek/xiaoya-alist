@@ -1292,6 +1292,8 @@ function install_resilio() {
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     fi
 
+    get_media_dir
+
     INFO "请输入后台管理端口（默认 8888 ）"
     read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
@@ -1302,7 +1304,14 @@ function install_resilio() {
         read -erp "Extra parameters:" extra_parameters
     fi
 
-    get_media_dir
+    INFO "是否自动配置系统 inotify watches & instances 的数值 [Y/n]（默认 Y）"
+    read -erp "inotify:" inotify_set
+    [[ -z "${inotify_set}" ]] && inotify_set="y"
+    if [[ ${inotify_set} == [Yy] ]]; then
+        echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf
+        echo fs.inotify.max_user_instances=524288 | tee -a /etc/sysctl.conf
+        sysctl -p
+    fi
 
     if [ ! -d "${MEDIA_DIR}"/config_sync ]; then
         INFO "复制 config 文件夹到 config_sync 中..."
