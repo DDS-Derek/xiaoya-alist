@@ -45,15 +45,15 @@ export PATH
 # bash -c "$(curl http://docker.xiaoya.pro/emby_new.sh)" -s --config_dir=xiaoya配置目录
 #
 # 模式0：每天自动清理一次。如果系统重启需要手动重新运行或把命令加入系统启动。
-# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 0 -tg
+# bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s 0 -tg
 # 模式1：一次性清理，一般用于测试效果。
-# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 1 -tg
+# bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s 1 -tg
 # 模式2：已废弃，不再支持
 # 模式3：创建一个名为 xiaoyakeeper 的docker定时运行小雅转存清理并升级小雅镜像
-# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 3 -tg
+# bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s 3 -tg
 # 模式4：同模式3
 # 模式5：与模式3的区别是实时清理，只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3
-# bash -c "$(curl -s https://xiaoyahelper.zngle.cf/aliyun_clear.sh | tail -n +2)" -s 5 -tg
+# bash -c "$(curl -s https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh | tail -n +2)" -s 5 -tg
 # 签到功能说明：
 # 1、执行时机和清理缓存完全相同
 # 2、可以手动创建/etc/xiaoya/mycheckintoken.txt，定义多个网盘签到的32位refresh token，每行一个，不添加文件就是默认小雅转存的网盘签到。
@@ -1488,7 +1488,7 @@ function main_xiaoya_all_emby() {
 
 function install_xiaoyahelper() {
 
-    XIAOYAHELPER_URL="https://xiaoyahelper.zngle.cf/aliyun_clear.sh"
+    XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
 
     INFO "选择模式：[3/5]（默认 3）"
     INFO "模式3: 定时运行小雅转存清理并升级小雅镜像"
