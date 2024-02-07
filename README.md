@@ -141,7 +141,7 @@ Docker启动容器名称设置 -> 71
 ## 感谢
 
 - [xiaoyaLiu](http://alist.xiaoya.pro/)
-- heiheigui
+- [heiheigui](https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh)
 - [alist-tvbox](https://github.com/power721/alist-tvbox)
 - [Auto_Symlink](https://github.com/shenxianmq/Auto_Symlink)
 - [Portainer](https://github.com/portainer/portainer)
