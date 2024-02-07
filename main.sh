@@ -1178,6 +1178,7 @@ function install_emby_xiaoya_all_emby() {
         echo -e "networks:\tfiles" >> ${CONFIG_DIR}/nsswitch.conf
         NSSWITCH=${CONFIG_DIR}/nsswitch.conf
     fi
+    INFO "nsswitch.conf 配置文件路径：${NSSWITCH}"
 
     if [ "$1" == "official" ]; then
         install_emby_embyserver
