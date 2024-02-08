@@ -93,7 +93,7 @@ Docker启动容器名称设置 -> 71
 
 [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
 
-[小雅官方 Telegram 交流群](https://t.me/xiaoyaliu00)
+小雅官方 [Telegram](https://t.me/xiaoyaliu00) 交流群
 
 ## 兼容性测试报告
 
