@@ -1,0 +1,34 @@
+name: backup
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 */12 * * *'
+
+jobs:
+
+  shfmt:
+    runs-on: ubuntu-latest
+    name: shfmt
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: shfmt
+          run: |
+            mv ./xiaoyahelper/aliyun_clear.sh ./xiaoyahelper/aliyun_clear.sh.backup
+            wget -O ./xiaoyahelper/aliyun_clear.sh https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh
+            if [ -f ./xiaoyahelper/aliyun_clear.sh ]; then
+                rm -rf ./xiaoyahelper/aliyun_clear.sh.backup
+            else
+                mv ./xiaoyahelper/aliyun_clear.sh.backup ./xiaoyahelper/aliyun_clear.sh
+            fi
+
+        - uses: stefanzweifel/git-auto-commit-action@4d160c5e4d67c62e67f03ae49aa38359e964139a
+          with:
+            commit_message: 'chore: backup xiaoyahelper'
+            branch: main
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
