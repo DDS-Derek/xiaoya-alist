@@ -9,14 +9,14 @@ on:
 
 jobs:
 
-  shfmt:
+  xiaoyahelper:
     runs-on: ubuntu-latest
-    name: shfmt
+    name: xiaoyahelper
     steps:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: shfmt
+        - name: xiaoyahelper
           run: |
             mv ./xiaoyahelper/aliyun_clear.sh ./xiaoyahelper/aliyun_clear.sh.backup
             wget -O ./xiaoyahelper/aliyun_clear.sh https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh
@@ -29,6 +29,6 @@ jobs:
         - uses: stefanzweifel/git-auto-commit-action@4d160c5e4d67c62e67f03ae49aa38359e964139a
           with:
             commit_message: 'chore: backup xiaoyahelper'
-            branch: main
+            branch: master
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
