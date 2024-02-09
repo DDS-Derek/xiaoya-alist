@@ -1406,7 +1406,7 @@ function main_xiaoya_all_emby() {
 
 function install_xiaoyahelper() {
 
-    XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
 
     INFO "选择模式：[3/5]（默认 3）"
     INFO "模式3: 定时运行小雅转存清理并升级小雅镜像"
