@@ -2,6 +2,10 @@
 
 ver="202402071459"
 
+upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+upgrade_url_backup="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+tg_push_api_url="http://xiaoyapush.zengge99.eu.org"
+
 hash_function() {
     str="$1"
     hash=0
@@ -64,9 +68,9 @@ fast_triger_update()
     fi
     fi
     
-    newsh=$(curl -k -s "http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh" 2>/dev/null)
+    newsh=$(curl -k -s "$upgrade_url" 2>/dev/null)
     if [ -z "$newsh" ];then
-        newsh=$(curl -k -s "https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh" 2>/dev/null)
+        newsh=$(curl -k -s "$upgrade_url_backup" 2>/dev/null)
     fi
 latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
     if [ "$latest_ver"x = x ] || [ "$ver"x = "$latest_ver"x ];then
@@ -112,9 +116,9 @@ retry_command() {
 
 #检查脚本更新
 if which curl &>/dev/null;then
-newsh=$(retry_command "curl -k -s \"http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh\" 2>/dev/null")
+newsh=$(retry_command "curl -k -s \"$upgrade_url\" 2>/dev/null")
 if [ -z "$newsh" ];then
-    newsh=$(retry_command "curl -k -s \"https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh\" 2>/dev/null")
+    newsh=$(retry_command "curl -k -s \"$upgrade_url_backup\" 2>/dev/null")
 fi
 fi
 latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
@@ -653,7 +657,8 @@ install_keeper(){
     
     #echo "$newsh" > "$XIAOYA_ROOT/aliyun_clear.sh"
     docker rm -f -v xiaoyakeeper >/dev/null 2>&1
-    docker run --name xiaoyakeeper --restart=always --network=host --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi"
+    docker run --name xiaoyakeeper --restart=always --network=host --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
+    docker run --name xiaoyakeeper --restart=always --network=host --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
     docker exec xiaoyakeeper touch /docker-entrypoint.sh
     docker exec xiaoyakeeper mkdir /etc/xiaoya
     #docker cp $XIAOYA_ROOT/aliyun_clear.sh xiaoyakeeper:/etc/xiaoya/aliyun_clear.sh
@@ -733,13 +738,12 @@ if [ -z "$(echo -e "$dockers" | sed '/^$/d' | head -n1)" ];then
     exit 0
 fi
 
-api_url="http://xiaoyapush.zengge99.eu.org"
 get_ChatId(){
     code="$((RANDOM%90000000+10000000))"
     echo "请先发送验证码$code给机器人@xiaoyahelper_bot，发送成功后请敲回车键继续，不发验证码直接敲回车表示用上次验证的账号推送，如果从来没有验证过则不推送。请2分钟内完成，超时自动跳过。"
     sleep 2
     read -t 120 line
-    chat_id="$(curl -H "User-Agent: xiaoyapush" $api_url/getUpdates -d "$code" 2>/dev/null | sed 's/{"message_id"/\n{"message_id"/g' | grep "$code" | grep -Eo '"id":[0-9]{1,20}' | tail -n 1 | tr -d '"' | awk -F: '{print $2}')"
+    chat_id="$(curl -H "User-Agent: xiaoyapush" $tg_push_api_url/getUpdates -d "$code" 2>/dev/null | sed 's/{"message_id"/\n{"message_id"/g' | grep "$code" | grep -Eo '"id":[0-9]{1,20}' | tail -n 1 | tr -d '"' | awk -F: '{print $2}')"
     if [ -z "$chat_id" ];then
         return 0
     fi
@@ -765,7 +769,7 @@ push_msg(){
     fi
     text="$(echo "$@" | grep -v 'chat_id:')"
     if [ -n "$chat_id" ] && [ -n "$text" ];then
-        curl -s -X POST -H "User-Agent: xiaoyapush;ver=$ver" -H 'Content-Type: application/json' -d '{"chat_id": '$chat_id',"text": "'"$text"'"}' "$api_url/sendMessage" &> /dev/null
+        curl -s -X POST -H "User-Agent: xiaoyapush;ver=$ver" -H 'Content-Type: application/json' -d '{"chat_id": '$chat_id',"text": "'"$text"'"}' "$tg_push_api_url/sendMessage" &> /dev/null
     fi
 }
 
