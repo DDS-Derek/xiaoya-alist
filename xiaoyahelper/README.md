@@ -4,6 +4,8 @@
 
 本仓库镜像备份了xiaoyakeeper，意旨提供稳定高效的服务！
 
+服务状态查看：https://uptime.ddsrem.com/status/xiaoyahelper
+
 ## 使用
 
 **模式0**：每天自动清理一次。如果系统重启需要手动重新运行或把命令加入系统启动。
