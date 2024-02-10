@@ -2171,10 +2171,6 @@ function main_other_tools() {
 
 function main_return() {
 
-    get_os
-
-    clear
-
     if ! curl -sL https://ddsrem.com/xiaoya/xiaoya_alist; then
         if ! curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist; then
             curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist
@@ -2277,15 +2273,19 @@ function first_init() {
         rm -rf ${DDSREM_CONFIG_DIR}/xiaoya_emby_api.txt
     fi
 
+    get_os
+
 }
 
 if [ ! "$*" ]; then
     first_init
+    clear
     main
 elif [ "$*" == test ]; then
     INFO "Test"
     ci_test
 else
     first_init
+    clear
     "$@"
 fi
