@@ -83,6 +83,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 ```shell
 Docker启动容器名称设置 -> 71
 是否开启容器运行额外参数添加 -> 72
+重置脚本配置 -> 73
 ```
 
 ## 地址

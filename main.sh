@@ -2090,6 +2090,43 @@ function container_name_settings() {
 
 }
 
+function reset_script_configuration() {
+
+    INFO "是否${Red}删除所有脚本配置文件${Font} [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将开始清理配置文件${Blue} $i ${Font}\r"
+            sleep 1
+        done
+        rm -rf ${DDSREM_CONFIG_DIR}/container_name
+        rm -f \
+            xiaoya_alist_tvbox_config_dir.txt \
+            xiaoya_alist_media_dir.txt \
+            xiaoya_alist_config_dir.txt \
+            resilio_config_dir.txt \
+            portainer_config_dir.txt \
+            onelist_config_dir.txt \
+            container_run_extra_parameters.txt \
+            auto_symlink_config_dir.txt
+        INFO "清理完成！"
+
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将返回主界面并重新生成默认配置${Blue} $i ${Font}\r"
+            sleep 1
+        done
+
+        first_init
+        clear
+        main
+    else
+        exit 0
+    fi
+
+}
+
 function main_advanced_configuration() {
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
@@ -2098,9 +2135,10 @@ function main_advanced_configuration() {
     echo -e "${Blue}高级配置${Font}\n"
     echo -e "1、容器名称设置"
     echo -e "2、是否开启容器运行额外参数添加（当前：${Green}${container_run_extra_parameters}${Font}）"
-    echo -e "3、返回上级"
+    echo -e "3、重置脚本配置"
+    echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-3]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
     1)
         clear
@@ -2117,11 +2155,15 @@ function main_advanced_configuration() {
         ;;
     3)
         clear
+        reset_script_configuration
+        ;;
+    4)
+        clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-3]'
+        ERROR '请输入正确数字 [1-4]'
         main_advanced_configuration
         ;;
     esac
