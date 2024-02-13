@@ -6,6 +6,8 @@
 
 ![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/image-2.png)
 
+![](https://count.getloli.com/get/@DDS-Derek.xiaoya-alist.readme)
+
 - [使用](#使用)
 - [功能列表](#功能列表)
 - [地址](#地址)
