@@ -126,36 +126,36 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 ## 通用兼容性测试报告
 
-|    系统名称     | 安装 |
-| :-------------: | :--: |
-|   CentOS 7.9    |  ✅   |
-|   CentOS 8.4    |  ✅   |
-| CentOS 8 Stream |  ✅   |
-| CentOS 9 Stream |  ✅   |
-|   Debian 10.3   |  ✅   |
-|   Debian 11.3   |  ✅   |
-|   Debian 12.0   |  ✅   |
-|  Ubuntu 18.04   |  ✅   |
-|  Ubuntu 20.04   |  ✅   |
-|  Ubuntu 22.04   |  ✅   |
-|    Fedora 31    |  ✅   |
-|    Fedora 32    |  ✅   |
-|   AlmaLinux 9   |  ✅   |
-| RockyLinux 8.6  |  ✅   |
-|   Arch Linux    |  ✅   |
-|  openSUSE 15.4  |  ✅   |
-|     FreeBSD     |  ✅   |
-|     EulerOS     |  ✅   |
-|  Amazon Linux   |  ✅   |
-|     Alpine      |  ✅   |
-|     UnRaid      |  ✅   |
-| OpenMediaVault  |  ✅   |
-|      QNAP       |  ✅   |
-|     OpenWRT     |  ✅   |
-|    Synology     |  ✅   |
-|  TrueNAS CORE   |  ✅   |
-|  TrueNAS SCALE  |  ✅   |
-|     UGREEN      |  ✅   |
+|    系统名称     | main.sh | emby_config_editor.sh |
+| :-------------: | :-----: | :-------------------: |
+|   CentOS 7.9    |    ✅    |           ✅           |
+|   CentOS 8.4    |    ✅    |           ✅           |
+| CentOS 8 Stream |    ✅    |           ✅           |
+| CentOS 9 Stream |    ✅    |           ✅           |
+|   Debian 10.3   |    ✅    |           ✅           |
+|   Debian 11.3   |    ✅    |           ✅           |
+|   Debian 12.0   |    ✅    |           ✅           |
+|  Ubuntu 18.04   |    ✅    |           ✅           |
+|  Ubuntu 20.04   |    ✅    |           ✅           |
+|  Ubuntu 22.04   |    ✅    |           ✅           |
+|    Fedora 31    |    ✅    |           ✅           |
+|    Fedora 32    |    ✅    |           ✅           |
+|   AlmaLinux 9   |    ✅    |           ✅           |
+| RockyLinux 8.6  |    ✅    |           ✅           |
+|   Arch Linux    |    ✅    |           ✅           |
+|  openSUSE 15.4  |    ✅    |           ✅           |
+|     FreeBSD     |    ✅    |           ✅           |
+|     EulerOS     |    ✅    |           ✅           |
+|  Amazon Linux   |    ✅    |           ✅           |
+|     Alpine      |    ✅    |           ✅           |
+|     UnRaid      |    ✅    |           ✅           |
+| OpenMediaVault  |    ✅    |           ✅           |
+|      QNAP       |    ✅    |           ✅           |
+|     OpenWRT     |    ✅    |           ✅           |
+|    Synology     |    ✅    |           ✅           |
+|  TrueNAS CORE   |    ✅    |           ✅           |
+|  TrueNAS SCALE  |    ✅    |           ✅           |
+|     UGREEN      |    ✅    |           ✅           |
 
 ## 免责声明
 
