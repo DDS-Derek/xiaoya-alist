@@ -76,7 +76,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.1.9-2024_02_11_13_31"
+DATE_VERSION="v1.2.0-2024_02_16_12_53"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -2213,11 +2213,7 @@ function main_other_tools() {
 
 function main_return() {
 
-    if ! curl -sL https://ddsrem.com/xiaoya/xiaoya_alist; then
-        if ! curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist; then
-            curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist
-        fi
-    fi
+    cat /tmp/xiaoya_alist
 
     echo -e "1、安装/更新/卸载 小雅Alist   当前状态：$(judgment_container "${xiaoya_alist_name}")"
     echo -e "2、安装/卸载 小雅Emby全家桶   当前状态：$(judgment_container "${xiaoya_emby_name}")"
@@ -2316,6 +2312,15 @@ function first_init() {
     fi
 
     get_os
+
+    if [ -f /tmp/xiaoya_alist ]; then
+        rm -rf /tmp/xiaoya_alist
+    fi
+    if ! curl -sL https://ddsrem.com/xiaoya/xiaoya_alist -o /tmp/xiaoya_alist; then
+        if ! curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist -o /tmp/xiaoya_alist; then
+            curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist -o /tmp/xiaoya_alist
+        fi
+    fi
 
 }
 
