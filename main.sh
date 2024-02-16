@@ -364,7 +364,7 @@ function get_media_dir() {
     else
         INFO "请输入媒体库目录（默认 /opt/media ）"
         read -erp "MEDIA_DIR:" MEDIA_DIR
-        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/etc/xiaoya"
+        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
         echo "${MEDIA_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
     fi
