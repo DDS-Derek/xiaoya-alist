@@ -8,15 +8,23 @@
 
 ![](https://count.getloli.com/get/@DDS-Derek.xiaoya-alist.readme?theme=rule34)
 
-- [使用](#使用)
-- [功能列表](#功能列表)
-- [地址](#地址)
-- [兼容性测试报告](#兼容性测试报告)
+- [main.sh](#mainsh)
+  - [使用](#使用)
+  - [功能列表](#功能列表)
+- [emby\_config\_editor.sh](#emby_config_editorsh)
+  - [介绍](#介绍)
+  - [使用](#使用-1)
+- [相关地址](#相关地址)
+- [通用兼容性测试报告](#通用兼容性测试报告)
 - [免责声明](#免责声明)
 - [Star History](#star-history)
 - [感谢](#感谢)
 
-## 使用
+## main.sh
+
+整合安装脚本，内置所有相关软件的安装。
+
+### 使用
 
 ```shell
 bash -c "$(curl -sL https://ddsrem.com/xiaoya_install.sh)"
@@ -32,7 +40,7 @@ bash -c "$(curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/ma
 bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
 ```
 
-## 功能列表
+### 功能列表
 
 > 数字代表先选x，再选x，再选x
 > 
@@ -88,17 +96,35 @@ Docker启动容器名称设置 -> 71
 重置脚本配置 -> 73
 ```
 
-## 地址
+## emby_config_editor.sh
 
-[https://hub.docker.com/r/ddsderek/xiaoya-emby-library](https://hub.docker.com/r/ddsderek/xiaoya-emby-library)
+### 介绍
 
-[https://hub.docker.com/r/ddsderek/xiaoya-glue](https://hub.docker.com/r/ddsderek/xiaoya-glue)
+emby_config.txt 的命令行的图形化编辑器，内置纠错。
+
+### 使用
+
+```shell
+bash -c "$(curl -sL https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s xiaoya配置目录
+```
+
+**备用地址**
+
+```shell
+bash -c "$(curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_config_editor.sh)" -s xiaoya配置目录
+```
+
+```shell
+bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/emby_config_editor.sh)" -s xiaoya配置目录
+```
+
+## 相关地址
 
 [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
 
 小雅官方 [Telegram](https://t.me/xiaoyaliu00) 交流群
 
-## 兼容性测试报告
+## 通用兼容性测试报告
 
 |    系统名称     | 安装 |
 | :-------------: | :--: |
