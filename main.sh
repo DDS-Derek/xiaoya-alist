@@ -14,7 +14,7 @@ export PATH
 #                       __/ |
 #                      |___/
 #
-# Copyright (c) 2023 DDSRem <https://blog.ddsrem.com>
+# Copyright (c) 2024 DDSRem <https://blog.ddsrem.com>
 #
 # This is free software, licensed under the Mit License.
 #
