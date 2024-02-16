@@ -103,7 +103,7 @@ DDSREM_CONFIG_DIR=/etc/DDSRem
 
 function root_need() {
     if [[ $EUID -ne 0 ]]; then
-        ERRO '此脚本必须以 root 身份运行！'
+        ERROR '此脚本必须以 root 身份运行！'
         exit 1
     fi
 }
