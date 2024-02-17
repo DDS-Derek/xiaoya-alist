@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver="202402132233"
+ver="202402170119"
 
 upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
 upgrade_url_backup="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
@@ -504,12 +504,14 @@ copy_tvbox_files() {
     target_dir3="/www/tvbox/libs"
     target_dir4="/www/tvbox/cat"
     target_dir5="/www/tvbox/cat/libs"
+    target_dir6="/www/tvbox/cat/lib"
 
     mkdir -p "$target_dir1"
     mkdir -p "$target_dir2"
     mkdir -p "$target_dir3"
     mkdir -p "$target_dir4"
     mkdir -p "$target_dir5"
+    mkdir -p "$target_dir6"
 
     copy_files_by_extension() {
         local ext=$1
@@ -533,13 +535,43 @@ copy_tvbox_files() {
             fi
         done
     }
+    
+    recursive_copy() {
+    local source="$1"
+    local destination="$2"
+    mkdir -p "$destination"
 
+    for item in "$source"/*; do
+        local filename=$(basename "$item")
+        local dest_path="$destination/$filename"
+        
+        if [ -d "$item" ]; then
+            if [ ! -d "$dest_path" ]; then
+                mkdir "$dest_path"
+            fi
+            recursive_copy "$item" "$dest_path"
+        elif [ -f "$item" ]; then
+            if [ -f "$dest_path" ]; then
+                if ! cmp -s "$item" "$dest_path"; then
+                    cp -f "$item" "$dest_path" >/dev/null
+                else
+                    :
+                fi
+            else
+                cp "$item" "$dest_path" >/dev/null
+            fi
+        fi
+    done
+}
+
+    recursive_copy "/data/tvbox" "/www/tvbox"
     copy_files_by_extension "json" "$target_dir1"
     copy_files_by_extension "json" "$target_dir2"
     copy_files_by_extension "js" "$target_dir3"
     copy_files_by_extension "json" "$target_dir4"
     copy_files_by_extension "js" "$target_dir4"
     copy_files_by_extension "js" "$target_dir5"
+    copy_files_by_extension "js" "$target_dir6"
 }
 
 copy_tvbox_files'
