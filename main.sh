@@ -76,7 +76,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.2.0-2024_02_16_12_53"
+DATE_VERSION="v1.3.0-2024_02_18_17_56"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1105,7 +1105,7 @@ function choose_network_mode() {
 
 function choose_emby_image() {
 
-    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver ]（默认 2）"
+    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver(目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 2）"
     read -erp "IMAGE:" IMAGE
     [[ -z "${IMAGE}" ]] && IMAGE="2"
     if [[ ${IMAGE} == [1] ]]; then
