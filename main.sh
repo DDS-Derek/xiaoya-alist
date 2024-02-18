@@ -1340,10 +1340,17 @@ function unisntall_resilio() {
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
         rm -rf "${OLD_CONFIG_DIR}"
     fi
-    crontab -l > /tmp/cronjob.tmp
-    grep -n "sync_emby_config" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
-    crontab /tmp/cronjob.tmp
-    rm -rf /tmp/cronjob.tmp
+
+    # 清理定时同步任务
+    if command -v crontab > /dev/null 2>&1; then
+        crontab -l > /tmp/cronjob.tmp
+        grep -n "sync_emby_config" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
+        crontab /tmp/cronjob.tmp
+        rm -rf /tmp/cronjob.tmp
+    elif [ -f /etc/synoinfo.conf ]; then
+        sed -i '/sync_emby_config/d' /etc/crontab
+    fi
+
     INFO "卸载成功！"
 
 }
@@ -1384,6 +1391,38 @@ function main_resilio() {
 
 }
 
+function once_sync_emby_config() {
+
+    if command -v crontab > /dev/null 2>&1; then
+        COMMAND=$(crontab -l | grep sync_emby_config | sed 's/^.*\* \*//; s/>>.*$//')
+        if [ -z "$COMMAND" ]; then
+            get_config_dir
+            get_media_dir
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+        fi
+    elif [ -f /etc/synoinfo.conf ]; then
+        COMMAND=$(grep 'sync_emby_config' /etc/crontab | sed -E 's/^.*\* \*|>>.*$//')
+        if [ -z "$COMMAND" ]; then
+            get_config_dir
+            get_media_dir
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+        fi
+    else
+        get_config_dir
+        get_media_dir
+        COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+    fi
+    echo -e "${COMMAND}" > /tmp/sync_command.txt
+    echo -e "${COMMAND}"
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始同步小雅Emby的config目录${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    bash /tmp/sync_command.txt
+    rm -rf /tmp/sync_command.txt
+
+}
+
 function main_xiaoya_all_emby() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -1393,10 +1432,11 @@ function main_xiaoya_all_emby() {
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
     echo -e "5、安装/更新/卸载 Resilio-Sync   当前状态：$(judgment_container "${xiaoya_resilio_name}")"
-    echo -e "6、卸载Emby全家桶"
-    echo -e "7、返回上级"
+    echo -e "6、立即同步小雅Emby的config目录"
+    echo -e "7、卸载Emby全家桶"
+    echo -e "8、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-7]:" num
+    read -erp "请输入数字 [1-8]:" num
     case "$num" in
     1)
         clear
@@ -1424,15 +1464,19 @@ function main_xiaoya_all_emby() {
         ;;
     6)
         clear
-        uninstall_xiaoya_all_emby
+        once_sync_emby_config
         ;;
     7)
+        clear
+        uninstall_xiaoya_all_emby
+        ;;
+    8)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-7]'
+        ERROR '请输入正确数字 [1-8]'
         main_xiaoya_all_emby
         ;;
     esac
