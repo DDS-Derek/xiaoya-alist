@@ -1207,6 +1207,10 @@ function install_resilio() {
     read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
 
+    INFO "resilio容器内存上限（单位：MB，默认：2048）"
+    read -erp "mem_size:" mem_size
+    [[ -z "${mem_size}" ]] && mem_size="2048"
+
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         INFO "请输入其他参数（默认 无 ）"
@@ -1234,6 +1238,7 @@ function install_resilio() {
     if [ -n "${extra_parameters}" ]; then
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
+            -m ${mem_size}M \
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
@@ -1248,6 +1253,7 @@ function install_resilio() {
     else
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
+            -m ${mem_size}M \
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
