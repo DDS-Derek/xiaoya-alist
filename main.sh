@@ -1266,8 +1266,7 @@ function install_resilio() {
             linuxserver/resilio-sync:latest
     fi
 
-    while true
-    do
+    while true; do
         INFO "请输入您希望的同步时间"
         read -erp "注意：24小时制，格式：hh:mm，小时分钟之间用英文冒号分隔 （示例：23:45，默认：06:00）：" sync_time
         [[ -z "${sync_time}" ]] && sync_time="06:00"
