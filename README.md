@@ -19,7 +19,7 @@
 - [免责声明](#免责声明)
 - [Star History](#star-history)
 - [感谢](#感谢)
-- [捐献](#捐献)
+- [捐赠](#捐赠)
 
 ## main.sh
 
@@ -181,9 +181,9 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
 
-## 捐献
+## 捐赠
 
-> 注：以下捐献码不包含此项目作者（DDSRem）的捐献码！
+> 注：以下捐赠不包含此项目作者（DDSRem）的捐赠！
 
-![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-xiaoya.png)
-![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ailaog.png)
+- [捐赠小雅](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-xiaoya.png)
+- [捐赠AI老G](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ailaog.png)
