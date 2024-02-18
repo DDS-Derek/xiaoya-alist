@@ -1266,14 +1266,18 @@ function install_resilio() {
             linuxserver/resilio-sync:latest
     fi
 
+    # 配置定时任务Cron
     while true; do
         INFO "请输入您希望的同步时间"
         read -erp "注意：24小时制，格式：hh:mm，小时分钟之间用英文冒号分隔 （示例：23:45，默认：06:00）：" sync_time
         [[ -z "${sync_time}" ]] && sync_time="06:00"
         read -erp "您希望几天同步一次？（单位：天）（默认：3）" sync_day
         [[ -z "${sync_day}" ]] && sync_day="3"
+        # 中文冒号纠错
         time_value=${sync_time//：/:}
+        # 提取小时位
         hour=${time_value%%:*}
+        # 提取分钟位
         minu=${time_value#*:}
         if ! [[ "$hour" =~ ^([01]?[0-9]|2[0-3])$ ]] || ! [[ "$minu" =~ ^([0-5]?[0-9])$ ]]; then
             ERROR "输入错误，请重新输入。小时必须为0-23的正整数，分钟必须为0-59的正整数。"
@@ -1282,6 +1286,7 @@ function install_resilio() {
         fi
     done
 
+    # 组合定时任务命令
     CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> ${CONFIG_DIR}/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
         crontab -l | grep -v sync_emby_config > /tmp/cronjob.tmp
@@ -1291,6 +1296,7 @@ function install_resilio() {
         INFO "${CRON}"
         rm -rf /tmp/cronjob.tmp
     elif [ -f /etc/synoinfo.conf ]; then
+        # 群晖单独支持
         cp /etc/crontab /etc/crontab.bak
         INFO "已创建/etc/crontab.bak备份文件"
         sed -i '/sync_emby_config/d' /etc/crontab
