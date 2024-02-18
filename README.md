@@ -69,6 +69,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 单独 下载 pikpak.mp4 -> 227
 单独 解压 pikpak.mp4 -> 228
 单独 安装Emby（可选择版本）-> 23
+立即 同步小雅Emby的config目录 -> 26
 ———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 42
 更新 小雅Alist -> 12
@@ -78,7 +79,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 更新 Auto_Symlink -> 622
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 13
-卸载 Emby全家桶 -> 26
+卸载 Emby全家桶 -> 27
 卸载 Resilio-Sync（单独） -> 253
 卸载 小雅助手（xiaoyahelper）-> 32
 卸载 小雅Alist-TVBox -> 43
