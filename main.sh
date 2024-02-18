@@ -1266,14 +1266,38 @@ function install_resilio() {
             linuxserver/resilio-sync:latest
     fi
 
-    CRON="0 6 */3 * * bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> ${CONFIG_DIR}/cron.log 2>&1"
+    while true
+    do
+        INFO "请输入您希望的同步时间"
+        read -erp "注意：24小时制，格式：hh:mm，小时分钟之间用英文冒号分隔 （示例：23:45，默认：06:00）：" sync_time
+        [[ -z "${sync_time}" ]] && sync_time="06:00"
+        read -erp "您希望几天同步一次？（单位：天）（默认：3）" sync_day
+        [[ -z "${sync_day}" ]] && sync_day="3"
+        time_value=${sync_time//：/:}
+        hour=${time_value%%:*}
+        minu=${time_value#*:}
+        if ! [[ "$hour" =~ ^([01]?[0-9]|2[0-3])$ ]] || ! [[ "$minu" =~ ^([0-5]?[0-9])$ ]]; then
+            ERROR "输入错误，请重新输入。小时必须为0-23的正整数，分钟必须为0-59的正整数。"
+        else
+            break
+        fi
+    done
+
+    CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> ${CONFIG_DIR}/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
         crontab -l | grep -v sync_emby_config > /tmp/cronjob.tmp
         echo -e "${CRON}" >> /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
-        INFO '已经添加下面的记录到crontab定时任务，每三天更新一次config'
+        INFO '已经添加下面的记录到crontab定时任务'
         INFO "${CRON}"
         rm -rf /tmp/cronjob.tmp
+    elif [ -f /etc/synoinfo.conf ]; then
+        cp /etc/crontab /etc/crontab.bak
+        INFO "已创建/etc/crontab.bak备份文件"
+        sed -i '/sync_emby_config/d' /etc/crontab
+        echo -e "${CRON}" >> /etc/crontab
+        INFO '已经添加下面的记录到crontab定时任务'
+        INFO "${CRON}"
     fi
 
     INFO "安装完成！"
