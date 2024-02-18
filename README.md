@@ -68,7 +68,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 单独 解压 config.mp4 -> 226
 单独 下载 pikpak.mp4 -> 227
 单独 解压 pikpak.mp4 -> 228
-单独 安装Emby（可选择版本）-> 23
+单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 23
 立即 同步小雅Emby的config目录 -> 26
 ———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 42
