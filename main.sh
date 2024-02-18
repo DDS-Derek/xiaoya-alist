@@ -2228,7 +2228,7 @@ function main_return() {
     echo -e "5、安装/更新/卸载 Onelist   当前状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "6、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
     echo -e "7、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
-    echo -e "8、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold${Font}"
+    echo -e "8、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [1-8]:" num
     case "$num" in

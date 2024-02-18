@@ -19,6 +19,7 @@
 - [免责声明](#免责声明)
 - [Star History](#star-history)
 - [感谢](#感谢)
+- [捐献](#捐献)
 
 ## main.sh
 
@@ -175,5 +176,13 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 - [Auto_Symlink](https://github.com/shenxianmq/Auto_Symlink)
 - [Portainer](https://github.com/portainer/portainer)
 - [CatVod](https://pcoof.com/git/https://github.com/catvod/CatVodOpen)
+- [AI老G](https://space.bilibili.com/252166818)
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
+
+## 捐献
+
+> 注：以下捐献码不包含此项目作者（DDSRem）的捐献码！
+
+![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-xiaoya.png)
+![](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ailaog.png)
