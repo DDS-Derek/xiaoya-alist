@@ -655,8 +655,6 @@ function pull_run_glue() {
             "${@}"
     fi
 
-    docker rmi xiaoyaliu/glue:latest
-
 }
 
 function pull_run_ddsderek_glue() {
@@ -691,8 +689,6 @@ function pull_run_ddsderek_glue() {
             ddsderek/xiaoya-glue:latest \
             "${@}"
     fi
-
-    docker rmi ddsderek/xiaoya-glue:latest
 
 }
 
@@ -1026,6 +1022,65 @@ function install_amilys_embyserver() {
 
 }
 
+function install_lovechen_embyserver() {
+
+    cpu_arch=$(uname -m)
+    INFO "开始安装Emby容器....."
+
+    INFO "开始转换数据库..."
+
+    mv ${MEDIA_DIR}/config/data/library.db ${MEDIA_DIR}/config/data/library.org.db
+    if [ -f "${MEDIA_DIR}/config/data/library.db-wal" ]; then
+        rm -rf ${MEDIA_DIR}/config/data/library.db-wal
+    fi
+    if [ -f "${MEDIA_DIR}/config/data/library.db-shm" ]; then
+        rm -rf ${MEDIA_DIR}/config/data/library.db-shm
+    fi
+    chmod 777 ${MEDIA_DIR}/config/data/library.org.db
+    curl -o ${MEDIA_DIR}/config/data/library.db https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_lovechen/library.db
+    curl -o ${MEDIA_DIR}/temp.sql https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_lovechen/temp.sql
+    pull_run_glue sqlite3 /media/config/data/library.db ".read /media/temp.sql"
+
+    INFO "数据库转换成功！"
+    rm -rf ${MEDIA_DIR}/temp.sql
+
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                ${extra_parameters} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                lovechen/embyserver:4.7.14.0
+        else
+            docker run -itd \
+                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                lovechen/embyserver:4.7.14.0
+        fi
+        ;;
+    *)
+        ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        exit 1
+        ;;
+    esac
+
+}
+
 function choose_network_mode() {
 
     INFO "请选择使用的网络模式 [ 1:host | 2:bridge ]（默认 1）"
@@ -1050,13 +1105,15 @@ function choose_network_mode() {
 
 function choose_emby_image() {
 
-    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver ]（默认 2）"
+    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver ]（默认 2）"
     read -erp "IMAGE:" IMAGE
     [[ -z "${IMAGE}" ]] && IMAGE="2"
     if [[ ${IMAGE} == [1] ]]; then
         install_amilys_embyserver
     elif [[ ${IMAGE} == [2] ]]; then
         install_emby_embyserver
+    elif [[ ${IMAGE} == [3] ]]; then
+        install_lovechen_embyserver
     else
         ERROR "输入无效，请重新选择"
         choose_emby_image
