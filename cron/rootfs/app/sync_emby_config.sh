@@ -14,35 +14,30 @@ fi
 
 EMBY_URL=$(cat /etc/xiaoya/emby_server.txt)
 
-media_lib=/media
-if [ ! -d "$media_lib/config_sync" ]; then
-	mkdir "$media_lib/config_sync"
-fi
-
 echo "Emby 和 Resilio关闭中 ...."
 docker stop "${EMBY_NAME}"
 docker stop "${RESILIO_NAME}"
 
 echo "检查同步数据库完整性..."
 sleep 4
-if sqlite3 $media_lib/config_sync/data/library.db ".tables" | grep Chapters3 > /dev/null ; then
+if sqlite3 /media/config_sync/data/library.db ".tables" | grep Chapters3 > /dev/null ; then
 	curl -s "${EMBY_URL}/Users?api_key=e825ed6f7f8f44ffa0563cddaddce14d" > /tmp/emby.response
 	echo -e "\033[32m同步数据库数据完整\033[0m"
-	sqlite3 $media_lib/config/data/library.db ".dump UserDatas" > /tmp/emby_user.sql
-	sqlite3 $media_lib/config/data/library.db ".dump ItemExtradata" > /tmp/emby_library_mediaconfig.sql
-	rm "$media_lib/config/data/library.db*"
-	cp "$media_lib/config_sync/data/library.db*" "$media_lib/config/data/"
-	sqlite3 $media_lib/config/data/library.db "DROP TABLE IF EXISTS UserDatas;"
-	sqlite3 $media_lib/config/data/library.db ".read /tmp/emby_user.sql"
-	sqlite3 $media_lib/config/data/library.db "DROP TABLE IF EXISTS ItemExtradata;"
-    sqlite3 $media_lib/config/data/library.db ".read /tmp/emby_library_mediaconfig.sql"	
+	sqlite3 /media/config/data/library.db ".dump UserDatas" > /tmp/emby_user.sql
+	sqlite3 /media/config/data/library.db ".dump ItemExtradata" > /tmp/emby_library_mediaconfig.sql
+	rm /media/config/data/library.db*
+	cp /media/config_sync/data/library.db* /media/config/data/
+	sqlite3 /media/config/data/library.db "DROP TABLE IF EXISTS UserDatas;"
+	sqlite3 /media/config/data/library.db ".read /tmp/emby_user.sql"
+	sqlite3 /media/config/data/library.db "DROP TABLE IF EXISTS ItemExtradata;"
+    sqlite3 /media/config/data/library.db ".read /tmp/emby_library_mediaconfig.sql"	
 	echo "保存用户信息完成"
-	cp -rf "$media_lib/config_sync/cache/*" "$media_lib/config/cache/"
-	cp -rf "$media_lib/config_sync/metadata/*" "$media_lib/config/metadata/"
+	cp -rf /media/config_sync/cache/* /media/config/cache/
+	cp -rf /media/config_sync/metadata/* /media/config/metadata/
 	chmod -R 777 \
-		"$media_lib/config/data" \
-		"$media_lib/config/cache" \
-		"$media_lib/config/metadata"
+		/media/config/data \
+		/media/config/cache \
+		/media/config/metadata
 	echo "复制 config_sync 至 config 完成"
 	echo "Emby 和 Resilio 重启中 ...."
 	docker start "${EMBY_NAME}"
