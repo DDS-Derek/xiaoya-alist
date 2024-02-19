@@ -1336,7 +1336,7 @@ function install_resilio() {
         hour=${time_value%%:*}
         # 提取分钟位
         minu=${time_value#*:}
-        if [[ "$hour" =~ ^([01]?[0-9]|2[0-3])$ && "$minu" =~ ^([0-5]?[0-9])$ ]]; then
+        if [[ "$hour" -ge 0 && "$hour" -le 23 && "$minu" -ge 0 && "$minu" -le 59 ]]; then
             break
         else
             ERROR "输入错误，请重新输入。小时必须为0-23的正整数，分钟必须为0-59的正整数。"
