@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 # shellcheck disable=SC1091
 # shellcheck disable=SC2154
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
@@ -21,7 +21,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.0-2024_02_16_16_46"
+DATE_VERSION="v1.0.1-2024_02_19_19_08"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
