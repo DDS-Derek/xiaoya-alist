@@ -272,7 +272,7 @@ function get_os() {
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
         packages_need
-    elif echo -e "${_os_all}" | grep -Eqi "UnRaid"; then
+    elif [ -f /etc/unraid-version ]; then
         OSNAME='unraid'
         packages_need
     elif grep -Eqi "openSUSE" /etc/*-release; then
