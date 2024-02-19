@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck shell=bash
 # shellcheck disable=SC2086
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
@@ -98,8 +98,6 @@ function ERROR() {
 function WARN() {
     echo -e "${WARN} ${1}"
 }
-
-DDSREM_CONFIG_DIR=/etc/DDSRem
 
 function root_need() {
     if [[ $EUID -ne 0 ]]; then
@@ -274,78 +272,99 @@ function get_os() {
     if [ "${_os}" == "Darwin" ]; then
         OSNAME='macos'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     # 必须先判断的系统
     # 绿联NAS 基于 OpenWRT
     elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
         OSNAME='ugreen'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     # OpenMediaVault 基于 Debian
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
         packages_need "apt"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     # FreeNAS（TrueNAS CORE）基于 FreeBSD
     elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
         OSNAME='truenas core'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     # TrueNAS SCALE 基于 Debian
     elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
         OSNAME='truenas scale'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/synoinfo.conf ]; then
         OSNAME='synology'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/openwrt_release ]; then
         OSNAME='openwrt'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "QNAP" /etc/issue; then
         OSNAME='qnap'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/unraid-version ]; then
         OSNAME='unraid'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
         OSNAME='libreelec'
-        ERROR "脚本不支持LibreELEC系统！"
-        exit 1
+        DDSREM_CONFIG_DIR=/storage/DDSRem
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
         packages_need "zypper"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "FreeBSD" /etc/*-release; then
         OSNAME='freebsd'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
         OSNAME='euler'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
         OSNAME='rhel'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
         OSNAME='rhel'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
         OSNAME='rhel'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
         OSNAME='rhel'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Arch Linux" /etc/issue || grep -Eqi "Arch Linux" /etc/*-release; then
         OSNAME='archlinux'
         packages_need "pacman"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
         OSNAME='amazon'
         packages_need "yum"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
         OSNAME='debian'
         packages_need "apt"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
         OSNAME='ubuntu'
         packages_need "apt"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
         OSNAME='alpine'
         packages_need "apk_alpine"
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     else
         OSNAME='unknow'
         packages_need
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     fi
 
 }
@@ -2462,6 +2481,9 @@ function ci_test() {
 function first_init() {
 
     root_need
+
+    get_os
+
     if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
         mkdir -p ${DDSREM_CONFIG_DIR}
     fi
@@ -2481,8 +2503,6 @@ function first_init() {
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_api.txt ]; then
         rm -rf ${DDSREM_CONFIG_DIR}/xiaoya_emby_api.txt
     fi
-
-    get_os
 
     if [ -f /tmp/xiaoya_alist ]; then
         rm -rf /tmp/xiaoya_alist
