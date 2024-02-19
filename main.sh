@@ -275,6 +275,10 @@ function get_os() {
     elif [ -f /etc/unraid-version ]; then
         OSNAME='unraid'
         packages_need
+    elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
+        OSNAME='libreelec'
+        ERROR "脚本不支持LibreELEC系统！"
+        exit 1
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
         packages_need "zypper"
