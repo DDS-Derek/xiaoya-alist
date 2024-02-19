@@ -158,7 +158,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 |  TrueNAS CORE   |    ✅    |           ✅           |
 |  TrueNAS SCALE  |    ✅    |           ✅           |
 |     UGREEN      |    ✅    |           ✅           |
-|   LibreELEC     |    ❌    |           ❌           |
+|   LibreELEC     |    ✅    |           ✅           |
 
 ## 免责声明
 
