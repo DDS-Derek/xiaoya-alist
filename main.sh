@@ -217,6 +217,34 @@ function packages_need() {
                 exit 1
             fi
         fi
+    elif [ "$1" == "pacman" ]; then
+        if ! which curl; then
+            WARN "curl 未安装，脚本尝试自动安装..."
+            if pacman -Sy --noconfirm curl; then
+                INFO "curl 安装成功！"
+            else
+                ERROR "curl 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which wget; then
+            WARN "wget 未安装，脚本尝试自动安装..."
+            if pacman -Sy --noconfirm wget; then
+                INFO "wget 安装成功！"
+            else
+                ERROR "wget 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
+        if ! which docker; then
+            WARN "docker 未安装，脚本尝试自动安装..."
+            if pacman -Sy --noconfirm docker; then
+                INFO "docker 安装成功！"
+            else
+                ERROR "docker 安装失败，请手动安装！"
+                exit 1
+            fi
+        fi
     else
         if ! which curl; then
             ERROR "curl 未安装，请手动安装！"
@@ -300,6 +328,9 @@ function get_os() {
     elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
         OSNAME='rhel'
         packages_need "yum"
+    elif grep -Eqi "Arch Linux" /etc/issue || grep -Eqi "Arch Linux" /etc/*-release; then
+        OSNAME='archlinux'
+        packages_need "pacman"
     elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
         OSNAME='amazon'
         packages_need "yum"
