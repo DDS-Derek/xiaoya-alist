@@ -6,6 +6,7 @@ cd /app || exit
 crontab -r
 
 echo "${CRON} bash /app/sync_emby_config.sh ${EMBY} ${RESILIO} >> /config/cron.log 2>&1" > /app/cronjob.list
+echo "${CRON} bash /app/sync_emby_config.sh ${EMBY} ${RESILIO} >> /config/cron.log 2>&1"
 echo "bash /app/sync_emby_config.sh ${EMBY} ${RESILIO}" > /app/command.sh
 
 if crontab /app/cronjob.list; then
