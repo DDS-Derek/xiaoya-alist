@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver="202402170119"
+ver="202402190042"
 
 upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
 upgrade_url_backup="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
@@ -241,7 +241,12 @@ delete_File(){
         return 1
     fi
     
-    myecho "彻底删除文件：$path/$_name"
+    drive_root="资源盘"
+    if [ "$folder_type"x = "b"x ];then
+        drive_root="备份盘"
+    fi
+    
+    myecho "彻底删除文件：/$drive_root$path/$_name"
     
     return 0
 }
