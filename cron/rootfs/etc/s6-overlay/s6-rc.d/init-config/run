@@ -5,8 +5,8 @@ cd /app || exit
 
 crontab -r
 
-echo "${CRON} bash /app/sync_emby_config.sh ${EMBY_NAME} ${RESILIO_NAME} >> /config/cron.log 2>&1" > /app/cronjob.list
-echo "bash /app/sync_emby_config.sh ${EMBY_NAME} ${RESILIO_NAME}" > /app/command.sh
+echo "${CRON} bash /app/sync_emby_config.sh ${EMBY} ${RESILIO} >> /config/cron.log 2>&1" > /app/cronjob.list
+echo "bash /app/sync_emby_config.sh ${EMBY} ${RESILIO}" > /app/command.sh
 
 if crontab /app/cronjob.list; then
     echo "定时任务添加成功"
