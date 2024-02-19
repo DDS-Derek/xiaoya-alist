@@ -81,7 +81,7 @@ latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
     
     clear_aliyun_all_docker_pre_update
     sleep 60
-    docker restart xiaoyakeeper
+    #docker restart xiaoyakeeper
     exit 0
 }
 
