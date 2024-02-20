@@ -76,7 +76,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.3.1-2024_02_19_19_04"
+DATE_VERSION="v1.3.2-2024_02_20_13_11"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -326,19 +326,19 @@ function get_os() {
         packages_need "yum"
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
-        OSNAME='rhel'
+        OSNAME='centos'
         packages_need "yum"
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-        OSNAME='rhel'
+        OSNAME='fedora'
         packages_need "yum"
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-        OSNAME='rhel'
+        OSNAME='rocky'
         packages_need "yum"
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-        OSNAME='rhel'
+        OSNAME='almalinux'
         packages_need "yum"
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Arch Linux" /etc/issue || grep -Eqi "Arch Linux" /etc/*-release; then
