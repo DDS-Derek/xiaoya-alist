@@ -3,7 +3,11 @@ name: backup
 on:
   workflow_dispatch:
   push:
-  pull_request:
+    branches:
+      - master
+    paths:
+      - "xiaoyahelper/**"
+      - ".github/workflows/backup.yml"
   schedule:
     - cron: '0 */12 * * *'
 
