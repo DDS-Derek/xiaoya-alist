@@ -1319,7 +1319,12 @@ function install_sync_emby_config_cron() {
     done
 
     # 组合定时任务命令
-    CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> ${CONFIG_DIR}/cron.log 2>&1"
+    CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
+${MEDIA_DIR} \
+$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> \
+${CONFIG_DIR}/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
         crontab -l | grep -v sync_emby_config > /tmp/cronjob.tmp
         echo -e "${CRON}" >> /tmp/cronjob.tmp
@@ -1553,14 +1558,22 @@ function once_sync_emby_config() {
         if [ -z "$COMMAND" ]; then
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
+${MEDIA_DIR} \
+${CONFIG_DIR} \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
         COMMAND=$(grep 'sync_emby_config' /etc/crontab | sed -E 's/^.*\* \*|>>.*$//')
         if [ -z "$COMMAND" ]; then
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
+${MEDIA_DIR} \
+${CONFIG_DIR} \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
@@ -1568,7 +1581,11 @@ function once_sync_emby_config() {
         else
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
+${MEDIA_DIR} \
+${CONFIG_DIR} \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     fi
     echo -e "${COMMAND}" > /tmp/sync_command.txt
