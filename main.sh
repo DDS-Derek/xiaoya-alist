@@ -1481,9 +1481,11 @@ function uninstall_sync_emby_config_cron() {
     elif [ -f /etc/synoinfo.conf ]; then
         sed -i '/sync_emby_config/d' /etc/crontab
     else
-        docker stop xiaoya-cron
-        docker rm xiaoya-cron
-        docker rmi ddsderek/xiaoya-cron:latest
+        if docker container inspect xiaoya-cron > /dev/null 2>&1; then
+            docker stop xiaoya-cron
+            docker rm xiaoya-cron
+            docker rmi ddsderek/xiaoya-cron:latest
+        fi
     fi
 
 }
@@ -1561,7 +1563,13 @@ function once_sync_emby_config() {
             COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     else
-        COMMAND="docker exec -it xiaoya-cron bash /app/command.sh"
+        if docker container inspect xiaoya-cron > /dev/null 2>&1; then
+            COMMAND="docker exec -it xiaoya-cron bash /app/command.sh"
+        else
+            get_config_dir
+            get_media_dir
+            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${MEDIA_DIR} ${CONFIG_DIR} $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+        fi
     fi
     echo -e "${COMMAND}" > /tmp/sync_command.txt
     echo -e "${COMMAND}"
