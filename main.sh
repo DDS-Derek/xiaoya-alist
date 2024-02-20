@@ -1361,6 +1361,8 @@ function install_sync_emby_config_cron() {
 
 function install_resilio() {
 
+    get_media_dir
+
     if [ -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)
         INFO "已读取Resilio-Sync配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
@@ -1368,14 +1370,12 @@ function install_resilio() {
         [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     else
-        INFO "请输入配置文件目录（默认 /etc/xiaoya/resilio ）"
+        INFO "请输入配置文件目录（默认 ${MEDIA_DIR}/resilio ）"
         read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya/resilio"
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="${MEDIA_DIR}/resilio"
         touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
     fi
-
-    get_media_dir
 
     INFO "请输入后台管理端口（默认 8888 ）"
     read -erp "HT_PORT:" HT_PORT
@@ -1409,6 +1409,12 @@ function install_resilio() {
     fi
 
     INFO "开始安装resilio..."
+    if [ ! -d "${CONFIG_DIR}" ]; then
+        mkdir -p "${CONFIG_DIR}"
+    fi
+    if [ ! -d "${CONFIG_DIR}/downloads" ]; then
+        mkdir -p "${CONFIG_DIR}/downloads"
+    fi
     if [ -n "${extra_parameters}" ]; then
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
