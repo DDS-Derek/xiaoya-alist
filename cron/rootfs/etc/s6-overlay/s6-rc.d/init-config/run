@@ -1,17 +1,40 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+Green="\033[32m"
+Red="\033[31m"
+Yellow='\033[33m'
+Font="\033[0m"
+INFO="[${Green}INFO${Font}]"
+ERROR="[${Red}ERROR${Font}]"
+WARN="[${Yellow}WARN${Font}]"
+function INFO() {
+    echo -e "${INFO} ${1}"
+}
+function ERROR() {
+    echo -e "${ERROR} ${1}"
+}
+function WARN() {
+    echo -e "${WARN} ${1}"
+}
+
+if [ ! -d /app ]; then
+    mkdir /app
+fi
 cd /app || exit
 
 crontab -r
 
-echo "${CRON} bash /app/sync_emby_config.sh ${EMBY} ${RESILIO} >> /config/cron.log 2>&1" > /app/cronjob.list
-echo "${CRON} bash /app/sync_emby_config.sh ${EMBY} ${RESILIO} >> /config/cron.log 2>&1"
-echo "bash /app/sync_emby_config.sh ${EMBY} ${RESILIO}" > /app/command.sh
+CRON_COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s /media /etc/xiaoya ${EMBY} ${RESILIO}"
+
+echo -e "${CRON} ${CRON_COMMAND} >> /config/cron.log 2>&1" > /app/cronjob.list
+echo -e "${CRON_COMMAND}" > /app/command.sh
+
+INFO "$(cat /app/cronjob.list)"
 
 if crontab /app/cronjob.list; then
-    echo "定时任务添加成功"
+    INFO "定时任务添加成功"
 else
-    echo "定时任务添加失败"
+    ERROR "定时任务添加失败"
     exit 1
 fi
