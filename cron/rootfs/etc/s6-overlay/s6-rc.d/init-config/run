@@ -25,9 +25,9 @@ cd /app || exit
 
 crontab -r
 
-CRON_COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s /media /etc/xiaoya ${EMBY} ${RESILIO}"
+CRON_COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s ${HOST_MEDIA_DIR} ${HOST_CONFIG_DIR} ${EMBY} ${RESILIO}"
 
-echo -e "${CRON} ${CRON_COMMAND} >> /config/cron.log 2>&1" > /app/cronjob.list
+echo -e "${CRON} ${CRON_COMMAND} >> ${HOST_RESILIO_DIR}/cron.log 2>&1" > /app/cronjob.list
 echo -e "${CRON_COMMAND}" > /app/command.sh
 
 INFO "$(cat /app/cronjob.list)"
