@@ -164,7 +164,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/mas
 
 - 请勿将 小雅系列软件 用于商业用途。
 - 请勿将 小雅系列软件 用于任何违反法律法规的行为。
-- 本仓库所有脚本都基于官方脚本制作，使用请自行承担数据损失但不限于此的风险。
+- 本仓库所有脚本均基于官方脚本制作，使用请自行承担数据损失但不限于此的风险。
 
 ## Star History
 
