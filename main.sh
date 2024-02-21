@@ -644,35 +644,21 @@ function test_xiaoya_status() {
 
     get_docker0_url
 
-    INFO "测试xiaoya的联通性.......尝试连接 ${docker_addr}"
-    wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://127.0.0.1:5678/d/README.md"
-    test_size=$(du -k /tmp/test.md | cut -f1)
-    if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
-        wget -4 -q -T 10 -t 3 -O /tmp/test.md "http://$docker0:5678/d/README.md"
-        test_size=$(du -k /tmp/test.md | cut -f1)
-        if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
-            if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
-                docker_addr=$(head -n1 "${CONFIG_DIR}"/docker_address.txt)
-            else
-                ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
-                exit 1
-            fi
-            wget -4 -q -T 10 -t 3 -O /tmp/test.md "$docker_addr/d/README.md"
-            test_size=$(du -k /tmp/test.md | cut -f1)
-            if [[ "$test_size" -eq 196 ]] || [[ "$test_size" -eq 65 ]] || [[ "$test_size" -eq 0 ]]; then
-                ERROR "请检查xiaoya是否正常运行后再试"
-                exit 1
-            else
-                xiaoya_addr=$docker_addr
-            fi
-        else
-            xiaoya_addr="http://$docker0:5678"
-        fi
-    else
+    INFO "测试xiaoya的联通性..."
+    if curl -siL http://127.0.0.1:5678/d/README.md | grep -v 302 | grep "x-oss-" ;then
         xiaoya_addr="http://127.0.0.1:5678"
+    elif curl -siL http://$docker0:5678/d/README.md | grep -v 302 | grep  "x-oss-" ;then
+        xiaoya_addr="http://$docker0:5678"
+    else
+        if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
+            xiaoya_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+        else
+            ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
+            exit 1
+        fi
     fi
 
-    rm -rf /tmp/test.md
+    INFO "连接小雅地址为 ${xiaoya_addr}"
 
 }
 
