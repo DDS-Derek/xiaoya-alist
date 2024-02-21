@@ -645,13 +645,19 @@ function test_xiaoya_status() {
     get_docker0_url
 
     INFO "测试xiaoya的联通性..."
-    if curl -siL http://127.0.0.1:5678/d/README.md | grep -v 302 | grep "x-oss-" ;then
+    if curl -siL http://127.0.0.1:5678/d/README.md | grep -v 302 | grep "x-oss-"; then
         xiaoya_addr="http://127.0.0.1:5678"
-    elif curl -siL http://$docker0:5678/d/README.md | grep -v 302 | grep  "x-oss-" ;then
-        xiaoya_addr="http://$docker0:5678"
+    elif curl -siL http://${docker0}:5678/d/README.md | grep -v 302 | grep "x-oss-"; then
+        xiaoya_addr="http://${docker0}:5678"
     else
-        if [ -s "${CONFIG_DIR}"/docker_address.txt ]; then
-            xiaoya_addr=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+        if [ -s ${CONFIG_DIR}/docker_address.txt ]; then
+            docker_address=$(head -n1 ${CONFIG_DIR}/docker_address.txt)
+            if curl -siL http://${docker_address}:5678/d/README.md | grep -v 302 | grep "x-oss-"; then
+                xiaoya_addr=${docker_address}
+            else
+                ERROR "请检查xiaoya是否正常运行后再试"
+                exit 1
+            fi
         else
             ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
             exit 1
