@@ -1386,6 +1386,10 @@ function install_resilio() {
     read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="8888"
 
+    INFO "请输入同步端口（默认 55555 ）"
+    read -erp "SYNC_PORT:" SYNC_PORT
+    [[ -z "${SYNC_PORT}" ]] && SYNC_PORT="55555"
+
     INFO "resilio容器内存上限（单位：MB，默认：2048）"
     read -erp "mem_size:" mem_size
     [[ -z "${mem_size}" ]] && mem_size="2048"
@@ -1427,8 +1431,8 @@ function install_resilio() {
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
-            -p "${HT_PORT}":8888 \
-            -p 55555:55555 \
+            -p ${HT_PORT}:8888 \
+            -p ${SYNC_PORT}:55555 \
             -v "${CONFIG_DIR}:/config" \
             -v "${CONFIG_DIR}/downloads:/downloads" \
             -v "${MEDIA_DIR}:/sync" \
@@ -1442,8 +1446,8 @@ function install_resilio() {
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
-            -p "${HT_PORT}":8888 \
-            -p 55555:55555 \
+            -p ${HT_PORT}:8888 \
+            -p ${SYNC_PORT}:55555 \
             -v "${CONFIG_DIR}:/config" \
             -v "${CONFIG_DIR}/downloads:/downloads" \
             -v "${MEDIA_DIR}:/sync" \
