@@ -10,26 +10,26 @@
 
 **模式0**：每天自动清理一次。如果系统重启需要手动重新运行或把命令加入系统启动。
 ```shell
-bash -c "$(curl -s https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 0 -tg
+bash -c "$(curl -sLk https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 0 -tg
 ```
 
 **模式1**：一次性清理，一般用于测试效果。
 ```shell
-bash -c "$(curl -s https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 1 -tg
+bash -c "$(curl -sLk https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 1 -tg
 ```
 
 **模式2**：已废弃，不再支持
 
 **模式3**：创建一个名为 xiaoyakeeper 的docker定时运行小雅转存清理并升级小雅镜像
 ```shell
-bash -c "$(curl -s https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 3 -tg
+bash -c "$(curl -sLk https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 3 -tg
 ```
 
 **模式4**：同模式3
 
 **模式5**：与模式3的区别是实时清理，只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3
 ```shell
-bash -c "$(curl -s https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 5 -tg
+bash -c "$(curl -sLk https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +2)" -s 5 -tg
 ```
 
 **其它模式**：也可以把脚本下载下来自己魔改。

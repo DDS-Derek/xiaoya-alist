@@ -28,17 +28,17 @@
 ### 使用
 
 ```shell
-bash -c "$(curl -sL https://ddsrem.com/xiaoya_install.sh)"
+bash -c "$(curl -sLk https://ddsrem.com/xiaoya_install.sh)"
 ```
 
 **备用地址**
 
 ```shell
-bash -c "$(curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+bash -c "$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
 ```
 
 ```shell
-bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
+bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
 ```
 
 ### 功能列表
@@ -107,17 +107,17 @@ emby_config.txt 的命令行的图形化编辑器，内置纠错。
 ### 使用
 
 ```shell
-bash -c "$(curl -sL https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s xiaoya配置目录
+bash -c "$(curl -sLk https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s xiaoya配置目录
 ```
 
 **备用地址**
 
 ```shell
-bash -c "$(curl -sL https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_config_editor.sh)" -s xiaoya配置目录
+bash -c "$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_config_editor.sh)" -s xiaoya配置目录
 ```
 
 ```shell
-bash -c "$(curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/emby_config_editor.sh)" -s xiaoya配置目录
+bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/emby_config_editor.sh)" -s xiaoya配置目录
 ```
 
 ## 相关地址
