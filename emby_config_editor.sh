@@ -148,10 +148,10 @@ function main_return() {
     cat /tmp/xiaoya_alist
 
     echo -e "1、开启/关闭硬解GPU映射    当前配置：$(get_dev_dri)"
-    echo -e "2、Emby容器网络模式    当前配置：${Sky_Blue}${mode}模式${Font}"
-    echo -e "3、Emby镜像    当前配置：${Sky_Blue}${image}${Font}"
-    echo -e "4、媒体库路径    当前配置：${Sky_Blue}${media_dir}${Font}"
-    echo -e "5、是否安装Resilio    当前配置：$(get_resilio)"
+    echo -e "2、Emby容器网络模式        当前配置：${Sky_Blue}${mode}模式${Font}"
+    echo -e "3、Emby镜像                当前配置：${Sky_Blue}${image}${Font}"
+    echo -e "4、媒体库路径              当前配置：${Sky_Blue}${media_dir}${Font}"
+    echo -e "5、是否安装Resilio         当前配置：$(get_resilio)"
     echo -e "6、退出脚本 | Script info: ${DATE_VERSION} Thanks: ${Blue}xiaoyaLiu${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [1-6]:" num
