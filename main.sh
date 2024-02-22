@@ -1,6 +1,8 @@
 #!/bin/bash
 # shellcheck shell=bash
 # shellcheck disable=SC2086
+# shellcheck disable=SC1091
+# shellcheck disable=SC2154
 PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -408,6 +410,15 @@ function get_config_dir() {
 }
 
 function get_media_dir() {
+
+    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
+            source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
+            echo "${media_dir}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
+            INFO "媒体库目录通过 emby_config.txt 获取"
+        fi
+    fi
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
         OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
@@ -1167,32 +1178,7 @@ function choose_emby_image() {
 
 }
 
-function install_emby_xiaoya_all_emby() {
-
-    get_docker0_url
-
-    choose_network_mode
-
-    if ! grep xiaoya.host /etc/hosts; then
-        if [ "$MODE" == "host" ]; then
-            echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
-            xiaoya_host="127.0.0.1"
-        fi
-        if [ "$MODE" == "bridge" ]; then
-            echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
-            xiaoya_host="$docker0"
-        fi
-    else
-        xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
-    fi
-
-    INFO "如果需要开启Emby硬件转码请先返回主菜单开启容器运行额外参数添加 -> 72"
-    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
-    if [ "${container_run_extra_parameters}" == "true" ]; then
-        INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
-        read -erp "Extra parameters:" extra_parameters
-        [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
-    fi
+function get_nsswitch_conf_path() {
 
     if [ -f /etc/nsswitch.conf ]; then
         NSSWITCH=/etc/nsswitch.conf
@@ -1204,10 +1190,82 @@ function install_emby_xiaoya_all_emby() {
     fi
     INFO "nsswitch.conf 配置文件路径：${NSSWITCH}"
 
-    if [ "$1" == "official" ]; then
-        install_emby_embyserver
+}
+
+function install_emby_xiaoya_all_emby() {
+
+    get_docker0_url
+
+    XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+    if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
+        source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
+
+        if [ "${mode}" == "bridge" ]; then
+            MODE=bridge
+            NET_MODE="-p 6908:6908"
+        elif [ "${mode}" == "host" ]; then
+            MODE=host
+            NET_MODE="--net=host"
+        else
+            choose_network_mode
+        fi
+
+        if ! grep xiaoya.host /etc/hosts; then
+            if [ "$MODE" == "host" ]; then
+                echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
+                xiaoya_host="127.0.0.1"
+            fi
+            if [ "$MODE" == "bridge" ]; then
+                echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
+                xiaoya_host="$docker0"
+            fi
+        else
+            xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
+        fi
+
+        if [ "${dev_dri}" == "yes" ]; then
+            extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
+        fi
+
+        get_nsswitch_conf_path
+
+        if [ "${image}" == "emby" ]; then
+            install_emby_embyserver
+        else
+            install_amilys_embyserver
+        fi
+
     else
-        choose_emby_image
+        choose_network_mode
+
+        if ! grep xiaoya.host /etc/hosts; then
+            if [ "$MODE" == "host" ]; then
+                echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
+                xiaoya_host="127.0.0.1"
+            fi
+            if [ "$MODE" == "bridge" ]; then
+                echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
+                xiaoya_host="$docker0"
+            fi
+        else
+            xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
+        fi
+
+        INFO "如果需要开启Emby硬件转码请先返回主菜单开启容器运行额外参数添加 -> 72"
+        container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+        if [ "${container_run_extra_parameters}" == "true" ]; then
+            INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
+        fi
+
+        get_nsswitch_conf_path
+
+        if [ "$1" == "official" ]; then
+            install_emby_embyserver
+        else
+            choose_emby_image
+        fi
     fi
 
     set_emby_server_infuse_api_key
@@ -1614,7 +1672,21 @@ function main_xiaoya_all_emby() {
         clear
         download_unzip_xiaoya_all_emby
         install_emby_xiaoya_all_emby "official"
-        install_resilio
+        XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        if [ ! -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
+            install_resilio
+        else
+            source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
+            if [ "${resilio}" == "yes" ]; then
+                install_resilio
+            elif [ "${resilio}" == "no" ]; then
+                INFO "跳过 Resilio-Sync 安装"
+            else
+                WARN "resilio 配置错误！默认安装 Resilio-Sync"
+                install_resilio
+            fi
+        fi
+        INFO "全家桶安装完成！ "
         ;;
     2)
         clear
