@@ -1698,10 +1698,11 @@ function main_xiaoya_all_emby() {
     echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、立即同步小雅Emby config目录"
     echo -e "7、创建/删除 Emby config同步定时任务          当前状态：$(judgment_sync_emby_config_status)"
-    echo -e "8、卸载Emby全家桶"
-    echo -e "9、返回上级"
+    echo -e "8、图形化编辑 emby_config.txt"
+    echo -e "9、卸载Emby全家桶"
+    echo -e "10、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-9]:" num
+    read -erp "请输入数字 [1-10]:" num
     case "$num" in
     1)
         clear
@@ -1787,15 +1788,20 @@ function main_xiaoya_all_emby() {
         ;;
     8)
         clear
-        uninstall_xiaoya_all_emby
+        get_config_dir
+        bash -c "$(curl -sLk https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s ${CONFIG_DIR}
         ;;
     9)
+        clear
+        uninstall_xiaoya_all_emby
+        ;;
+    10)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-9]'
+        ERROR '请输入正确数字 [1-10]'
         main_xiaoya_all_emby
         ;;
     esac

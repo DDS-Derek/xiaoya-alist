@@ -71,6 +71,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 23
 立即 同步小雅Emby的config目录 -> 26
 单独 创建/删除 Emby config同步定时任务 -> 27
+图形化编辑 emby_config.txt -> 28
 ———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 42
 更新 小雅Alist -> 12
@@ -80,7 +81,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 更新 Auto_Symlink -> 622
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 13
-卸载 Emby全家桶 -> 28
+卸载 Emby全家桶 -> 29
 卸载 Resilio-Sync（单独） -> 253
 卸载 小雅助手（xiaoyahelper）-> 32
 卸载 小雅Alist-TVBox -> 43
