@@ -1348,6 +1348,16 @@ function uninstall_xiaoya_all_emby() {
 
 function install_sync_emby_config_cron() {
 
+    if [ ! -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
+        INFO "请输入Resilio-Sync配置文件目录"
+        read -erp "CONFIG_DIR:" CONFIG_DIR
+        touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
+    fi
+    if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        get_config_dir
+    fi
+
     # 配置定时任务Cron
     while true; do
         INFO "请输入您希望的同步时间"
@@ -1374,7 +1384,7 @@ ${MEDIA_DIR} \
 $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> \
-${CONFIG_DIR}/cron.log 2>&1"
+$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
         crontab -l | grep -v sync_emby_config > /tmp/cronjob.tmp
         echo -e "${CRON}" >> /tmp/cronjob.tmp
@@ -1400,9 +1410,9 @@ ${CONFIG_DIR}/cron.log 2>&1"
             -e RESILIO="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
             -e CRON="${minu} ${hour} */${sync_day} * *" \
             -e HOST_MEDIA_DIR="${MEDIA_DIR}" \
-            -e HOST_RESILIO_DIR="${CONFIG_DIR}" \
+            -e HOST_RESILIO_DIR="$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
             -e HOST_CONFIG_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
-            -v "${CONFIG_DIR}:${CONFIG_DIR}" \
+            -v "$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
             -v "${MEDIA_DIR}:${MEDIA_DIR}" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
             -v /tmp:/tmp \
@@ -1653,6 +1663,30 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
 
 }
 
+function judgment_sync_emby_config_status() {
+
+    if command -v crontab > /dev/null 2>&1; then
+        if crontab -l | grep sync_emby_config > /dev/null 2>&1; then
+            echo -e "${Green}已创建${Font}"
+        else
+            echo -e "${Red}未创建${Font}"
+        fi
+    elif [ -f /etc/synoinfo.conf ]; then
+        if grep 'sync_emby_config' /etc/crontab > /dev/null 2>&1; then
+            echo -e "${Green}已创建${Font}"
+        else
+            echo -e "${Red}未创建${Font}"
+        fi
+    else
+        if docker container inspect xiaoya-cron > /dev/null 2>&1; then
+            echo -e "${Green}已创建${Font}"
+        else
+            echo -e "${Red}未创建${Font}"
+        fi
+    fi
+
+}
+
 function main_xiaoya_all_emby() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -1662,11 +1696,12 @@ function main_xiaoya_all_emby() {
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
     echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
-    echo -e "6、立即同步小雅Emby的config目录"
-    echo -e "7、卸载Emby全家桶"
-    echo -e "8、返回上级"
+    echo -e "6、立即同步小雅Emby config目录"
+    echo -e "7、创建/删除 Emby config同步定时任务          当前状态：$(judgment_sync_emby_config_status)"
+    echo -e "8、卸载Emby全家桶"
+    echo -e "9、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-8]:" num
+    read -erp "请输入数字 [1-9]:" num
     case "$num" in
     1)
         clear
@@ -1712,15 +1747,55 @@ function main_xiaoya_all_emby() {
         ;;
     7)
         clear
-        uninstall_xiaoya_all_emby
+        if command -v crontab > /dev/null 2>&1; then
+            if crontab -l | grep sync_emby_config > /dev/null 2>&1; then
+                for i in $(seq -w 3 -1 0); do
+                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    sleep 1
+                done
+                uninstall_sync_emby_config_cron
+                clear
+                INFO "已删除"
+            else
+                install_sync_emby_config_cron
+            fi
+        elif [ -f /etc/synoinfo.conf ]; then
+            if grep 'sync_emby_config' /etc/crontab > /dev/null 2>&1; then
+                for i in $(seq -w 3 -1 0); do
+                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    sleep 1
+                done
+                uninstall_sync_emby_config_cron
+                clear
+                INFO "已删除"
+            else
+                install_sync_emby_config_cron
+            fi
+        else
+            if docker container inspect xiaoya-cron > /dev/null 2>&1; then
+                for i in $(seq -w 3 -1 0); do
+                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    sleep 1
+                done
+                uninstall_sync_emby_config_cron
+                clear
+                INFO "已删除"
+            else
+                install_sync_emby_config_cron
+            fi
+        fi
         ;;
     8)
+        clear
+        uninstall_xiaoya_all_emby
+        ;;
+    9)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-8]'
+        ERROR '请输入正确数字 [1-9]'
         main_xiaoya_all_emby
         ;;
     esac
