@@ -1357,6 +1357,9 @@ function install_sync_emby_config_cron() {
     if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         get_config_dir
     fi
+    if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+        get_media_dir
+    fi
 
     # 配置定时任务Cron
     while true; do
@@ -1380,7 +1383,7 @@ function install_sync_emby_config_cron() {
 
     # 组合定时任务命令
     CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
-${MEDIA_DIR} \
+$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> \
@@ -1409,11 +1412,11 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
             -e EMBY="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -e RESILIO="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
             -e CRON="${minu} ${hour} */${sync_day} * *" \
-            -e HOST_MEDIA_DIR="${MEDIA_DIR}" \
+            -e HOST_MEDIA_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)" \
             -e HOST_RESILIO_DIR="$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
             -e HOST_CONFIG_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
-            -v "${MEDIA_DIR}:${MEDIA_DIR}" \
+            -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
             -v /tmp:/tmp \
             -v /var/run/docker.sock:/var/run/docker.sock:ro \
