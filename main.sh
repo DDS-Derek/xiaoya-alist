@@ -1472,14 +1472,6 @@ function install_resilio() {
         sysctl -p
     fi
 
-    if [ ! -d "${MEDIA_DIR}"/config_sync ]; then
-        INFO "复制 config 文件夹到 config_sync 中..."
-        INFO "这可能需要一定时间，请耐心等待！"
-        mkdir -p "${MEDIA_DIR}"/config_sync
-        chmod 777 "${MEDIA_DIR}"/config_sync
-        cp -r "${MEDIA_DIR}"/config/* "${MEDIA_DIR}"/config_sync/
-    fi
-
     INFO "开始安装resilio..."
     if [ ! -d "${CONFIG_DIR}" ]; then
         mkdir -p "${CONFIG_DIR}"
