@@ -78,7 +78,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.3.5-2024_02_23_13_44"
+DATE_VERSION="v1.3.6-2024_03_01_19_03"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -1218,6 +1218,28 @@ function get_xiaoya_hosts() {
     fi
 
     XIAOYA_HOSTS_SHOW=$(grep xiaoya.host ${HOSTS_FILE_PATH})
+    # if echo "${XIAOYA_HOSTS_SHOW}" | awk '
+    # {
+    #     split($1, ip, ".");
+    #     if(length(ip) == 4 && ip[1] >= 0 && ip[1] <= 255 && ip[2] >= 0 && ip[2] <= 255 && ip[3] >= 0 && ip[3] <= 255 && ip[4] >= 0 && ip[4] <= 255 && index($2, "\t") == 0)
+    #         exit 0;
+    #     else
+    #         exit 1;
+    # }'; then
+    #     INFO "hosts 文件设置正确！"
+    # else
+    #     WARN "hosts 文件设置错误！"
+    #     INFO "是否使用脚本自动纠错（只支持单机部署自动纠错，如果小雅和全家桶不在同一台机器上，请手动修改）[Y/n]（默认 Y）"
+    #     read -erp "自动纠错:" FIX_HOST_ERROR
+    #     [[ -z "${FIX_HOST_ERROR}" ]] && FIX_HOST_ERROR="y"
+    #     if [[ ${FIX_HOST_ERROR} == [Yy] ]]; then
+    #         INFO "开始自动纠错..."
+    #         sed -i '/xiaoya\.host/d' /etc/hosts
+    #         get_xiaoya_hosts
+    #     else
+    #         exit 1
+    #     fi
+    # fi
     if echo "${XIAOYA_HOSTS_SHOW}" | awk '{ if($1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $2 ~ /^[^\t]+$/) exit 0; else exit 1 }'; then
         INFO "hosts 文件设置正确！"
     else
@@ -1384,8 +1406,8 @@ function install_sync_emby_config_cron() {
         INFO "请输入您希望的同步时间"
         read -erp "注意：24小时制，格式：hh:mm，小时分钟之间用英文冒号分隔 （示例：23:45，默认：06:00）：" sync_time
         [[ -z "${sync_time}" ]] && sync_time="06:00"
-        read -erp "您希望几天同步一次？（单位：天）（默认：3）" sync_day
-        [[ -z "${sync_day}" ]] && sync_day="3"
+        read -erp "您希望几天同步一次？（单位：天）（默认：7）" sync_day
+        [[ -z "${sync_day}" ]] && sync_day="7"
         # 中文冒号纠错
         time_value=${sync_time//：/:}
         # 提取小时位
