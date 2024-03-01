@@ -369,6 +369,8 @@ function get_os() {
         DDSREM_CONFIG_DIR=/etc/DDSRem
     fi
 
+    HOSTS_FILE_PATH=/etc/hosts
+
 }
 
 function TODO() {
@@ -647,6 +649,14 @@ function get_docker0_url() {
         docker0=$(ifconfig docker0 | awk '/inet / {print $2}' | sed 's/addr://')
     else
         docker0=$(ip addr show docker0 | awk '/inet / {print $2}' | cut -d '/' -f 1)
+    fi
+
+    if [ -n "$docker0" ]; then
+        INFO "docker0 的 IP 地址是：$docker0"
+    else
+        WARN "无法获取 docker0 的 IP 地址！"
+        docker0=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        INFO "尝试使用本地IP：${docker0}"
     fi
 
 }
@@ -1192,6 +1202,40 @@ function get_nsswitch_conf_path() {
 
 }
 
+function get_xiaoya_hosts() {
+
+    if ! grep -q xiaoya.host ${HOSTS_FILE_PATH}; then
+        if [ "$MODE" == "host" ]; then
+            echo -e "127.0.0.1\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
+            xiaoya_host="127.0.0.1"
+        fi
+        if [ "$MODE" == "bridge" ]; then
+            echo -e "$docker0\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
+            xiaoya_host="$docker0"
+        fi
+    else
+        xiaoya_host=$(grep xiaoya.host ${HOSTS_FILE_PATH} | awk '{print $1}' | head -n1)
+    fi
+
+    XIAOYA_HOSTS_SHOW=$(grep xiaoya.host ${HOSTS_FILE_PATH})
+    if echo "${XIAOYA_HOSTS_SHOW}" | awk '{ if($1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $2 ~ /^[^\t]+$/) exit 0; else exit 1 }'; then
+        INFO "hosts 文件设置正确！"
+    else
+        WARN "hosts 文件设置错误！"
+        INFO "是否使用脚本自动纠错（只支持单机部署自动纠错，如果小雅和全家桶不在同一台机器上，请手动修改）[Y/n]（默认 Y）"
+        read -erp "自动纠错:" FIX_HOST_ERROR
+        [[ -z "${FIX_HOST_ERROR}" ]] && FIX_HOST_ERROR="y"
+        if [[ ${FIX_HOST_ERROR} == [Yy] ]]; then
+            INFO "开始自动纠错..."
+            sed -i '/xiaoya\.host/d' /etc/hosts
+            get_xiaoya_hosts
+        else
+            exit 1
+        fi
+    fi
+
+}
+
 function install_emby_xiaoya_all_emby() {
 
     get_docker0_url
@@ -1210,18 +1254,7 @@ function install_emby_xiaoya_all_emby() {
             choose_network_mode
         fi
 
-        if ! grep xiaoya.host /etc/hosts; then
-            if [ "$MODE" == "host" ]; then
-                echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
-                xiaoya_host="127.0.0.1"
-            fi
-            if [ "$MODE" == "bridge" ]; then
-                echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
-                xiaoya_host="$docker0"
-            fi
-        else
-            xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
-        fi
+        get_xiaoya_hosts
 
         if [ "${dev_dri}" == "yes" ]; then
             extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
@@ -1238,18 +1271,7 @@ function install_emby_xiaoya_all_emby() {
     else
         choose_network_mode
 
-        if ! grep xiaoya.host /etc/hosts; then
-            if [ "$MODE" == "host" ]; then
-                echo -e "127.0.0.1\txiaoya.host\n" >> /etc/hosts
-                xiaoya_host="127.0.0.1"
-            fi
-            if [ "$MODE" == "bridge" ]; then
-                echo -e "$docker0\txiaoya.host\n" >> /etc/hosts
-                xiaoya_host="$docker0"
-            fi
-        else
-            xiaoya_host=$(grep xiaoya.host /etc/hosts | awk '{print $1}' | head -n1)
-        fi
+        get_xiaoya_hosts
 
         INFO "如果需要开启Emby硬件转码请先返回主菜单开启容器运行额外参数添加 -> 72"
         container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
