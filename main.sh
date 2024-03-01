@@ -1261,11 +1261,7 @@ function install_emby_xiaoya_all_emby() {
 
         get_nsswitch_conf_path
 
-        if [ "$1" == "official" ]; then
-            install_emby_embyserver
-        else
-            choose_emby_image
-        fi
+        choose_emby_image
     fi
 
     set_emby_server_infuse_api_key
@@ -1702,7 +1698,7 @@ function main_xiaoya_all_emby() {
     1)
         clear
         download_unzip_xiaoya_all_emby
-        install_emby_xiaoya_all_emby "official"
+        install_emby_xiaoya_all_emby
         XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         if [ ! -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
             install_resilio
