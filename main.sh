@@ -408,6 +408,8 @@ function get_config_dir() {
         touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
     fi
+    # 将所有小雅配置文件修正成 linux 格式
+    find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
 
 }
 

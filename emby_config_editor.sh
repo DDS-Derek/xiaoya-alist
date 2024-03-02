@@ -212,6 +212,8 @@ if [ ! -d "${config_dir}" ]; then
     mkdir -p "${config_dir}"
 fi
 
+find "${config_dir}" -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
+
 if [ ! -s "${config_dir}/emby_config.txt" ]; then
     {
         echo "dev_dri=no"
