@@ -410,6 +410,8 @@ function get_config_dir() {
     fi
     # 将所有小雅配置文件修正成 linux 格式
     find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
+    # 设置权限
+    chmod -R 777 ${CONFIG_DIR}
 
 }
 
