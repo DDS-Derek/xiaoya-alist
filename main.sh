@@ -454,9 +454,15 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    touch "${CONFIG_DIR}"/mytoken.txt
-    touch "${CONFIG_DIR}"/myopentoken.txt
-    touch "${CONFIG_DIR}"/temp_transfer_folder_id.txt
+    if [ ! -f "${CONFIG_DIR}/mytoken.txt" ]; then
+        touch ${CONFIG_DIR}/mytoken.txt
+    fi
+    if [ ! -f "${CONFIG_DIR}/myopentoken.txt" ]; then
+        touch ${CONFIG_DIR}/myopentoken.txt
+    fi
+    if [ ! -f "${CONFIG_DIR}/temp_transfer_folder_id.txt" ]; then
+        touch ${CONFIG_DIR}/temp_transfer_folder_id.txt
+    fi
 
     mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
     mytokenstringsize=${#mytokenfilesize}
@@ -503,7 +509,11 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+    if command -v ifconfig > /dev/null 2>&1; then
+        localip=$(ifconfig -a | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1)
+    else
+        localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+    fi
     INFO "本地IP：${localip}"
 
     INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
