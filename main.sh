@@ -868,15 +868,17 @@ function download_xiaoya_emby() {
     test_xiaoya_status
 
     mkdir -p "${MEDIA_DIR}"/temp
+    chown 0:0 "${MEDIA_DIR}"/temp
+    chmod 777 "${MEDIA_DIR}"/temp
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
     free_size=$((free_size))
     free_size_G=$((free_size / 1024 / 1024))
     INFO "磁盘容量：${free_size_G}G"
 
-    mkdir -p "${MEDIA_DIR}"/xiaoya
-    mkdir -p "${MEDIA_DIR}"/config
-    chmod 755 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
+    if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
+        INFO "清理旧 ${1} 中..."
+        rm -f ${MEDIA_DIR}/temp/${1}
+    fi
 
     INFO "开始下载 ${1} ..."
 
@@ -886,6 +888,7 @@ function download_xiaoya_emby() {
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
+    chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
 
     INFO "下载完成！"
 
@@ -902,9 +905,7 @@ function unzip_xiaoya_emby() {
     free_size_G=$((free_size / 1024 / 1024))
     INFO "磁盘容量：${free_size_G}G"
 
-    mkdir -p "${MEDIA_DIR}"/xiaoya
-    mkdir -p "${MEDIA_DIR}"/config
-    chmod 755 "${MEDIA_DIR}"
+    chmod 777 "${MEDIA_DIR}"
     chown root:root "${MEDIA_DIR}"
 
     INFO "开始解压 ${1} ..."
@@ -912,12 +913,16 @@ function unzip_xiaoya_emby() {
     if [ "${1}" == "config.mp4" ]; then
         extra_parameters="--workdir=/media"
 
+        mkdir -p "${MEDIA_DIR}"/config
+
         pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
 
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/config
     else
         extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
 
         pull_run_glue 7z x -aoa -mmt=16 /media/temp/"${1}"
 
@@ -994,6 +999,7 @@ function install_emby_embyserver() {
 
     cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
+    INFO "您的架构是：$cpu_arch"
     case $cpu_arch in
     "x86_64" | *"amd64"*)
         if [ -n "${extra_parameters}" ]; then
@@ -1067,6 +1073,7 @@ function install_amilys_embyserver() {
 
     cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
+    INFO "您的架构是：$cpu_arch"
     case $cpu_arch in
     "x86_64" | *"amd64"*)
         if [ -n "${extra_parameters}" ]; then
@@ -1108,6 +1115,7 @@ function install_lovechen_embyserver() {
 
     cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
+    INFO "您的架构是：$cpu_arch"
 
     INFO "开始转换数据库..."
 
@@ -1276,6 +1284,14 @@ function get_xiaoya_hosts() {
 function install_emby_xiaoya_all_emby() {
 
     get_docker0_url
+
+    if [ -f "${MEDIA_DIR}/config/config/system.xml" ]; then
+        if ! grep -q 6908 ${MEDIA_DIR}/config/config/system.xml; then
+            ERROR "Emby config 出错，请重新下载解压！"
+        fi
+    else
+        ERROR "Emby config 出错，请重新下载解压！"
+    fi
 
     XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
     if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
