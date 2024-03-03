@@ -1695,7 +1695,7 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        COMMAND=$(grep 'sync_emby_config' /etc/crontab | sed -E 's/^.*\* \*|>>.*$//')
+        COMMAND=$(grep 'sync_emby_config' /etc/crontab | sed 's/^.*\* \*//; s/>>.*$//')
         if [ -z "$COMMAND" ]; then
             get_config_dir
             get_media_dir
