@@ -2984,7 +2984,11 @@ function first_init() {
     fi
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
-        echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        if [ "$OSNAME" = "ugreen" ]; then
+            echo 'wget' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        else
+            echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        fi
     fi
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt ]; then
