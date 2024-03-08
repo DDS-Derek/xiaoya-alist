@@ -1763,7 +1763,11 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         INFO "Emby config同步后台运行中..."
         INFO "运行日志存于 /tmp/sync_config.log 文件内。"
         # 守护进程，最终清理运行产生的文件
-        { while ps -p ${pid} > /dev/null; do sleep 4; done; sleep 2; rm -f /tmp/sync_command.sh; } &
+        {
+            while ps -p ${pid} > /dev/null; do sleep 4; done
+            sleep 2
+            rm -f /tmp/sync_command.sh
+        } &
     fi
 
 }
