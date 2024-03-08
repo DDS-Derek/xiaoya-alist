@@ -881,7 +881,7 @@ case "$run_mode" in
         fi
     ;;
     2)
-        echo "本模式已不再支持，建议使用模式3或模式4"
+        echo "本模式已不再支持，建议使用模式3或模式5"
     ;;
     3|4)
         gen_post_cmd_all
