@@ -68,6 +68,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 单独 解压 config.mp4 -> 226
 单独 下载 pikpak.mp4 -> 227
 单独 解压 pikpak.mp4 -> 228
+选择 下载器【aria2/wget】-> 229
 单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 23
 立即 同步小雅Emby的config目录 -> 26
 单独 创建/删除 Emby config同步定时任务 -> 27
