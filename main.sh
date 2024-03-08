@@ -78,7 +78,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.3.7-2024_03_03_15_16"
+DATE_VERSION="v1.4.0-2024_03_08_21_11"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -785,44 +785,6 @@ function set_emby_server_infuse_api_key() {
 
 }
 
-function download_unzip_xiaoya_all_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    test_xiaoya_status
-
-    mkdir -p "${MEDIA_DIR}/temp"
-    rm -rf "${MEDIA_DIR}/config"
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    if [ "$free_size" -le 63886080 ]; then
-        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
-        exit 1
-    else
-        INFO "磁盘容量：${free_size_G}G"
-    fi
-    mkdir -p "${MEDIA_DIR}/xiaoya"
-    mkdir -p "${MEDIA_DIR}/config"
-    chmod 755 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
-
-    INFO "开始下载解压..."
-
-    pull_run_glue "/update_all.sh" "$xiaoya_addr"
-
-    set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
-
-    INFO "下载解压完成！"
-
-}
-
 function unzip_xiaoya_all_emby() {
 
     get_config_dir
@@ -856,6 +818,76 @@ function unzip_xiaoya_all_emby() {
     INFO "设置目录权限..."
     INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
+
+    INFO "解压完成！"
+
+}
+
+function unzip_xiaoya_emby() {
+
+    get_config_dir
+
+    get_media_dir
+
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+    chmod 777 "${MEDIA_DIR}"
+    chown root:root "${MEDIA_DIR}"
+
+    INFO "开始解压 ${1} ..."
+
+    if [ "${1}" == "config.mp4" ]; then
+        extra_parameters="--workdir=/media"
+
+        mkdir -p "${MEDIA_DIR}"/config
+
+        config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
+        if [[ "$config_size" -le 3200000 ]]; then
+            ERROR "config.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
+            exit 1
+        else
+            INFO "config.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/config
+    elif [ "${1}" == "all.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
+        if [[ "$all_size" -le 30000000 ]]; then
+            ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
+            exit 1
+        else
+            INFO "all.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    elif [ "${1}" == "pikpak.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        pikpak_size=$(du -k ${MEDIA_DIR}/temp/pikpak.mp4 | cut -f1)
+        if [[ "$pikpak_size" -le 14000000 ]]; then
+            ERROR "pikpak.mp4 下载不完整，文件大小(in KB):$pikpak_size 小于预期"
+            exit 1
+        else
+            INFO "pikpak.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    fi
 
     INFO "解压完成！"
 
@@ -931,6 +963,44 @@ function download_wget_xiaoya_emby() {
 
 }
 
+function download_unzip_xiaoya_all_emby() {
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p "${MEDIA_DIR}/temp"
+    rm -rf "${MEDIA_DIR}/config"
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    if [ "$free_size" -le 63886080 ]; then
+        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+        exit 1
+    else
+        INFO "磁盘容量：${free_size_G}G"
+    fi
+    mkdir -p "${MEDIA_DIR}/xiaoya"
+    mkdir -p "${MEDIA_DIR}/config"
+    chmod 755 "${MEDIA_DIR}"
+    chown root:root "${MEDIA_DIR}"
+
+    INFO "开始下载解压..."
+
+    pull_run_glue "/update_all.sh" "$xiaoya_addr"
+
+    set_emby_server_infuse_api_key
+
+    INFO "设置目录权限..."
+    INFO "这可能需要一定时间，请耐心等待！"
+    chmod -R 777 "${MEDIA_DIR}"
+
+    INFO "下载解压完成！"
+
+}
+
 function download_wget_unzip_xiaoya_all_emby() {
 
     get_config_dir
@@ -994,76 +1064,6 @@ function download_wget_unzip_xiaoya_all_emby() {
     chmod -R 777 "${MEDIA_DIR}"
 
     INFO "下载解压完成！"
-
-}
-
-function unzip_xiaoya_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
-
-    chmod 777 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
-
-    INFO "开始解压 ${1} ..."
-
-    if [ "${1}" == "config.mp4" ]; then
-        extra_parameters="--workdir=/media"
-
-        mkdir -p "${MEDIA_DIR}"/config
-
-        config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
-        if [[ "$config_size" -le 3200000 ]]; then
-            ERROR "config.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
-            exit 1
-        else
-            INFO "config.mp4 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
-        fi
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/config
-    elif [ "${1}" == "all.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
-        if [[ "$all_size" -le 30000000 ]]; then
-            ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
-            exit 1
-        else
-            INFO "all.mp4 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
-        fi
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    elif [ "${1}" == "pikpak.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        pikpak_size=$(du -k ${MEDIA_DIR}/temp/pikpak.mp4 | cut -f1)
-        if [[ "$pikpak_size" -le 14000000 ]]; then
-            ERROR "pikpak.mp4 下载不完整，文件大小(in KB):$pikpak_size 小于预期"
-            exit 1
-        else
-            INFO "pikpak.mp4 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
-        fi
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    fi
-
-    INFO "解压完成！"
 
 }
 
@@ -2786,7 +2786,8 @@ function reset_script_configuration() {
             portainer_config_dir.txt \
             onelist_config_dir.txt \
             container_run_extra_parameters.txt \
-            auto_symlink_config_dir.txt
+            auto_symlink_config_dir.txt \
+            data_downloader.txt
         INFO "清理完成！"
 
         for i in $(seq -w 3 -1 0); do
