@@ -896,6 +896,107 @@ function download_xiaoya_emby() {
 
 }
 
+function download_wget_xiaoya_emby() {
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p "${MEDIA_DIR}"/temp
+    chown 0:0 "${MEDIA_DIR}"/temp
+    chmod 777 "${MEDIA_DIR}"/temp
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+    if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
+        INFO "清理旧 ${1} 中..."
+        rm -f ${MEDIA_DIR}/temp/${1}
+    fi
+
+    INFO "开始下载 ${1} ..."
+
+    extra_parameters="--workdir=/media/temp"
+
+    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"
+
+    INFO "设置目录权限..."
+    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
+    chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+
+    INFO "下载完成！"
+
+}
+
+function download_wget_unzip_xiaoya_all_emby() {
+
+    get_config_dir
+
+    get_media_dir
+
+    test_xiaoya_status
+
+    mkdir -p "${MEDIA_DIR}/temp"
+    rm -rf "${MEDIA_DIR}/config"
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    if [ "$free_size" -le 63886080 ]; then
+        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+        exit 1
+    else
+        INFO "磁盘容量：${free_size_G}G"
+    fi
+    mkdir -p "${MEDIA_DIR}/xiaoya"
+    mkdir -p "${MEDIA_DIR}/config"
+    mkdir -p "${MEDIA_DIR}/temp"
+    chown 0:0 "${MEDIA_DIR}"
+    chmod 777 "${MEDIA_DIR}"
+
+    INFO "开始下载解压..."
+
+    extra_parameters="--workdir=/media/temp"
+    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"
+    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"
+    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"
+
+    config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
+    if [[ "$config_size" -le 3200000 ]]; then
+        ERROR "config.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
+        exit 1
+    fi
+    extra_parameters="--workdir=/media"
+    pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
+
+    all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
+    if [[ "$all_size" -le 30000000 ]]; then
+        ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
+        exit 1
+    fi
+    extra_parameters="--workdir=/media/xiaoya"
+    pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
+
+    pikpak_size=$(du -k ${MEDIA_DIR}/temp/pikpak.mp4 | cut -f1)
+    if [[ "$pikpak_size" -le 14000000 ]]; then
+        ERROR "pikpak.mp4 下载不完整，文件大小(in KB):$pikpak_size 小于预期"
+        exit 1
+    fi
+    extra_parameters="--workdir=/media/xiaoya"
+    pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
+
+    set_emby_server_infuse_api_key
+
+    INFO "设置目录权限..."
+    INFO "这可能需要一定时间，请耐心等待！"
+    chmod -R 777 "${MEDIA_DIR}"
+
+    INFO "下载解压完成！"
+
+}
+
 function unzip_xiaoya_emby() {
 
     get_config_dir
@@ -917,16 +1018,46 @@ function unzip_xiaoya_emby() {
 
         mkdir -p "${MEDIA_DIR}"/config
 
-        pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
+        config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
+        if [[ "$config_size" -le 3200000 ]]; then
+            ERROR "config.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
+            exit 1
+        else
+            INFO "config.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
+        fi
 
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/config
-    else
+    elif [ "${1}" == "all.mp4" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
         mkdir -p "${MEDIA_DIR}"/xiaoya
 
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/"${1}"
+        all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
+        if [[ "$all_size" -le 30000000 ]]; then
+            ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
+            exit 1
+        else
+            INFO "all.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    elif [ "${1}" == "pikpak.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        pikpak_size=$(du -k ${MEDIA_DIR}/temp/pikpak.mp4 | cut -f1)
+        if [[ "$pikpak_size" -le 14000000 ]]; then
+            ERROR "pikpak.mp4 下载不完整，文件大小(in KB):$pikpak_size 小于预期"
+            exit 1
+        else
+            INFO "pikpak.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
+        fi
 
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/xiaoya
@@ -938,6 +1069,8 @@ function unzip_xiaoya_emby() {
 
 function main_download_unzip_xiaoya_emby() {
 
+    __data_downloader=$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}下载/解压 元数据${Font}\n"
     echo -e "1、下载并解压 全部元数据"
@@ -948,13 +1081,18 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "6、解压 config.mp4"
     echo -e "7、下载 pikpak.mp4"
     echo -e "8、解压 pikpak.mp4"
-    echo -e "9、返回上级"
+    echo -e "9、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
+    echo -e "10、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-9]:" num
+    read -erp "请输入数字 [1-10]:" num
     case "$num" in
     1)
         clear
-        download_unzip_xiaoya_all_emby
+        if [ "${__data_downloader}" == "wget" ]; then
+            download_wget_unzip_xiaoya_all_emby
+        else
+            download_unzip_xiaoya_all_emby
+        fi
         ;;
     2)
         clear
@@ -962,7 +1100,11 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     3)
         clear
-        download_xiaoya_emby "all.mp4"
+        if [ "${__data_downloader}" == "wget" ]; then
+            download_wget_xiaoya_emby "all.mp4"
+        else
+            download_xiaoya_emby "all.mp4"
+        fi
         ;;
     4)
         clear
@@ -970,7 +1112,11 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     5)
         clear
-        download_xiaoya_emby "config.mp4"
+        if [ "${__data_downloader}" == "wget" ]; then
+            download_wget_xiaoya_emby "config.mp4"
+        else
+            download_xiaoya_emby "config.mp4"
+        fi
         ;;
     6)
         clear
@@ -978,19 +1124,34 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     7)
         clear
-        download_xiaoya_emby "pikpak.mp4"
+        if [ "${__data_downloader}" == "wget" ]; then
+            download_wget_xiaoya_emby "pikpak.mp4"
+        else
+            download_xiaoya_emby "pikpak.mp4"
+        fi
         ;;
     8)
         clear
         unzip_xiaoya_emby "pikpak.mp4"
         ;;
     9)
+        if [ "${__data_downloader}" == "wget" ]; then
+            echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        elif [ "${__data_downloader}" == "aria2" ]; then
+            echo 'wget' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        else
+            echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+        fi
+        clear
+        main_download_unzip_xiaoya_emby
+        ;;
+    10)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-9]'
+        ERROR '请输入正确数字 [1-10]'
         main_download_unzip_xiaoya_emby
         ;;
     esac
@@ -2820,6 +2981,10 @@ function first_init() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt ]; then
         echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
+    fi
+
+    if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
+        echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
     fi
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt ]; then
