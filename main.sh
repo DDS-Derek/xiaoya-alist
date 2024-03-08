@@ -886,7 +886,7 @@ function download_xiaoya_emby() {
 
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
+    pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
