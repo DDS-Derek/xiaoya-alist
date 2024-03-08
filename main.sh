@@ -884,7 +884,7 @@ function download_xiaoya_emby() {
 
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
+    pull_run_glue aria2c -o "${1}" --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
@@ -1707,6 +1707,16 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
+            # 先更新 xiaoya-cron，再运行立刻同步
+            docker pull containrrr/watchtower:latest
+            docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                containrrr/watchtower:latest \
+                --run-once \
+                --cleanup \
+                xiaoya-cron
+            docker rmi containrrr/watchtower:latest
+            sleep 10
             COMMAND="docker exec -it xiaoya-cron bash /app/command.sh"
         else
             get_config_dir
@@ -1718,14 +1728,43 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         fi
     fi
-    echo -e "${COMMAND}" > /tmp/sync_command.txt
+    echo -e "${COMMAND}" > /tmp/sync_command.sh
     echo -e "${COMMAND}"
+
+    INFO "是否前台输出运行日志 [Y/n]（默认 Y）"
+    read -erp "Log out:" LOG_OUT
+    [[ -z "${LOG_OUT}" ]] && LOG_OUT="y"
+
     for i in $(seq -w 3 -1 0); do
         echo -en "即将开始同步小雅Emby的config目录${Blue} $i ${Font}\r"
         sleep 1
     done
-    bash /tmp/sync_command.txt
-    rm -rf /tmp/sync_command.txt
+
+    echo > /tmp/sync_config.log
+    # 后台运行
+    bash /tmp/sync_command.sh > /tmp/sync_config.log 2>&1 &
+    # 获取pid
+    pid=$!
+    if [[ ${LOG_OUT} == [Yy] ]]; then
+        clear
+        # 实时输出模式
+        while ps -p ${pid} > /dev/null; do
+            clear
+            cat /tmp/sync_config.log
+            sleep 4
+        done
+        sleep 2
+        rm -f \
+            /tmp/sync_command.sh \
+            /tmp/sync_config.log
+    else
+        # 后台运行模式
+        clear
+        INFO "Emby config同步后台运行中..."
+        INFO "运行日志存于 /tmp/sync_config.log 文件内。"
+        # 守护进程，最终清理运行产生的文件
+        { while ps -p ${pid} > /dev/null; do sleep 4; done; sleep 2; rm -f /tmp/sync_command.sh; } &
+    fi
 
 }
 
