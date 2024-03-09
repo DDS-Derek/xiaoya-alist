@@ -90,7 +90,6 @@ function test_xiaoya_status() {
                 xiaoya_addr=${docker_address}
             else
                 ERROR "请检查xiaoya是否正常运行后再试"
-                docker logs --tail 8 "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 exit 1
             fi
         else
