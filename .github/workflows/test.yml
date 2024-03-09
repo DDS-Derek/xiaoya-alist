@@ -30,7 +30,7 @@ jobs:
         run: |
             shellcheck main.sh
             shellcheck emby_config_editor.sh
-            shellcheck sync_emby_media.sh
+            shellcheck xiaoya_notify.sh
 
   shfmt:
     runs-on: ubuntu-latest
@@ -49,4 +49,4 @@ jobs:
         run: |
             ./shfmt -d -i 4 -sr main.sh
             ./shfmt -d -i 4 -sr emby_config_editor.sh
-            ./shfmt -d -i 4 -sr sync_emby_media.sh
+            ./shfmt -d -i 4 -sr xiaoya_notify.sh
