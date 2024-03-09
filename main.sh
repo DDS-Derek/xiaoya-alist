@@ -1911,7 +1911,7 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
     if [[ ${LOG_OUT} == [Yy] ]]; then
         clear
         # 实时输出模式
-        while ps -p ${pid} > /dev/null; do
+        while ps ${pid} > /dev/null; do
             clear
             cat /tmp/sync_config.log
             sleep 4
