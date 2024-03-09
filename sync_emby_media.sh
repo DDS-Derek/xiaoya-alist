@@ -206,27 +206,27 @@ function update_media() {
 }
 
 if [ ! "$1" ]; then
-	ERROR "请配置媒体目录后重试！"
+    ERROR "请配置媒体目录后重试！"
 else
-	MEDIA_DIR=$1
+    MEDIA_DIR=$1
 fi
 
 if [ "$2" ]; then
-	CONFIG_DIR=$2
+    CONFIG_DIR=$2
 else
-	CONFIG_DIR=/etc/xiaoya
+    CONFIG_DIR=/etc/xiaoya
 fi
 
 if [ "$3" ]; then
-	EMBY_NAME=$3
+    EMBY_NAME=$3
 else
-	EMBY_NAME=emby
+    EMBY_NAME=emby
 fi
 
 if [ "$4" ]; then
-	RESILIO_NAME=$4
+    RESILIO_NAME=$4
 else
-	RESILIO_NAME=resilio
+    RESILIO_NAME=resilio
 fi
 
 INFO "小雅配置目录：${CONFIG_DIR}"
