@@ -12,13 +12,13 @@ INFO="[${Green}INFO${Font}]"
 ERROR="[${Red}ERROR${Font}]"
 WARN="[${Yellow}WARN${Font}]"
 Time=$(date +"%Y-%m-%d %T")
-function INFO(){
+function INFO() {
     echo -e "${Time} ${INFO} ${1}"
 }
-function ERROR(){
+function ERROR() {
     echo -e "${Time} ${ERROR} ${1}"
 }
-function WARN(){
+function WARN() {
     echo -e "${Time} ${WARN} ${1}"
 }
 
