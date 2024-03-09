@@ -1918,8 +1918,7 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         done
         sleep 2
         rm -f \
-            /tmp/sync_command.sh \
-            /tmp/sync_config.log
+            /tmp/sync_command.sh
     else
         # 后台运行模式
         clear
