@@ -212,10 +212,10 @@ function compare_metadata_size() {
     INFO "${1} REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
     INFO "${1} LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
 
-    if [ "${REMOTE_METADATA_SIZE}" == "${LOCAL_METADATA_SIZE}" ]; then
-        __COMPARE_METADATA_SIZE=1
-    else
+    if [ ! "${REMOTE_METADATA_SIZE}" == "${LOCAL_METADATA_SIZE}" ] && [ -n "${REMOTE_METADATA_SIZE}" ] && [ "${REMOTE_METADATA_SIZE}" -gt 3221225472 ]; then
         __COMPARE_METADATA_SIZE=2
+    else
+        __COMPARE_METADATA_SIZE=1
     fi
 
 }
