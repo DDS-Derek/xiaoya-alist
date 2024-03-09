@@ -115,8 +115,8 @@ function compare_metadata_size() {
         LOCAL_METADATA_SIZE=0
     fi
 
-    INFO "REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
-    INFO "LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
+    INFO "${1} REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
+    INFO "${1} LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
 
     if [ "${REMOTE_METADATA_SIZE}" == "${LOCAL_METADATA_SIZE}" ]; then
         __COMPARE_METADATA_SIZE=1
@@ -236,18 +236,18 @@ INFO "Resilio 容器名称：${RESILIO_NAME}"
 
 test_xiaoya_status
 
-compare_metadata_size all.mp4
+compare_metadata_size "all.mp4"
 if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
     INFO "跳过 all.mp4 更新"
 else
-    update_media all.mp4
+    update_media "all.mp4"
 fi
 
-compare_metadata_size pikpak.mp4
+compare_metadata_size "pikpak.mp4"
 if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
     INFO "跳过 pikpak.mp4 更新"
 else
-    update_media pikpak.mp4
+    update_media "pikpak.mp4"
 fi
 
 INFO "全部媒体元数据更新完成！"
