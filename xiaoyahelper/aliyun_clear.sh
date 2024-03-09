@@ -4,7 +4,7 @@ ver="202402190042"
 
 upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
 upgrade_url_backup="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
-tg_push_api_url="https://xiaoyapush.ddsrem.com"
+tg_push_api_url="https://xiaoyapush.zngle.cf"
 
 hash_function() {
     str="$1"
