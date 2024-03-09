@@ -1917,8 +1917,7 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
             sleep 4
         done
         sleep 2
-        rm -f \
-            /tmp/sync_command.sh
+        rm -f /tmp/sync_command.sh
     else
         # 后台运行模式
         clear
@@ -1926,7 +1925,7 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         INFO "运行日志存于 /tmp/sync_config.log 文件内。"
         # 守护进程，最终清理运行产生的文件
         {
-            while ps -p ${pid} > /dev/null; do sleep 4; done
+            while ps ${pid} > /dev/null; do sleep 4; done
             sleep 2
             rm -f /tmp/sync_command.sh
         } &
