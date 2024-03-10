@@ -2828,7 +2828,14 @@ function reset_script_configuration() {
 
 function main_advanced_configuration() {
 
-    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    __container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${__container_run_extra_parameters}" == "true" ]; then
+        _container_run_extra_parameters="${Green}开启${Font}"
+    elif [ "${__container_run_extra_parameters}" == "false" ]; then
+        _container_run_extra_parameters="${Red}关闭${Font}"
+    else
+        _container_run_extra_parameters="${Red}错误${Font}"
+    fi
 
     __disk_capacity_detection=$(cat ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt)
     if [ "${__disk_capacity_detection}" == "true" ]; then
@@ -2851,7 +2858,7 @@ function main_advanced_configuration() {
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}高级配置${Font}\n"
     echo -e "1、容器名称设置"
-    echo -e "2、是否开启容器运行额外参数添加（当前：${Green}${container_run_extra_parameters}${Font}）"
+    echo -e "2、开启/关闭 容器运行额外参数添加             当前状态：${_container_run_extra_parameters}"
     echo -e "3、重置脚本配置"
     echo -e "4、开启/关闭 磁盘容量检测                     当前状态：${_disk_capacity_detection}"
     echo -e "5、开启/关闭 小雅连通性检测                   当前状态：${_xiaoya_connectivity_detection}"
@@ -2864,7 +2871,7 @@ function main_advanced_configuration() {
         container_name_settings
         ;;
     2)
-        if [ "${container_run_extra_parameters}" == "false" ]; then
+        if [ "${__container_run_extra_parameters}" == "false" ]; then
             echo 'true' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
         else
             echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
