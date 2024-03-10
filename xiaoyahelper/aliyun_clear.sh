@@ -203,7 +203,8 @@ get_rawList(){
 get_List(){
     _res=$raw_list
     
-    echo "$_res" | tr '{' '\n' | grep -v "folder" | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
+    #echo "$_res" | tr '{' '\n' | grep -v "folder" | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
+    echo "$_res" | tr '{' '\n' | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
     return 0
 }
 
@@ -241,7 +242,7 @@ delete_File(){
         return 1
     fi
     
-    drive_root="资源盘"
+    drive_root="资源库"
     if [ "$folder_type"x = "b"x ];then
         drive_root="备份盘"
     fi
