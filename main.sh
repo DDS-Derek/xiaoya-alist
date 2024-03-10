@@ -692,9 +692,15 @@ function test_xiaoya_status() {
             if curl -siL ${docker_address}/d/README.md | grep -v 302 | grep "x-oss-"; then
                 xiaoya_addr=${docker_address}
             else
-                ERROR "请检查xiaoya是否正常运行后再试"
-                docker logs --tail 8 "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                exit 1
+                __xiaoya_connectivity_detection=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt)
+                if [ "${__xiaoya_connectivity_detection}" == "false" ]; then
+                    xiaoya_addr=${docker_address}
+                    WARN "您已设置跳过小雅连通性检测"
+                else
+                    ERROR "请检查xiaoya是否正常运行后再试"
+                    docker logs --tail 8 "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                    exit 1
+                fi
             fi
         else
             ERROR "请先配置 ${CONFIG_DIR}/docker_address.txt 后重试"
@@ -703,6 +709,27 @@ function test_xiaoya_status() {
     fi
 
     INFO "连接小雅地址为 ${xiaoya_addr}"
+
+}
+
+function test_disk_capacity() {
+
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+
+    __disk_capacity_detection=$(cat ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt)
+    if [ "${__disk_capacity_detection}" == "false" ]; then
+        WARN "您已设置跳过磁盘容量检测"
+        INFO "磁盘容量：${free_size_G}G"
+    else
+        if [ "$free_size" -le 63886080 ]; then
+            ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
+            exit 1
+        else
+            INFO "磁盘容量：${free_size_G}G"
+        fi 
+    fi
 
 }
 
@@ -795,15 +822,9 @@ function unzip_xiaoya_all_emby() {
 
     mkdir -p "${MEDIA_DIR}"/temp
     rm -rf "${MEDIA_DIR}"/config
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    if [ "$free_size" -le 63886080 ]; then
-        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
-        exit 1
-    else
-        INFO "磁盘容量：${free_size_G}G"
-    fi
+
+    test_disk_capacity
+
     mkdir -p "${MEDIA_DIR}"/xiaoya
     mkdir -p "${MEDIA_DIR}"/config
     chmod 755 "${MEDIA_DIR}"
@@ -980,15 +1001,9 @@ function download_unzip_xiaoya_all_emby() {
 
     mkdir -p "${MEDIA_DIR}/temp"
     rm -rf "${MEDIA_DIR}/config"
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    if [ "$free_size" -le 63886080 ]; then
-        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
-        exit 1
-    else
-        INFO "磁盘容量：${free_size_G}G"
-    fi
+
+    test_disk_capacity
+
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     chmod 755 "${MEDIA_DIR}"
@@ -1018,15 +1033,9 @@ function download_wget_unzip_xiaoya_all_emby() {
 
     mkdir -p "${MEDIA_DIR}/temp"
     rm -rf "${MEDIA_DIR}/config"
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    if [ "$free_size" -le 63886080 ]; then
-        ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求140G"
-        exit 1
-    else
-        INFO "磁盘容量：${free_size_G}G"
-    fi
+
+    test_disk_capacity
+
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     mkdir -p "${MEDIA_DIR}/temp"
@@ -2821,14 +2830,34 @@ function main_advanced_configuration() {
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
 
+    __disk_capacity_detection=$(cat ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt)
+    if [ "${__disk_capacity_detection}" == "true" ]; then
+        _disk_capacity_detection="${Green}开启${Font}"
+    elif [ "${__disk_capacity_detection}" == "false" ]; then
+        _disk_capacity_detection="${Red}关闭${Font}"
+    else
+        _disk_capacity_detection="${Red}错误${Font}"
+    fi
+
+    __xiaoya_connectivity_detection=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt)
+    if [ "${__xiaoya_connectivity_detection}" == "true" ]; then
+        _xiaoya_connectivity_detection="${Green}开启${Font}"
+    elif [ "${__xiaoya_connectivity_detection}" == "false" ]; then
+        _xiaoya_connectivity_detection="${Red}关闭${Font}"
+    else
+        _xiaoya_connectivity_detection="${Red}错误${Font}"
+    fi
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}高级配置${Font}\n"
     echo -e "1、容器名称设置"
     echo -e "2、是否开启容器运行额外参数添加（当前：${Green}${container_run_extra_parameters}${Font}）"
     echo -e "3、重置脚本配置"
-    echo -e "4、返回上级"
+    echo -e "4、开启/关闭 磁盘容量检测                     当前状态：${_disk_capacity_detection}"
+    echo -e "5、开启/关闭 小雅连通性检测                   当前状态：${_xiaoya_connectivity_detection}"
+    echo -e "6、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [1-6]:" num
     case "$num" in
     1)
         clear
@@ -2848,12 +2877,34 @@ function main_advanced_configuration() {
         reset_script_configuration
         ;;
     4)
+        if [ "${__disk_capacity_detection}" == "true" ]; then
+            echo 'false' > ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt
+        elif [ "${__disk_capacity_detection}" == "false" ]; then
+            echo 'true' > ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt
+        else
+            echo 'true' > ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt
+        fi
+        clear
+        main_advanced_configuration
+        ;;
+    5)
+        if [ "${__xiaoya_connectivity_detection}" == "true" ]; then
+            echo 'false' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
+        elif [ "${__xiaoya_connectivity_detection}" == "false" ]; then
+            echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
+        else
+            echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
+        fi
+        clear
+        main_advanced_configuration
+        ;;
+    6)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [1-6]'
         main_advanced_configuration
         ;;
     esac
@@ -3003,6 +3054,14 @@ function first_init() {
         else
             echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
         fi
+    fi
+
+    if [ ! -f ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt ]; then
+        echo 'true' > ${DDSREM_CONFIG_DIR}/disk_capacity_detection.txt
+    fi
+
+    if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt ]; then
+        echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
     fi
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt ]; then
