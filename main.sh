@@ -839,6 +839,8 @@ function unzip_xiaoya_emby() {
 
     INFO "开始解压 ${1} ..."
 
+    start_time1=$(date +%s)
+
     if [ "${1}" == "config.mp4" ]; then
         extra_parameters="--workdir=/media"
 
@@ -888,6 +890,11 @@ function unzip_xiaoya_emby() {
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/xiaoya
     fi
+
+    end_time1=$(date +%s)
+    total_time1=$((end_time1 - start_time1))
+    total_time1=$((total_time1 / 60))
+    INFO "解压执行时间：$total_time1 分钟"
 
     INFO "解压完成！"
 
@@ -1033,6 +1040,8 @@ function download_wget_unzip_xiaoya_all_emby() {
     pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"
     pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"
 
+    start_time1=$(date +%s)
+
     config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
     if [[ "$config_size" -le 3200000 ]]; then
         ERROR "config.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
@@ -1057,13 +1066,19 @@ function download_wget_unzip_xiaoya_all_emby() {
     extra_parameters="--workdir=/media/xiaoya"
     pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
 
+    end_time1=$(date +%s)
+    total_time1=$((end_time1 - start_time1))
+    total_time1=$((total_time1 / 60))
+    INFO "解压执行时间：$total_time1 分钟"
+
     set_emby_server_infuse_api_key
 
     INFO "设置目录权限..."
     INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
 
-    INFO "下载解压完成！"
+    host=$(echo $xiaoya_addr | cut -f1,2 -d:)
+    INFO "刮削数据已经下载解压完成，请登入${host}:2345，用户名:xiaoya   密码:1234"
 
 }
 
