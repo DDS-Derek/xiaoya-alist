@@ -99,6 +99,8 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 Docker启动容器名称设置 -> 71
 是否开启容器运行额外参数添加 -> 72
 重置脚本配置 -> 73
+开启/关闭 磁盘容量检测 -> 74
+开启/关闭 小雅连通性检测 -> 75
 ```
 
 ## emby_config_editor.sh

@@ -728,7 +728,7 @@ function test_disk_capacity() {
             exit 1
         else
             INFO "磁盘容量：${free_size_G}G"
-        fi 
+        fi
     fi
 
 }
