@@ -640,7 +640,9 @@ function uninstall_xiaoya_alist() {
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-            rm -rf ${OLD_CONFIG_DIR}/*.*
+            rm -rf \
+                ${OLD_CONFIG_DIR}/*.txt \
+                ${OLD_CONFIG_DIR}/*.m3u
         fi
     fi
     INFO "小雅Alist卸载成功！"
@@ -2356,6 +2358,7 @@ function uninstall_xiaoya_alist_tvbox() {
             for dir in "${OLD_CONFIG_DIR}"/*/; do
                 rm -rf "$dir"
             done
+            rm -rf ${OLD_CONFIG_DIR}/*.db
         fi
     fi
     INFO "小雅Alist-TVBox卸载成功！"
