@@ -620,7 +620,7 @@ function uninstall_xiaoya_alist() {
             rm -rf ${OLD_CONFIG_DIR}/*.*
         fi
     fi
-    INFO "卸载成功！"
+    INFO "小雅Alist卸载成功！"
 }
 
 function main_xiaoya_alist() {
@@ -1568,42 +1568,6 @@ function docker_address_xiaoya_all_emby() {
 
 }
 
-function uninstall_xiaoya_all_emby() {
-
-    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
-    read -erp "Clean config:" CLEAN_CONFIG
-    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
-
-    for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"
-        sleep 1
-    done
-    docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
-    docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
-    cpu_arch=$(uname -m)
-    case $cpu_arch in
-    "x86_64" | *"amd64"*)
-        if docker inspect amilys/embyserver:4.8.0.56 > /dev/null 2>&1; then
-            docker rmi amilys/embyserver:4.8.0.56
-        elif docker inspect emby/embyserver:4.8.0.56 > /dev/null 2>&1; then
-            docker rmi emby/embyserver:4.8.0.56
-        fi
-        ;;
-    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        docker rmi emby/embyserver_arm64v8:4.8.0.56
-        ;;
-    esac
-    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
-        INFO "清理配置文件..."
-        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
-            OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
-            rm -rf "${OLD_MEDIA_DIR}"
-        fi
-    fi
-    INFO "卸载成功！"
-
-}
-
 function install_sync_emby_config_cron() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
@@ -1815,7 +1779,7 @@ function uninstall_sync_emby_config_cron() {
 function unisntall_resilio() {
 
     for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始卸载Resilio-Sync${Blue} $i ${Font}\r"
+        echo -en "即将开始卸载 Resilio-Sync${Blue} $i ${Font}\r"
         sleep 1
     done
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
@@ -1828,7 +1792,7 @@ function unisntall_resilio() {
 
     uninstall_sync_emby_config_cron
 
-    INFO "卸载成功！"
+    INFO "Resilio-Sync 卸载成功！"
 
 }
 
@@ -1978,6 +1942,45 @@ function judgment_sync_emby_config_status() {
             echo -e "${Red}未创建${Font}"
         fi
     fi
+
+}
+
+function uninstall_xiaoya_all_emby() {
+
+    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+    docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"*)
+        if docker inspect amilys/embyserver:4.8.0.56 > /dev/null 2>&1; then
+            docker rmi amilys/embyserver:4.8.0.56
+        elif docker inspect emby/embyserver:4.8.0.56 > /dev/null 2>&1; then
+            docker rmi emby/embyserver:4.8.0.56
+        fi
+        ;;
+    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        docker rmi emby/embyserver_arm64v8:4.8.0.56
+        ;;
+    esac
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+            OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
+            rm -rf "${OLD_MEDIA_DIR}"
+        fi
+    fi
+
+    unisntall_resilio
+
+    INFO "全家桶卸载成功！"
 
 }
 
@@ -2134,7 +2137,7 @@ function uninstall_xiaoyahelper() {
     docker stop xiaoyakeeper
     docker rm xiaoyakeeper
     docker rmi dockerproxy.com/library/alpine:3.18.2
-    INFO "卸载成功！"
+    INFO "小雅助手（xiaoyahelper）卸载成功！"
 
 }
 
@@ -2270,7 +2273,7 @@ function uninstall_xiaoya_alist_tvbox() {
             done
         fi
     fi
-    INFO "卸载成功！"
+    INFO "小雅Alist-TVBox卸载成功！"
 
 }
 
@@ -2370,7 +2373,7 @@ function uninstall_onelist() {
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始卸载Onelist${Blue} $i ${Font}\r"
+        echo -en "即将开始卸载 Onelist${Blue} $i ${Font}\r"
         sleep 1
     done
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)"
@@ -2383,7 +2386,7 @@ function uninstall_onelist() {
             rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
-    INFO "卸载成功！"
+    INFO "Onelist 卸载成功！"
 
 }
 
@@ -2490,7 +2493,7 @@ function uninstall_portainer() {
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始卸载Portainer${Blue} $i ${Font}\r"
+        echo -en "即将开始卸载 Portainer${Blue} $i ${Font}\r"
         sleep 1
     done
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)"
@@ -2503,7 +2506,7 @@ function uninstall_portainer() {
             rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
-    INFO "卸载成功！"
+    INFO "Portainer 卸载成功！"
 
 }
 
@@ -2618,7 +2621,7 @@ function uninstall_auto_symlink() {
     [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
 
     for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始卸载Auto_Symlink${Blue} $i ${Font}\r"
+        echo -en "即将开始卸载 Auto_Symlink${Blue} $i ${Font}\r"
         sleep 1
     done
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
@@ -2631,7 +2634,7 @@ function uninstall_auto_symlink() {
             rm -rf "${OLD_CONFIG_DIR}"
         fi
     fi
-    INFO "卸载成功！"
+    INFO "Auto_Symlink 卸载成功！"
 
 }
 
