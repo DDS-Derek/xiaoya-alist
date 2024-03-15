@@ -845,7 +845,10 @@ function set_emby_server_infuse_api_key() {
     get_docker0_url
 
     echo "http://$docker0:6908" > "${CONFIG_DIR}"/emby_server.txt
-    echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
+
+    if [ ! -f "${CONFIG_DIR}"/infuse_api_key.txt ]; then
+        echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
+    fi
 
 }
 
@@ -895,7 +898,7 @@ function unzip_xiaoya_emby() {
     chmod 777 "${MEDIA_DIR}"
     chown root:root "${MEDIA_DIR}"
 
-    INFO "开始解压 ${1} ..."
+    INFO "开始解压 ${MEDIA_DIR}/temp/${1} ..."
 
     start_time1=$(date +%s)
 
@@ -980,6 +983,7 @@ function download_xiaoya_emby() {
     fi
 
     INFO "开始下载 ${1} ..."
+    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
 
     extra_parameters="--workdir=/media/temp"
 
@@ -1015,6 +1019,7 @@ function download_wget_xiaoya_emby() {
     fi
 
     INFO "开始下载 ${1} ..."
+    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
 
     extra_parameters="--workdir=/media/temp"
 
@@ -1462,12 +1467,12 @@ function choose_emby_image() {
 function get_nsswitch_conf_path() {
 
     if [ -f /etc/nsswitch.conf ]; then
-        NSSWITCH=/etc/nsswitch.conf
+        NSSWITCH="/etc/nsswitch.conf"
     else
         CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         echo -e "hosts:\tfiles dns" > ${CONFIG_DIR}/nsswitch.conf
         echo -e "networks:\tfiles" >> ${CONFIG_DIR}/nsswitch.conf
-        NSSWITCH=${CONFIG_DIR}/nsswitch.conf
+        NSSWITCH="${CONFIG_DIR}/nsswitch.conf"
     fi
     INFO "nsswitch.conf 配置文件路径：${NSSWITCH}"
 
@@ -1758,9 +1763,18 @@ function install_resilio() {
     read -erp "inotify:" inotify_set
     [[ -z "${inotify_set}" ]] && inotify_set="y"
     if [[ ${inotify_set} == [Yy] ]]; then
-        echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf
-        echo fs.inotify.max_user_instances=524288 | tee -a /etc/sysctl.conf
+        if ! grep -q "fs.inotify.max_user_watches=524288" /etc/sysctl.conf; then
+            echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf
+        else
+            INFO "系统 inotify watches 数值已存在！"
+        fi
+        if ! grep -q "fs.inotify.max_user_instances=524288" /etc/sysctl.conf; then
+            echo fs.inotify.max_user_instances=524288 | tee -a /etc/sysctl.conf
+        else
+            INFO "系统 inotify instances 数值已存在！"
+        fi
         sysctl -p
+        INFO "系统 inotify watches & instances 数值配置成功！"
     fi
 
     INFO "开始安装resilio..."
