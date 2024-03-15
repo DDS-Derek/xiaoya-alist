@@ -300,37 +300,37 @@ function detection_xiaoya_image_update() {
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --config_dir=*)
-            CONFIG_DIR="${1#*=}"
-            shift
-            ;;
-        --media_dir=*)
-            MEDIA_DIR="${1#*=}"
-            shift
-            ;;
-        --emby_name=*)
-            EMBY_NAME="${1#*=}"
-            shift
-            ;;
-        --resilio_name=*)
-            RESILIO_NAME="${1#*=}"
-            shift
-            ;;
-        --xiaoya_name=*)
-            XIAOYA_NAME="${1#*=}"
-            shift
-            ;;
-        --auto_update_config=*)
-            AUTO_UPDATE_CONFIG="${1#*=}"
-            shift
-            ;;
-        --auto_update_all_pikpak=*)
-            AUTO_UPDATE_ALL_PIKPAK="${1#*=}"
-            shift
-            ;;
-        *)
-            shift
-            ;;
+    --config_dir=*)
+        CONFIG_DIR="${1#*=}"
+        shift
+        ;;
+    --media_dir=*)
+        MEDIA_DIR="${1#*=}"
+        shift
+        ;;
+    --emby_name=*)
+        EMBY_NAME="${1#*=}"
+        shift
+        ;;
+    --resilio_name=*)
+        RESILIO_NAME="${1#*=}"
+        shift
+        ;;
+    --xiaoya_name=*)
+        XIAOYA_NAME="${1#*=}"
+        shift
+        ;;
+    --auto_update_config=*)
+        AUTO_UPDATE_CONFIG="${1#*=}"
+        shift
+        ;;
+    --auto_update_all_pikpak=*)
+        AUTO_UPDATE_ALL_PIKPAK="${1#*=}"
+        shift
+        ;;
+    *)
+        shift
+        ;;
     esac
 done
 
