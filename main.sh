@@ -640,9 +640,20 @@ function uninstall_xiaoya_alist() {
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            for file in "${OLD_CONFIG_DIR}/mycheckintoken.txt" "${OLD_CONFIG_DIR}/mycmd.txt" "${OLD_CONFIG_DIR}/myruntime.txt"; do
+                if [ -f "$file" ]; then
+                    mv -f "$file" "/tmp/$(basename "$file")"
+                fi
+            done
             rm -rf \
                 ${OLD_CONFIG_DIR}/*.txt \
-                ${OLD_CONFIG_DIR}/*.m3u
+                ${OLD_CONFIG_DIR}/*.m3u \
+                ${OLD_CONFIG_DIR}/*.m3u8
+            for file in /tmp/mycheckintoken.txt /tmp/mycmd.txt /tmp/myruntime.txt; do
+                if [ -f "$file" ]; then
+                    mv -f "$file" "${OLD_CONFIG_DIR}/$(basename "$file")"
+                fi
+            done
         fi
     fi
     INFO "小雅Alist卸载成功！"
