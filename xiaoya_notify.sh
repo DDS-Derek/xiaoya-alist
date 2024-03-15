@@ -298,34 +298,68 @@ function detection_xiaoya_image_update() {
 
 }
 
-if [ ! "$1" ]; then
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --config_dir=*)
+            CONFIG_DIR="${1#*=}"
+            shift
+            ;;
+        --media_dir=*)
+            MEDIA_DIR="${1#*=}"
+            shift
+            ;;
+        --emby_name=*)
+            EMBY_NAME="${1#*=}"
+            shift
+            ;;
+        --resilio_name=*)
+            RESILIO_NAME="${1#*=}"
+            shift
+            ;;
+        --xiaoya_name=*)
+            XIAOYA_NAME="${1#*=}"
+            shift
+            ;;
+        --auto_update_config=*)
+            AUTO_UPDATE_CONFIG="${1#*=}"
+            shift
+            ;;
+        --auto_update_all_pikpak=*)
+            AUTO_UPDATE_ALL_PIKPAK="${1#*=}"
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [ -z ${MEDIA_DIR} ]; then
     ERROR "请配置媒体目录后重试！"
-else
-    MEDIA_DIR=$1
 fi
 
-if [ "$2" ]; then
-    CONFIG_DIR=$2
-else
+if [ -z ${CONFIG_DIR} ]; then
     CONFIG_DIR=/etc/xiaoya
 fi
 
-if [ "$3" ]; then
-    EMBY_NAME=$3
-else
+if [ -z ${EMBY_NAME} ]; then
     EMBY_NAME=emby
 fi
 
-if [ "$4" ]; then
-    RESILIO_NAME=$4
-else
+if [ -z ${RESILIO_NAME} ]; then
     RESILIO_NAME=resilio
 fi
 
-if [ "$5" ]; then
-    XIAOYA_NAME=$5
-else
+if [ -z ${XIAOYA_NAME} ]; then
     XIAOYA_NAME=xiaoya
+fi
+
+if [ -z ${AUTO_UPDATE_CONFIG} ]; then
+    AUTO_UPDATE_CONFIG=true
+fi
+
+if [ -z ${AUTO_UPDATE_ALL_PIKPAK} ]; then
+    AUTO_UPDATE_ALL_PIKPAK=true
 fi
 
 INFO "小雅配置目录：${CONFIG_DIR}"
@@ -336,9 +370,17 @@ INFO "小雅容器名称：${XIAOYA_NAME}"
 
 test_xiaoya_status
 # all.mp4 和 pikpak.mp4
-detection_all_pikpak_update
+if [ "${AUTO_UPDATE_CONFIG}" == "true" ]; then
+    detection_all_pikpak_update
+else
+    INFO "all.mp4 和 pikpak.mp4 更新已关闭"
+fi
 # config.mp4
-detection_config_update
+if [ "${AUTO_UPDATE_CONFIG}" == "true" ]; then
+    detection_config_update
+else
+    INFO "Emby config sync 已关闭"
+fi
 # xiaoya version
 detection_xiaoya_version_update
 # xiaoya image
