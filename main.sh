@@ -1536,9 +1536,11 @@ function install_emby_xiaoya_all_emby() {
     if [ -f "${MEDIA_DIR}/config/config/system.xml" ]; then
         if ! grep -q 6908 ${MEDIA_DIR}/config/config/system.xml; then
             ERROR "Emby config 出错，请重新下载解压！"
+            exit 1
         fi
     else
         ERROR "Emby config 出错，请重新下载解压！"
+        exit 1
     fi
 
     XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
