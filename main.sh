@@ -393,6 +393,20 @@ function judgment_container() {
 
 }
 
+function container_update() {
+
+    docker pull containrrr/watchtower:latest
+    docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        containrrr/watchtower:latest \
+        --run-once \
+        --cleanup \
+        "${@}"
+    docker rmi containrrr/watchtower:latest
+    INFO "${*} 更新成功"
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -585,15 +599,8 @@ function update_xiaoya_alist() {
         echo -en "即将开始更新小雅Alist${Blue} $i ${Font}\r"
         sleep 1
     done
-    docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+
 }
 
 function uninstall_xiaoya_alist() {
@@ -1744,15 +1751,7 @@ function update_resilio() {
         echo -en "即将开始更新Resilio-Sync${Blue} $i ${Font}\r"
         sleep 1
     done
-    docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
 
 }
 
@@ -2239,15 +2238,7 @@ function update_xiaoya_alist_tvbox() {
         echo -en "即将开始更新小雅Alist-TVBox${Blue} $i ${Font}\r"
         sleep 1
     done
-    docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
 
 }
 
@@ -2354,15 +2345,7 @@ function update_onelist() {
         echo -en "即将开始更新Onelist${Blue} $i ${Font}\r"
         sleep 1
     done
-    docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_onelist_name.txt)"
 
 }
 
@@ -2475,14 +2458,7 @@ function update_portainer() {
         sleep 1
     done
     docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/portainer_name.txt)"
 
 }
 
@@ -2602,15 +2578,7 @@ function update_auto_symlink() {
         echo -en "即将开始更新Auto_Symlink${Blue} $i ${Font}\r"
         sleep 1
     done
-    docker pull containrrr/watchtower:latest
-    docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        containrrr/watchtower:latest \
-        --run-once \
-        --cleanup \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
-    docker rmi containrrr/watchtower:latest
-    INFO "更新成功！"
+    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/auto_symlink_name.txt)"
 
 }
 
