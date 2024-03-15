@@ -52,3 +52,11 @@ bash -c "$(curl -sLk https://xiaoyahelper.ddsrem.com/aliyun_clear.sh | tail -n +
 所有模式加上-tg功能均可绑定消息推送的TG账号，只有第1次运行需要加-tg参数
 
 **问题反馈**: 联系[Telegram群](https://t.me/xiaoyaliu00)里的heiheigui
+
+## 免责声明
+
+- 请勿将 xiaoyahelper 用于商业用途。
+- 请勿将 xiaoyahelper 用于任何违反法律法规的行为。
+- 本仓库 xiaoyahelper 基于官方作者仓库备份，使用请自行承担数据损失但不限于此的风险。
+- 此项目 xiaoyahelper 开启`Telegram通知`时会收集用户`ChatID`，用于消息通知和数据分析，使用即代表默认同意。
+- 此项目 xiaoyahelper 所有`API`均使用阿里云官方渠道。
