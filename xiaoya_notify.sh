@@ -272,11 +272,15 @@ function detection_all_pikpak_update() {
 
 function detection_config_update() {
 
-    compare_metadata_size "config.mp4"
-    if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
-        INFO "跳过 config.mp4 更新"
-    else
+    if [ "${FORCE_UPDATE_CONFIG}" == "true" ]; then
         bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+    else
+        compare_metadata_size "config.mp4"
+        if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
+            INFO "跳过 config.mp4 更新"
+        else
+            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+        fi
     fi
 
 }
@@ -354,6 +358,10 @@ while [[ $# -gt 0 ]]; do
         AUTO_UPDATE_CONFIG="${1#*=}"
         shift
         ;;
+    --force_update_config=*)
+        FORCE_UPDATE_CONFIG="${1#*=}"
+        shift
+        ;;
     --auto_update_all_pikpak=*)
         AUTO_UPDATE_ALL_PIKPAK="${1#*=}"
         shift
@@ -387,6 +395,10 @@ fi
 
 if [ -z ${AUTO_UPDATE_CONFIG} ]; then
     AUTO_UPDATE_CONFIG=true
+fi
+
+if [ -z ${FORCE_UPDATE_CONFIG} ]; then
+    FORCE_UPDATE_CONFIG=false
 fi
 
 if [ -z ${AUTO_UPDATE_ALL_PIKPAK} ]; then
