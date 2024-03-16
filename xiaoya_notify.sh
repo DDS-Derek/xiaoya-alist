@@ -272,7 +272,7 @@ function detection_all_pikpak_update() {
 
 function detection_config_update() {
 
-    if [ "${FORCE_UPDATE_CONFIG}" == "true" ]; then
+    if [ "${FORCE_UPDATE_CONFIG}" == "yes" ]; then
         bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
     else
         compare_metadata_size "config.mp4"
@@ -394,15 +394,15 @@ if [ -z ${XIAOYA_NAME} ]; then
 fi
 
 if [ -z ${AUTO_UPDATE_CONFIG} ]; then
-    AUTO_UPDATE_CONFIG=true
+    AUTO_UPDATE_CONFIG=yes
 fi
 
 if [ -z ${FORCE_UPDATE_CONFIG} ]; then
-    FORCE_UPDATE_CONFIG=false
+    FORCE_UPDATE_CONFIG=no
 fi
 
 if [ -z ${AUTO_UPDATE_ALL_PIKPAK} ]; then
-    AUTO_UPDATE_ALL_PIKPAK=true
+    AUTO_UPDATE_ALL_PIKPAK=yes
 fi
 
 INFO "小雅配置目录：${CONFIG_DIR}"
@@ -413,13 +413,13 @@ INFO "小雅容器名称：${XIAOYA_NAME}"
 
 test_xiaoya_status
 # all.mp4 和 pikpak.mp4
-if [ "${AUTO_UPDATE_CONFIG}" == "true" ]; then
+if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
     detection_all_pikpak_update
 else
     INFO "all.mp4 和 pikpak.mp4 更新已关闭"
 fi
 # config.mp4
-if [ "${AUTO_UPDATE_CONFIG}" == "true" ]; then
+if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
     detection_config_update
 else
     INFO "Emby config sync 已关闭"
