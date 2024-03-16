@@ -3210,18 +3210,15 @@ function first_init() {
             curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist -o /tmp/xiaoya_alist
             if ! grep -q 'alias xiaoya' /etc/profile; then
                 echo -e "alias xiaoya='bash -c \"\$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/xiaoya_alist)\"'" >> /etc/profile
-                source /etc/profile
             fi
         else
             if ! grep -q 'alias xiaoya' /etc/profile; then
                 echo -e "alias xiaoya='bash -c \"\$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/xiaoya_alist)\"'" >> /etc/profile
-                source /etc/profile
             fi
         fi
     else
         if ! grep -q 'alias xiaoya' /etc/profile; then
             echo -e "alias xiaoya='bash -c \"\$(curl -sLk https://ddsrem.com/xiaoya_install.sh)\"'" >> /etc/profile
-            source /etc/profile
         fi
     fi
 
