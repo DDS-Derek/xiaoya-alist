@@ -395,11 +395,20 @@ function judgment_container() {
 
 function container_update() {
 
-    if docker pull containrrr/watchtower:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
+    if ! docker inspect containrrr/watchtower:latest > /dev/null 2>&1; then
+        if docker pull containrrr/watchtower:latest; then
+            INFO "镜像拉取成功！"
+            REMOVE_WATCHTOWER_IMAGE=true
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+    fi
+
+    CURRENT_WATCHTOWER=$(docker ps --format '{{.Names}}' --filter ancestor=containrrr/watchtower | sed ':a;N;$!ba;s/\n/ /g')
+
+    if [ -n "${CURRENT_WATCHTOWER}" ]; then
+        docker stop "${CURRENT_WATCHTOWER}"
     fi
 
     docker run --rm \
@@ -408,7 +417,15 @@ function container_update() {
         --run-once \
         --cleanup \
         "${@}"
-    docker rmi containrrr/watchtower:latest
+
+    if [ "${REMOVE_WATCHTOWER_IMAGE}" == "true" ]; then
+        docker rmi containrrr/watchtower:latest
+    fi
+
+    if [ -n "${CURRENT_WATCHTOWER}" ]; then
+        docker start "${CURRENT_WATCHTOWER}"
+    fi
+
     INFO "${*} 更新成功"
 
 }

@@ -24,14 +24,37 @@ function WARN() {
 
 function container_update() {
 
-    docker pull containrrr/watchtower:latest
+    if ! docker inspect containrrr/watchtower:latest > /dev/null 2>&1; then
+        if docker pull containrrr/watchtower:latest; then
+            INFO "镜像拉取成功！"
+            REMOVE_WATCHTOWER_IMAGE=true
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+    fi
+
+    CURRENT_WATCHTOWER=$(docker ps --format '{{.Names}}' --filter ancestor=containrrr/watchtower | sed ':a;N;$!ba;s/\n/ /g')
+
+    if [ -n "${CURRENT_WATCHTOWER}" ]; then
+        docker stop "${CURRENT_WATCHTOWER}"
+    fi
+
     docker run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         containrrr/watchtower:latest \
         --run-once \
         --cleanup \
         "${@}"
-    docker rmi containrrr/watchtower:latest
+
+    if [ "${REMOVE_WATCHTOWER_IMAGE}" == "true" ]; then
+        docker rmi containrrr/watchtower:latest
+    fi
+
+    if [ -n "${CURRENT_WATCHTOWER}" ]; then
+        docker start "${CURRENT_WATCHTOWER}"
+    fi
+
     INFO "${*} 更新成功"
 
 }
@@ -44,6 +67,13 @@ function pull_run_glue() {
         if [ ! "$local_sha" == "$remote_sha" ]; then
             docker rmi xiaoyaliu/glue:latest
         fi
+    fi
+
+    if docker pull xiaoyaliu/glue:latest; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
+        exit 1
     fi
 
     if [ -n "${extra_parameters}" ]; then
@@ -382,7 +412,7 @@ if [ "${AUTO_UPDATE_CONFIG}" == "true" ]; then
 else
     INFO "Emby config sync 已关闭"
 fi
-# xiaoya version
-detection_xiaoya_version_update
 # xiaoya image
 detection_xiaoya_image_update
+# xiaoya version
+detection_xiaoya_version_update
