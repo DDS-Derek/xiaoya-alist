@@ -1981,9 +1981,9 @@ function main_resilio() {
 function once_sync_emby_config() {
 
     if command -v crontab > /dev/null 2>&1; then
-        COMMAND_1=$(crontab -l | grep xiaoya_notify | sed 's/^.*-s//; s/>>.*$//' | \
-sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' | \
-sed 's/--force_update_config=no/--force_update_config=no/g')
+        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' |
+            sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' |
+            sed 's/--force_update_config=no/--force_update_config=yes/g')
         if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
@@ -2000,9 +2000,9 @@ sed 's/--force_update_config=no/--force_update_config=no/g')
             COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s ${COMMAND_1}"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' | \
-sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' | \
-sed 's/--force_update_config=no/--force_update_config=no/g')
+        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' |
+            sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' |
+            sed 's/--force_update_config=no/--force_update_config=yes/g')
         if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
