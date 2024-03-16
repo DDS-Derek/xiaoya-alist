@@ -1672,7 +1672,7 @@ function docker_address_xiaoya_all_emby() {
 
 }
 
-function install_sync_emby_config_cron() {
+function install_xiaoya_notify_cron() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         INFO "请输入Resilio-Sync配置文件目录"
@@ -1707,15 +1707,37 @@ function install_sync_emby_config_cron() {
         fi
     done
 
+    INFO "是否开启Emby config自动同步 [Y/n]（默认 Y 开启）"
+    read -erp "Auto update config:" AUTO_UPDATE_CONFIG
+    [[ -z "${AUTO_UPDATE_CONFIG}" ]] && AUTO_UPDATE_CONFIG="y"
+    if [[ ${AUTO_UPDATE_CONFIG} == [Yy] ]]; then
+        auto_update_config=yes
+    else
+        auto_update_config=no
+    fi
+
+    INFO "是否开启自动同步 all 与 pikpak 元数据 [Y/n]（默认 Y 开启）"
+    read -erp "Auto update all & pikpak:" AUTO_UPDATE_ALL_PIKPAK
+    [[ -z "${AUTO_UPDATE_ALL_PIKPAK}" ]] && AUTO_UPDATE_ALL_PIKPAK="y"
+    if [[ ${AUTO_UPDATE_ALL_PIKPAK} == [Yy] ]]; then
+        auto_update_all_pikpak=yes
+    else
+        auto_update_all_pikpak=no
+    fi
+
     # 组合定时任务命令
-    CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
-$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) >> \
+    CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh)\" -s \
+--auto_update_all_pikpak=${auto_update_all_pikpak} \
+--auto_update_config=${auto_update_config} \
+--force_update_config=no \
+--media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
+--config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
+--emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+--resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) >> \
 $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
-        crontab -l | grep -v sync_emby_config > /tmp/cronjob.tmp
+        crontab -l | grep -v sync_emby_config | grep -v xiaoya_notify > /tmp/cronjob.tmp
         echo -e "${CRON}" >> /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
         INFO '已经添加下面的记录到crontab定时任务'
@@ -1726,6 +1748,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
         cp /etc/crontab /etc/crontab.bak
         INFO "已创建/etc/crontab.bak备份文件"
         sed -i '/sync_emby_config/d' /etc/crontab
+        sed -i '/xiaoya_notify/d' /etc/crontab
         echo -e "${CRON}" >> /etc/crontab
         INFO '已经添加下面的记录到crontab定时任务'
         INFO "${CRON}"
@@ -1738,16 +1761,20 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
             ERROR "镜像拉取失败！"
             exit 1
         fi
+        parameters="--auto_update_all_pikpak=${auto_update_all_pikpak} \
+--auto_update_config=${auto_update_config} \
+--force_update_config=no \
+--media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
+--config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
+--emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+--resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
         docker run -itd \
             --name=xiaoya-cron \
             -e TZ=Asia/Shanghai \
-            -e EMBY="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -e RESILIO="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
             -e CRON="${minu} ${hour} */${sync_day} * *" \
-            -e HOST_MEDIA_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)" \
-            -e HOST_RESILIO_DIR="$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
-            -e HOST_CONFIG_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
-            -v "$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)" \
+            -e parameters="${parameters}" \
+            -v "$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt):/config" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
             -v /tmp:/tmp \
@@ -1857,7 +1884,7 @@ function install_resilio() {
             linuxserver/resilio-sync:latest
     fi
 
-    install_sync_emby_config_cron
+    install_xiaoya_notify_cron
 
     INFO "安装完成！"
 
@@ -1873,16 +1900,18 @@ function update_resilio() {
 
 }
 
-function uninstall_sync_emby_config_cron() {
+function uninstall_xiaoya_notify_cron() {
 
     # 清理定时同步任务
     if command -v crontab > /dev/null 2>&1; then
         crontab -l > /tmp/cronjob.tmp
         grep -n "sync_emby_config" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
+        grep -n "xiaoya_notify" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
         rm -rf /tmp/cronjob.tmp
     elif [ -f /etc/synoinfo.conf ]; then
         sed -i '/sync_emby_config/d' /etc/crontab
+        sed -i '/xiaoya_notify/d' /etc/crontab
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
             docker stop xiaoya-cron
@@ -1907,7 +1936,7 @@ function unisntall_resilio() {
         rm -rf "${OLD_CONFIG_DIR}"
     fi
 
-    uninstall_sync_emby_config_cron
+    uninstall_xiaoya_notify_cron
 
     INFO "Resilio-Sync 卸载成功！"
 
@@ -1952,26 +1981,42 @@ function main_resilio() {
 function once_sync_emby_config() {
 
     if command -v crontab > /dev/null 2>&1; then
-        COMMAND=$(crontab -l | grep sync_emby_config | sed 's/^.*\* \*//; s/>>.*$//')
-        if [ -z "$COMMAND" ]; then
+        COMMAND_1=$(crontab -l | grep xiaoya_notify | sed 's/^.*-s//; s/>>.*$//' | \
+sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' | \
+sed 's/--force_update_config=no/--force_update_config=no/g')
+        if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
-${MEDIA_DIR} \
-${CONFIG_DIR} \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s \
+--auto_update_all_pikpak=no \
+--auto_update_config=yes \
+--force_update_config=yes \
+--media_dir=${MEDIA_DIR} \
+--config_dir=${CONFIG_DIR} \
+--emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+--resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        else
+            COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s ${COMMAND_1}"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        COMMAND=$(grep 'sync_emby_config' /etc/crontab | sed 's/^.*\* \*//; s/>>.*$//')
-        if [ -z "$COMMAND" ]; then
+        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' | \
+sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' | \
+sed 's/--force_update_config=no/--force_update_config=no/g')
+        if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
-${MEDIA_DIR} \
-${CONFIG_DIR} \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s \
+--auto_update_all_pikpak=no \
+--auto_update_config=yes \
+--force_update_config=yes \
+--media_dir=${MEDIA_DIR} \
+--config_dir=${CONFIG_DIR} \
+--emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+--resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        else
+            COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s ${COMMAND_1}"
         fi
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
@@ -1994,11 +2039,15 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
         else
             get_config_dir
             get_media_dir
-            COMMAND="bash -c \"\$(curl http://docker.xiaoya.pro/sync_emby_config.sh)\" -s \
-${MEDIA_DIR} \
-${CONFIG_DIR} \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
-$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s \
+--auto_update_all_pikpak=no \
+--auto_update_config=yes \
+--force_update_config=yes \
+--media_dir=${MEDIA_DIR} \
+--config_dir=${CONFIG_DIR} \
+--emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
+--resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
         fi
     fi
     echo -e "${COMMAND}" > /tmp/sync_command.sh
@@ -2043,16 +2092,16 @@ $(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
 
 }
 
-function judgment_sync_emby_config_status() {
+function judgment_xiaoya_notify_status() {
 
     if command -v crontab > /dev/null 2>&1; then
-        if crontab -l | grep sync_emby_config > /dev/null 2>&1; then
+        if crontab -l | grep xiaoya_notify > /dev/null 2>&1; then
             echo -e "${Green}已创建${Font}"
         else
             echo -e "${Red}未创建${Font}"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        if grep 'sync_emby_config' /etc/crontab > /dev/null 2>&1; then
+        if grep 'xiaoya_notify' /etc/crontab > /dev/null 2>&1; then
             echo -e "${Green}已创建${Font}"
         else
             echo -e "${Red}未创建${Font}"
@@ -2116,7 +2165,7 @@ function main_xiaoya_all_emby() {
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
     echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、立即同步小雅Emby config目录"
-    echo -e "7、创建/删除 Emby config同步定时任务          当前状态：$(judgment_sync_emby_config_status)"
+    echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
     echo -e "9、卸载Emby全家桶"
     echo -e "10、返回上级"
@@ -2168,28 +2217,28 @@ function main_xiaoya_all_emby() {
     7)
         clear
         if command -v crontab > /dev/null 2>&1; then
-            if crontab -l | grep sync_emby_config > /dev/null 2>&1; then
+            if crontab -l | grep xiaoya_notify > /dev/null 2>&1; then
                 for i in $(seq -w 3 -1 0); do
                     echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
                     sleep 1
                 done
-                uninstall_sync_emby_config_cron
+                uninstall_xiaoya_notify_cron
                 clear
                 INFO "已删除"
             else
-                install_sync_emby_config_cron
+                install_xiaoya_notify_cron
             fi
         elif [ -f /etc/synoinfo.conf ]; then
-            if grep 'sync_emby_config' /etc/crontab > /dev/null 2>&1; then
+            if grep 'xiaoya_notify' /etc/crontab > /dev/null 2>&1; then
                 for i in $(seq -w 3 -1 0); do
                     echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
                     sleep 1
                 done
-                uninstall_sync_emby_config_cron
+                uninstall_xiaoya_notify_cron
                 clear
                 INFO "已删除"
             else
-                install_sync_emby_config_cron
+                install_xiaoya_notify_cron
             fi
         else
             if docker container inspect xiaoya-cron > /dev/null 2>&1; then
@@ -2197,11 +2246,11 @@ function main_xiaoya_all_emby() {
                     echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
                     sleep 1
                 done
-                uninstall_sync_emby_config_cron
+                uninstall_xiaoya_notify_cron
                 clear
                 INFO "已删除"
             else
-                install_sync_emby_config_cron
+                install_xiaoya_notify_cron
             fi
         fi
         ;;

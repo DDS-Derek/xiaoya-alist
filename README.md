@@ -71,7 +71,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 选择 下载器【aria2/wget】-> 2 2 9
 单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 2 3
 立即 同步小雅Emby的config目录 -> 2 6
-单独 创建/删除 Emby config同步定时任务 -> 2 7
+单独 创建/删除 同步定时更新任务 -> 2 7
 图形化编辑 emby_config.txt -> 2 8
 ———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 4 2
