@@ -338,6 +338,27 @@ function detection_xiaoya_image_update() {
 
 }
 
+function main() {
+
+    # all.mp4 和 pikpak.mp4
+    if [ "${AUTO_UPDATE_ALL_PIKPAK}" == "yes" ]; then
+        detection_all_pikpak_update
+    else
+        INFO "all.mp4 和 pikpak.mp4 更新已关闭"
+    fi
+    # config.mp4
+    if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
+        detection_config_update
+    else
+        INFO "Emby config sync 已关闭"
+    fi
+    # xiaoya image
+    detection_xiaoya_image_update
+    # xiaoya version
+    detection_xiaoya_version_update
+
+}
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
     --config_dir=*)
@@ -418,19 +439,5 @@ INFO "Resilio 容器名称：${RESILIO_NAME}"
 INFO "小雅容器名称：${XIAOYA_NAME}"
 
 test_xiaoya_status
-# all.mp4 和 pikpak.mp4
-if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
-    detection_all_pikpak_update
-else
-    INFO "all.mp4 和 pikpak.mp4 更新已关闭"
-fi
-# config.mp4
-if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
-    detection_config_update
-else
-    INFO "Emby config sync 已关闭"
-fi
-# xiaoya image
-detection_xiaoya_image_update
-# xiaoya version
-detection_xiaoya_version_update
+
+main
