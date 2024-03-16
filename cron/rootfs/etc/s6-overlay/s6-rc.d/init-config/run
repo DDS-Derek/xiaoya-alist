@@ -29,7 +29,9 @@ crontab -r
 CRON_COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh)\" -s ${parameters}"
 
 echo -e "${CRON} ${CRON_COMMAND} >> /config/cron.log 2>&1" > /app/cronjob.list
-echo -e "${CRON_COMMAND}" > /app/command.sh
+echo -e "bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s ${parameters}" | \
+sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' | \
+sed 's/--force_update_config=no/--force_update_config=yes/g' > /app/command.sh
 
 INFO "$(cat /app/cronjob.list)"
 
