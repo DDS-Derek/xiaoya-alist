@@ -793,14 +793,20 @@ function pull_run_glue() {
         remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
         if [ ! "$local_sha" == "$remote_sha" ]; then
             docker rmi xiaoyaliu/glue:latest
+            if docker pull xiaoyaliu/glue:latest; then
+                INFO "镜像拉取成功！"
+            else
+                ERROR "镜像拉取失败！"
+                exit 1
+            fi
         fi
-    fi
-
-    if docker pull xiaoyaliu/glue:latest; then
-        INFO "镜像拉取成功！"
     else
-        ERROR "镜像拉取失败！"
-        exit 1
+        if docker pull xiaoyaliu/glue:latest; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
     fi
 
     if [ -n "${extra_parameters}" ]; then
