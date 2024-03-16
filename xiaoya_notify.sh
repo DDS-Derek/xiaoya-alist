@@ -336,6 +336,7 @@ done
 
 if [ -z ${MEDIA_DIR} ]; then
     ERROR "请配置媒体目录后重试！"
+    exit 1
 fi
 
 if [ -z ${CONFIG_DIR} ]; then
