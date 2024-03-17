@@ -2110,13 +2110,13 @@ function once_sync_emby_config() {
 function judgment_xiaoya_notify_status() {
 
     if command -v crontab > /dev/null 2>&1; then
-        if crontab -l | grep xiaoya_notify > /dev/null 2>&1; then
+        if crontab -l | grep 'xiaoya_notify\|sync_emby_config' > /dev/null 2>&1; then
             echo -e "${Green}已创建${Font}"
         else
             echo -e "${Red}未创建${Font}"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        if grep 'xiaoya_notify' /etc/crontab > /dev/null 2>&1; then
+        if grep 'xiaoya_notify\|sync_emby_config' /etc/crontab > /dev/null 2>&1; then
             echo -e "${Green}已创建${Font}"
         else
             echo -e "${Red}未创建${Font}"
