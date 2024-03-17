@@ -279,13 +279,13 @@ function detection_all_pikpak_update() {
 function detection_config_update() {
 
     if [ "${FORCE_UPDATE_CONFIG}" == "yes" ]; then
-        bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+        bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
     else
         compare_metadata_size "config.mp4"
         if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
             INFO "跳过 config.mp4 更新"
         else
-            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
         fi
     fi
 
@@ -339,6 +339,19 @@ function detection_xiaoya_image_update() {
 }
 
 function main() {
+
+    cat <<EOF
+可添加参数解释：
+1. --auto_update_all_pikpak：是否开启all和pikpak自动下载更新（yes开启，no关闭）（可选，默认开启）
+2. --auto_update_config：是否开启config自动同步（yes开启，no关闭）（可选，默认开启）
+3. --force_update_config：强制同步config（yes开启，no关闭）（可选，默认关闭）
+4. --media_dir：媒体库路径
+5. --config_dir：小雅配置文件路径（可选，默认/etc/xiaoya）
+6. --xiaoya_name：小雅容器名（可选，默认xiaoya）
+7. --resilio_name：resilio容器名（可选，默认resilio）
+8. --emby_name：emby容器名（可选，默认emby）
+
+EOF
 
     # all.mp4 和 pikpak.mp4
     if [ "${AUTO_UPDATE_ALL_PIKPAK}" == "yes" ]; then
