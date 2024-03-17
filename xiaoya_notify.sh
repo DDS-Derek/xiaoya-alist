@@ -353,6 +353,14 @@ function main() {
 
 EOF
 
+    INFO "小雅配置目录：${CONFIG_DIR}"
+    INFO "媒体库目录：${MEDIA_DIR}"
+    INFO "Emby 容器名称：${EMBY_NAME}"
+    INFO "Resilio 容器名称：${RESILIO_NAME}"
+    INFO "小雅容器名称：${XIAOYA_NAME}"
+
+    test_xiaoya_status
+
     # all.mp4 和 pikpak.mp4
     if [ "${AUTO_UPDATE_ALL_PIKPAK}" == "yes" ]; then
         detection_all_pikpak_update
@@ -444,13 +452,5 @@ fi
 if [ -z ${AUTO_UPDATE_ALL_PIKPAK} ]; then
     AUTO_UPDATE_ALL_PIKPAK=yes
 fi
-
-INFO "小雅配置目录：${CONFIG_DIR}"
-INFO "媒体库目录：${MEDIA_DIR}"
-INFO "Emby 容器名称：${EMBY_NAME}"
-INFO "Resilio 容器名称：${RESILIO_NAME}"
-INFO "小雅容器名称：${XIAOYA_NAME}"
-
-test_xiaoya_status
 
 main
