@@ -340,7 +340,7 @@ function detection_xiaoya_image_update() {
 
 function main() {
 
-    cat <<EOF
+    cat << EOF
 可添加参数解释：
 1. --auto_update_all_pikpak：是否开启all和pikpak自动下载更新（yes开启，no关闭）（可选，默认开启）
 2. --auto_update_config：是否开启config自动同步（yes开启，no关闭）（可选，默认开启）
