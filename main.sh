@@ -2415,6 +2415,14 @@ function install_xiaoya_alist_tvbox() {
         read -erp "Extra parameters:" extra_parameters
     fi
 
+    if ls ${CONFIG_DIR}/*.txt 1>/dev/null 2>&1; then
+        INFO "备份小雅配置数据中..."
+        mkdir -p ${CONFIG_DIR}/xiaoya_backup
+        cp -rf ${CONFIG_DIR}/*.txt ${CONFIG_DIR}/xiaoya_backup
+        INFO "完成备份小雅配置数据！"
+        INFO "备份数据路径：${CONFIG_DIR}/xiaoya_backup"
+    fi
+
     if docker pull haroldli/xiaoya-tvbox:latest; then
         INFO "镜像拉取成功！"
     else
