@@ -84,13 +84,15 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 卸载 小雅Alist -> 1 3
 卸载 Emby全家桶 -> 2 9
 卸载 Resilio-Sync（单独） -> 2 5 3
-卸载 小雅助手（xiaoyahelper）-> 3 2
+卸载 小雅助手（xiaoyahelper）-> 3 3
 卸载 小雅Alist-TVBox -> 4 3
 卸载 Onelist -> 5 3
 卸载 Portainer -> 6 1 3
 卸载 Auto_Symlink -> 6 2 3
 ——————————————————————————————————————系统工具——————————————————————————————————————
 查看系统磁盘挂载 -> 6 3
+———————————————————————————————————————其他———————————————————————————————————————
+一次性运行 小雅助手（xiaoyahelper）-> 3 2
 ```
 
 **高级功能**

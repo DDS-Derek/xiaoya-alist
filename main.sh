@@ -2280,8 +2280,6 @@ function main_xiaoya_all_emby() {
 
 function install_xiaoyahelper() {
 
-    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
-
     INFO "选择模式：[3/5]（默认 3）"
     INFO "模式3: 定时运行小雅转存清理并升级小雅镜像"
     INFO "模式5: 只要产生了播放缓存一分钟内立即清理。签到和定时升级同模式3"
@@ -2301,6 +2299,20 @@ function install_xiaoyahelper() {
 
 }
 
+function once_xiaoyahelper() {
+
+    INFO "是否使用Telegram通知 [Y/n]（默认 n 不使用）"
+    read -erp "TG:" TG
+    [[ -z "${TG}" ]] && TG="n"
+    if [[ ${TG} == [Yy] ]]; then
+        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 -tg
+    fi
+    if [[ ${TG} == [Nn] ]]; then
+        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1
+    fi
+
+}
+
 function uninstall_xiaoyahelper() {
 
     for i in $(seq -w 3 -1 0); do
@@ -2316,13 +2328,16 @@ function uninstall_xiaoyahelper() {
 
 function main_xiaoyahelper() {
 
+    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅助手（xiaoyahelper）${Font}\n"
     echo -e "1、安装/更新"
-    echo -e "2、卸载"
-    echo -e "3、返回上级"
+    echo -e "2、一次性运行"
+    echo -e "3、卸载"
+    echo -e "4、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-3]:" num
+    read -erp "请输入数字 [1-4]:" num
     case "$num" in
     1)
         clear
@@ -2330,15 +2345,19 @@ function main_xiaoyahelper() {
         ;;
     2)
         clear
-        uninstall_xiaoyahelper
+        once_xiaoyahelper
         ;;
     3)
+        clear
+        uninstall_xiaoyahelper
+        ;;
+    4)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-3]'
+        ERROR '请输入正确数字 [1-4]'
         main_xiaoyahelper
         ;;
     esac
