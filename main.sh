@@ -1818,6 +1818,16 @@ function install_resilio() {
     read -erp "mem_size:" mem_size
     [[ -z "${mem_size}" ]] && mem_size="2048"
 
+    INFO "resilio日志文件大小上限（单位：MB，默认：2，设置为 0 则代表关闭日志）"
+    read -erp "log_size:" log_size
+    [[ -z "${log_size}" ]] && log_size="2"
+
+    if [ "${log_size}" == "0" ]; then
+        log_opinion="--log-driver none"
+    else
+        log_opinion="--log-opt max-size=${log_size}m --log-opt max-file=1"
+    fi
+
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         INFO "请输入其他参数（默认 无 ）"
@@ -1862,6 +1872,7 @@ function install_resilio() {
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
             -m ${mem_size}M \
+            ${log_opinion} \
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
@@ -1877,6 +1888,7 @@ function install_resilio() {
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
             -m ${mem_size}M \
+            ${log_opinion} \
             -e PUID=0 \
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
