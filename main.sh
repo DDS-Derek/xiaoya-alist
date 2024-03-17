@@ -2315,6 +2315,10 @@ function once_xiaoyahelper() {
 
 function uninstall_xiaoyahelper() {
 
+    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
     for i in $(seq -w 3 -1 0); do
         echo -en "即将开始卸载小雅助手（xiaoyahelper）${Blue} $i ${Font}\r"
         sleep 1
@@ -2322,6 +2326,19 @@ function uninstall_xiaoyahelper() {
     docker stop xiaoyakeeper
     docker rm xiaoyakeeper
     docker rmi dockerproxy.com/library/alpine:3.18.2
+
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            for file in "${OLD_CONFIG_DIR}/mycheckintoken.txt" "${OLD_CONFIG_DIR}/mycmd.txt" "${OLD_CONFIG_DIR}/myruntime.txt"; do
+                if [ -f "$file" ]; then
+                    rm -f "$file"
+                fi
+            done
+        fi
+    fi
+
     INFO "小雅助手（xiaoyahelper）卸载成功！"
 
 }
