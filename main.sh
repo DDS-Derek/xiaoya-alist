@@ -666,6 +666,9 @@ function uninstall_xiaoya_alist() {
                 ${OLD_CONFIG_DIR}/*.txt \
                 ${OLD_CONFIG_DIR}/*.m3u \
                 ${OLD_CONFIG_DIR}/*.m3u8
+            if [ -d "${OLD_CONFIG_DIR}/xiaoya_backup" ]; then
+                rm -rf ${OLD_CONFIG_DIR}/xiaoya_backup
+            fi
             for file in /tmp/mycheckintoken.txt /tmp/mycmd.txt /tmp/myruntime.txt; do
                 if [ -f "$file" ]; then
                     mv -f "$file" "${OLD_CONFIG_DIR}/$(basename "$file")"
