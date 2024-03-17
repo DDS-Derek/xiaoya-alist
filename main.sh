@@ -1747,8 +1747,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
         # 群晖单独支持
         cp /etc/crontab /etc/crontab.bak
         INFO "已创建/etc/crontab.bak备份文件"
-        sed -i '/sync_emby_config/d' /etc/crontab
-        sed -i '/xiaoya_notify/d' /etc/crontab
+        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
         echo -e "${CRON}" >> /etc/crontab
         INFO '已经添加下面的记录到crontab定时任务'
         INFO "${CRON}"
@@ -1761,7 +1760,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
             ERROR "镜像拉取失败！"
             exit 1
         fi
-        parameters="--auto_update_all_pikpak=${auto_update_all_pikpak} \
+        CRON_PARAMETERS="--auto_update_all_pikpak=${auto_update_all_pikpak} \
 --auto_update_config=${auto_update_config} \
 --force_update_config=no \
 --media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
@@ -1773,7 +1772,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
             --name=xiaoya-cron \
             -e TZ=Asia/Shanghai \
             -e CRON="${minu} ${hour} */${sync_day} * *" \
-            -e parameters="${parameters}" \
+            -e parameters="${CRON_PARAMETERS}" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt):/config" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)" \
             -v "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt):$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" \
@@ -1836,6 +1835,9 @@ function install_resilio() {
         else
             INFO "系统 inotify instances 数值已存在！"
         fi
+        awk \
+            '!seen[$0]++ || !/^(fs\.inotify\.max_user_instances|fs\.inotify\.max_user_watches)/' /etc/sysctl.conf > \
+            /tmp/sysctl.conf.tmp && mv /tmp/sysctl.conf.tmp /etc/sysctl.conf
         sysctl -p
         INFO "系统 inotify watches & instances 数值配置成功！"
     fi
@@ -1905,13 +1907,11 @@ function uninstall_xiaoya_notify_cron() {
     # 清理定时同步任务
     if command -v crontab > /dev/null 2>&1; then
         crontab -l > /tmp/cronjob.tmp
-        grep -n "sync_emby_config" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
-        grep -n "xiaoya_notify" /tmp/cronjob.tmp | cut -d ":" -f 1 | xargs -I {} sed -i '{}d' /tmp/cronjob.tmp
+        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
-        rm -rf /tmp/cronjob.tmp
+        rm -f /tmp/cronjob.tmp
     elif [ -f /etc/synoinfo.conf ]; then
-        sed -i '/sync_emby_config/d' /etc/crontab
-        sed -i '/xiaoya_notify/d' /etc/crontab
+        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
             docker stop xiaoya-cron
