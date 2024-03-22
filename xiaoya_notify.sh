@@ -315,10 +315,11 @@ function compare_metadata_size() {
     INFO "${1} REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
     INFO "${1} LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
 
-    if \
-        [ "${REMOTE_METADATA_SIZE}" != "${LOCAL_METADATA_SIZE}" ] && \
-        [ -n "${REMOTE_METADATA_SIZE}" ] && \
-        awk -v remote="${REMOTE_METADATA_SIZE}" -v threshold="2147483648" 'BEGIN { if (remote > threshold) print "1"; else print "0"; }' | grep -q "1"; then
+    if
+        [ "${REMOTE_METADATA_SIZE}" != "${LOCAL_METADATA_SIZE}" ] &&
+            [ -n "${REMOTE_METADATA_SIZE}" ] &&
+            awk -v remote="${REMOTE_METADATA_SIZE}" -v threshold="2147483648" 'BEGIN { if (remote > threshold) print "1"; else print "0"; }' | grep -q "1"
+    then
         __COMPARE_METADATA_SIZE=2
     else
         __COMPARE_METADATA_SIZE=1
