@@ -83,7 +83,7 @@ function pull_run_glue() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
-        docker run -it \
+        docker run -i \
             --security-opt seccomp=unconfined \
             --rm \
             --net=host \
@@ -94,7 +94,7 @@ function pull_run_glue() {
             xiaoyaliu/glue:latest \
             "${@}"
     else
-        docker run -it \
+        docker run -i \
             --security-opt seccomp=unconfined \
             --rm \
             --net=host \
@@ -104,6 +104,73 @@ function pull_run_glue() {
             xiaoyaliu/glue:latest \
             "${@}"
     fi
+
+}
+
+function pull_run_glue_xh() {
+
+    BUILDER_NAME="xiaoya_builder_$(date -u +"T%H%M%S%3NZ")"
+
+    if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ ! "$local_sha" == "$remote_sha" ]; then
+            docker rmi xiaoyaliu/glue:latest
+            if docker pull xiaoyaliu/glue:latest; then
+                INFO "镜像拉取成功！"
+            else
+                ERROR "镜像拉取失败！"
+                exit 1
+            fi
+        fi
+    else
+        if docker pull xiaoyaliu/glue:latest; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+    fi
+
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --security-opt seccomp=unconfined \
+            --name=${BUILDER_NAME} \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            ${extra_parameters} \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}" > /dev/null 2>&1
+    else
+        docker run -itd \
+            --security-opt seccomp=unconfined \
+            --name=${BUILDER_NAME} \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}" > /dev/null 2>&1
+    fi
+
+    timeout=20
+    start_time=$(date +%s)
+    end_time=$((start_time + timeout))
+    while [ "$(date +%s)" -lt $end_time ]; do
+        status=$(docker inspect -f '{{.State.Status}}' "${BUILDER_NAME}")
+        if [ "$status" = "exited" ]; then
+            break
+        fi
+        sleep 1
+    done
+
+    status=$(docker inspect -f '{{.State.Status}}' "${BUILDER_NAME}")
+    if [ "$status" != "exited" ]; then
+        docker kill ${BUILDER_NAME} > /dev/null 2>&1
+    fi
+    docker rm ${BUILDER_NAME} > /dev/null 2>&1
 
 }
 
@@ -235,7 +302,7 @@ function update_media() {
 
 function compare_metadata_size() {
 
-    pull_run_glue xh --headers --follow -o /media/headers.log "${xiaoya_addr}/d/元数据/${1}"
+    pull_run_glue_xh xh --headers --follow --timeout=10 -o /media/headers.log "${xiaoya_addr}/d/元数据/${1}"
     REMOTE_METADATA_SIZE=$(cat ${MEDIA_DIR}/headers.log | grep 'Content-Length' | awk '{print $2}')
     rm -f ${MEDIA_DIR}/headers.log
 
@@ -248,7 +315,10 @@ function compare_metadata_size() {
     INFO "${1} REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
     INFO "${1} LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
 
-    if [ ! "${REMOTE_METADATA_SIZE}" == "${LOCAL_METADATA_SIZE}" ] && [ -n "${REMOTE_METADATA_SIZE}" ] && [ "${REMOTE_METADATA_SIZE}" -gt 3221225472 ]; then
+    if \
+        [ "${REMOTE_METADATA_SIZE}" != "${LOCAL_METADATA_SIZE}" ] && \
+        [ -n "${REMOTE_METADATA_SIZE}" ] && \
+        awk -v remote="${REMOTE_METADATA_SIZE}" -v threshold="2147483648" 'BEGIN { if (remote > threshold) print "1"; else print "0"; }' | grep -q "1"; then
         __COMPARE_METADATA_SIZE=2
     else
         __COMPARE_METADATA_SIZE=1
