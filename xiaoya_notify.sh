@@ -366,7 +366,9 @@ function detection_xiaoya_version_update() {
 
     REMOTE_XIAOYA_VERSION=$(curl -skL https://docker.xiaoya.pro/version.txt | head -n 1 | sed "s/\r$//g")
 
-    LOCAL_XIAOYA_VERSION=$(docker exec -it ${XIAOYA_NAME} cat /version.txt | head -n 1 | sed "s/\r$//g")
+    docker cp ${XIAOYA_NAME}:/version.txt ${MEDIA_DIR}
+    LOCAL_XIAOYA_VERSION=$(cat ${MEDIA_DIR}/version.txt | head -n 1 | sed "s/\r$//g")
+    rm -f cat ${MEDIA_DIR}/version.txt
 
     INFO "REMOTE_XIAOYA_VERSION: ${REMOTE_XIAOYA_VERSION}"
     INFO "LOCAL_XIAOYA_VERSION: ${LOCAL_XIAOYA_VERSION}"
