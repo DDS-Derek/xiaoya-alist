@@ -256,7 +256,9 @@ function update_media() {
 
     INFO "${1} 下载完成！"
 
-    docker stop ${RESILIO_NAME}
+    if docker container inspect "${RESILIO_NAME}" > /dev/null 2>&1; then
+        docker stop ${RESILIO_NAME}
+    fi
 
     INFO "开始解压 ${1} ..."
 
@@ -294,7 +296,9 @@ function update_media() {
         chmod 777 -R "${MEDIA_DIR}"/xiaoya
     fi
 
-    docker start ${RESILIO_NAME}
+    if docker container inspect "${RESILIO_NAME}" > /dev/null 2>&1; then
+        docker start ${RESILIO_NAME}
+    fi
 
     INFO "${1} 更新完成"
 
