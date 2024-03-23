@@ -2352,6 +2352,7 @@ function uninstall_xiaoyahelper() {
                 fi
             done
         fi
+        rm -f ${OLD_CONFIG_DIR}/*json
     fi
 
     INFO "小雅助手（xiaoyahelper）卸载成功！"
