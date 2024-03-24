@@ -770,6 +770,10 @@ function test_xiaoya_status() {
 
 function test_disk_capacity() {
 
+    if [ ! -d "${MEDIA_DIR}" ]; then
+        mkdir -p "${MEDIA_DIR}"
+    fi
+
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
     free_size=$((free_size))
     free_size_G=$((free_size / 1024 / 1024))
