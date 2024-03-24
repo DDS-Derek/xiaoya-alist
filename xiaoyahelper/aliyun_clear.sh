@@ -4,7 +4,7 @@ ver="202402190042"
 
 upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
 upgrade_url_backup="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
-tg_push_api_url="https://xiaoyapush.zngle.cf"
+tg_push_api_url="https://xiaoyapush.ddsrem.com"
 
 hash_function() {
     str="$1"
@@ -203,8 +203,7 @@ get_rawList(){
 get_List(){
     _res=$raw_list
     
-    #echo "$_res" | tr '{' '\n' | grep -v "folder" | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
-    echo "$_res" | tr '{' '\n' | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
+    echo "$_res" | tr '{' '\n' | grep -v "folder" | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' 
     return 0
 }
 
@@ -242,7 +241,7 @@ delete_File(){
         return 1
     fi
     
-    drive_root="资源库"
+    drive_root="资源盘"
     if [ "$folder_type"x = "b"x ];then
         drive_root="备份盘"
     fi
@@ -530,7 +529,7 @@ copy_tvbox_files() {
         for file in "${files[@]}"; do
             file_name=$(basename "$file")
             target_file="$target_dir/$file_name"
-            src_content="$(cat "$file_name" | sed "s/ALI_SHORT_TOKEN/$ali_tiken/g")"
+            src_content="$(cat "$file" | sed "s/ALI_SHORT_TOKEN/$ali_tiken/g")"
             if [ -f "$target_file" ]; then
                 dst_content="$(cat "$target_file")"
                 if [ "$src_content"x != "$dst_content"x ]; then
@@ -882,7 +881,7 @@ case "$run_mode" in
         fi
     ;;
     2)
-        echo "本模式已不再支持，建议使用模式3或模式5"
+        echo "本模式已不再支持，建议使用模式3或模式4"
     ;;
     3|4)
         gen_post_cmd_all
