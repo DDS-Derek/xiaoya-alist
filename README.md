@@ -64,11 +64,12 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 单独 解压 全部元数据 -> 2 2 2
 单独 下载 all.mp4 -> 2 2 3
 单独 解压 all.mp4 -> 2 2 4
-单独 下载 config.mp4 -> 2 2 5
-单独 解压 config.mp4 -> 2 2 6
-单独 下载 pikpak.mp4 -> 2 2 7
-单独 解压 pikpak.mp4 -> 2 2 8
-选择 下载器【aria2/wget】-> 2 2 9
+解压 all.mp4 的指定元数据目录【非全部解压】-> 2 2 5
+单独 下载 config.mp4 -> 2 2 6
+单独 解压 config.mp4 -> 2 2 7
+单独 下载 pikpak.mp4 -> 2 2 8
+单独 解压 pikpak.mp4 -> 2 2 9
+选择 下载器【aria2/wget】-> 2 2 10
 单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 2 3
 立即 同步小雅Emby的config目录 -> 2 6
 单独 创建/删除 同步定时更新任务 -> 2 7

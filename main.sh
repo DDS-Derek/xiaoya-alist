@@ -1000,6 +1000,95 @@ function unzip_xiaoya_emby() {
 
 }
 
+function unzip_appoint_xiaoya_emby() {
+
+    get_config_dir
+
+    get_media_dir
+
+    if [ "${1}" == "all.mp4" ]; then
+        INFO "请选择要解压的压缩包目录 [ 1:动漫 | 2:每日更新 | 3:电影 | 4:电视剧 | 5:纪录片 | 6:纪录片（已刮削）| 7:综艺 ]"
+        valid_choice=false
+        while [ "$valid_choice" = false ]; do
+            read -erp "请输入数字 [1-7]:" choice
+            for i in {1..7}; do
+                if [ "$choice" = "$i" ]; then
+                    valid_choice=true
+                    break
+                fi
+            done
+            if [ "$valid_choice" = false ]; then
+                ERROR "请输入正确数字 [1-7]"
+            fi
+        done
+        case $choice in
+            1)
+                UNZIP_FOLD=动漫
+                ;;
+            2)
+                UNZIP_FOLD=每日更新
+                ;;
+            3)
+                UNZIP_FOLD=电影
+                ;;
+            4)
+                UNZIP_FOLD=电视剧
+                ;;
+            5)
+                UNZIP_FOLD=纪录片
+                ;;
+            6)
+                UNZIP_FOLD=纪录片（已刮削）
+                ;;
+            7)
+                UNZIP_FOLD=综艺
+                ;;
+        esac
+    else
+        ERROR "此文件暂时不支持解压指定元数据！"
+    fi
+
+    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+    chmod 777 "${MEDIA_DIR}"
+    chown root:root "${MEDIA_DIR}"
+
+    INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
+
+    start_time1=$(date +%s)
+
+    if [ "${1}" == "all.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
+        if [[ "$all_size" -le 30000000 ]]; then
+            ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
+            exit 1
+        else
+            INFO "all.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4 ${UNZIP_FOLD}/* -o/media/xiaoya
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    else
+        ERROR "此文件暂时不支持解压指定元数据！"
+    fi
+
+    end_time1=$(date +%s)
+    total_time1=$((end_time1 - start_time1))
+    total_time1=$((total_time1 / 60))
+    INFO "解压执行时间：$total_time1 分钟"
+
+    INFO "解压完成！"
+
+}
+
 function download_xiaoya_emby() {
 
     get_config_dir
@@ -1182,14 +1271,15 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "2、解压 全部元数据"
     echo -e "3、下载 all.mp4"
     echo -e "4、解压 all.mp4"
-    echo -e "5、下载 config.mp4"
-    echo -e "6、解压 config.mp4"
-    echo -e "7、下载 pikpak.mp4"
-    echo -e "8、解压 pikpak.mp4"
-    echo -e "9、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
-    echo -e "10、返回上级"
+    echo -e "5、解压 all.mp4 的指定元数据目录【非全部解压】"
+    echo -e "6、下载 config.mp4"
+    echo -e "7、解压 config.mp4"
+    echo -e "8、下载 pikpak.mp4"
+    echo -e "9、解压 pikpak.mp4"
+    echo -e "10、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
+    echo -e "11、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-10]:" num
+    read -erp "请输入数字 [1-11]:" num
     case "$num" in
     1)
         clear
@@ -1217,17 +1307,21 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     5)
         clear
+        unzip_appoint_xiaoya_emby "all.mp4"
+        ;;
+    6)
+        clear
         if [ "${__data_downloader}" == "wget" ]; then
             download_wget_xiaoya_emby "config.mp4"
         else
             download_xiaoya_emby "config.mp4"
         fi
         ;;
-    6)
+    7)
         clear
         unzip_xiaoya_emby "config.mp4"
         ;;
-    7)
+    8)
         clear
         if [ "${__data_downloader}" == "wget" ]; then
             download_wget_xiaoya_emby "pikpak.mp4"
@@ -1235,11 +1329,11 @@ function main_download_unzip_xiaoya_emby() {
             download_xiaoya_emby "pikpak.mp4"
         fi
         ;;
-    8)
+    9)
         clear
         unzip_xiaoya_emby "pikpak.mp4"
         ;;
-    9)
+    10)
         if [ "${__data_downloader}" == "wget" ]; then
             echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
         elif [ "${__data_downloader}" == "aria2" ]; then
@@ -1250,13 +1344,13 @@ function main_download_unzip_xiaoya_emby() {
         clear
         main_download_unzip_xiaoya_emby
         ;;
-    10)
+    11)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-10]'
+        ERROR '请输入正确数字 [1-11]'
         main_download_unzip_xiaoya_emby
         ;;
     esac
