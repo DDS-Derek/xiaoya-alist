@@ -1119,7 +1119,12 @@ function download_xiaoya_emby() {
 
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
+    if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
+        INFO "${1} 下载成功！"
+    else
+        ERROR "${1} 下载失败！"
+        exit 1
+    fi
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
@@ -1219,9 +1224,24 @@ function download_wget_unzip_xiaoya_all_emby() {
     INFO "开始下载解压..."
 
     extra_parameters="--workdir=/media/temp"
-    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"
-    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"
-    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"
+    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"; then
+        INFO "config.mp4 下载成功！"
+    else
+        ERROR "config.mp4 下载失败！"
+        exit 1
+    fi
+    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"; then
+        INFO "all.mp4 下载成功！"
+    else
+        ERROR "all.mp4 下载失败！"
+        exit 1
+    fi
+    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"; then
+        INFO "pikpak.mp4 下载成功！"
+    else
+        ERROR "pikpak.mp4 下载失败！"
+        exit 1
+    fi
 
     start_time1=$(date +%s)
 
@@ -1946,6 +1966,7 @@ function install_resilio() {
         else
             INFO "系统 inotify instances 数值已存在！"
         fi
+        # 清除多余的inotify设置
         awk \
             '!seen[$0]++ || !/^(fs\.inotify\.max_user_instances|fs\.inotify\.max_user_watches)/' /etc/sysctl.conf > \
             /tmp/sysctl.conf.tmp && mv /tmp/sysctl.conf.tmp /etc/sysctl.conf
