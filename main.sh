@@ -1022,27 +1022,27 @@ function unzip_appoint_xiaoya_emby() {
             fi
         done
         case $choice in
-            1)
-                UNZIP_FOLD=动漫
-                ;;
-            2)
-                UNZIP_FOLD=每日更新
-                ;;
-            3)
-                UNZIP_FOLD=电影
-                ;;
-            4)
-                UNZIP_FOLD=电视剧
-                ;;
-            5)
-                UNZIP_FOLD=纪录片
-                ;;
-            6)
-                UNZIP_FOLD=纪录片（已刮削）
-                ;;
-            7)
-                UNZIP_FOLD=综艺
-                ;;
+        1)
+            UNZIP_FOLD=动漫
+            ;;
+        2)
+            UNZIP_FOLD=每日更新
+            ;;
+        3)
+            UNZIP_FOLD=电影
+            ;;
+        4)
+            UNZIP_FOLD=电视剧
+            ;;
+        5)
+            UNZIP_FOLD=纪录片
+            ;;
+        6)
+            UNZIP_FOLD=纪录片（已刮削）
+            ;;
+        7)
+            UNZIP_FOLD=综艺
+            ;;
         esac
     else
         ERROR "此文件暂时不支持解压指定元数据！"
