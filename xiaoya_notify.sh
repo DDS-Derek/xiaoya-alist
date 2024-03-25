@@ -354,13 +354,13 @@ function detection_all_pikpak_update() {
 function detection_config_update() {
 
     if [ "${FORCE_UPDATE_CONFIG}" == "yes" ]; then
-        bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+        bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
     else
         compare_metadata_size "config.mp4"
         if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
             INFO "跳过 config.mp4 更新"
         else
-            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME}
+            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
         fi
     fi
 
@@ -427,6 +427,7 @@ function main() {
 6. --xiaoya_name：小雅容器名（可选，默认xiaoya）
 7. --resilio_name：resilio容器名（可选，默认resilio）
 8. --emby_name：emby容器名（可选，默认emby）
+9. --emby_apikey: emby api key（可选）
 
 EOF
 
@@ -469,6 +470,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     --emby_name=*)
         EMBY_NAME="${1#*=}"
+        shift
+        ;;
+    --emby_apikey=*)
+        EMBY_APIKEY="${1#*=}"
         shift
         ;;
     --resilio_name=*)
