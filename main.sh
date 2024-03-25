@@ -1933,8 +1933,14 @@ function install_resilio() {
     [[ -z "${SYNC_PORT}" ]] && SYNC_PORT="55555"
 
     INFO "resilio容器内存上限（单位：MB，默认：2048）"
+    WARN "PS: 部分系统有可能不支持内存限制设置，请输入 n 取消此设置！"
     read -erp "mem_size:" mem_size
     [[ -z "${mem_size}" ]] && mem_size="2048"
+    if [[ ${mem_size} == [Nn] ]]; then
+        mem_set=
+    else
+        mem_set="-m ${mem_size}M"
+    fi
 
     INFO "resilio日志文件大小上限（单位：MB，默认：2，设置为 0 则代表关闭日志）"
     read -erp "log_size:" log_size
@@ -1990,7 +1996,7 @@ function install_resilio() {
     if [ -n "${extra_parameters}" ]; then
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
-            -m ${mem_size}M \
+            ${mem_set} \
             ${log_opinion} \
             -e PUID=0 \
             -e PGID=0 \
@@ -2006,7 +2012,7 @@ function install_resilio() {
     else
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
-            -m ${mem_size}M \
+            ${mem_set} \
             ${log_opinion} \
             -e PUID=0 \
             -e PGID=0 \
