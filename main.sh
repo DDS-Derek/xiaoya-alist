@@ -754,6 +754,7 @@ function test_xiaoya_status() {
                     WARN "您已设置跳过小雅连通性检测"
                 else
                     ERROR "请检查xiaoya是否正常运行后再试"
+                    ERROR "小雅日志如下："
                     docker logs --tail 8 "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                     exit 1
                 fi
