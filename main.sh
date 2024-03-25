@@ -2302,7 +2302,7 @@ function main_xiaoya_all_emby() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Emby全家桶${Font}\n"
-    echo -e "${Red}注意：2023年3月16日后Emby config同步定时任务更换为同步定时更新任务${Font}"
+    echo -e "${Red}注意：2024年3月16日后Emby config同步定时任务更换为同步定时更新任务${Font}"
     echo -e "${Red}用户需先执行一遍 菜单27 删除旧任务，再执行一遍 菜单27 创建新任务${Font}\n"
     echo -e "1、一键安装Emby全家桶"
     echo -e "2、下载/解压 元数据"
