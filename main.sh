@@ -1942,12 +1942,14 @@ function install_resilio() {
         mem_set="-m ${mem_size}M"
     fi
 
-    INFO "resilio日志文件大小上限（单位：MB，默认：2，设置为 0 则代表关闭日志）"
+    INFO "resilio日志文件大小上限（单位：MB；默认：2；设置为 0 则代表关闭日志；设置为 n 则代表取消此设置）"
     read -erp "log_size:" log_size
     [[ -z "${log_size}" ]] && log_size="2"
 
     if [ "${log_size}" == "0" ]; then
         log_opinion="--log-driver none"
+    elif [[ ${log_size} == [Nn] ]]; then
+        log_opinion=
     else
         log_opinion="--log-opt max-size=${log_size}m --log-opt max-file=1"
     fi
