@@ -227,17 +227,17 @@ function wait_emby_start() {
     CONTAINER_NAME=${EMBY_NAME}
     TARGET_LOG_LINE_SUCCESS="All entry points have started"
     while true; do
-        line=$(docker logs "$CONTAINER_NAME" 2>&1| tail -n 10)
+        line=$(docker logs "$CONTAINER_NAME" 2>&1 | tail -n 10)
         echo "$line"
         if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
-        break
+            break
         fi
         current_time=$(date +%s)
         elapsed_time=$((current_time - start_time))
         if [ "$elapsed_time" -gt 300 ]; then
             WARN "Emby未正常启动超时5分钟，终止脚本！"
             exit 1
-        fi      
+        fi
         sleep 3
     done
 
@@ -434,7 +434,7 @@ function sync_emby_config() {
         exit 1
     fi
 
-    if ${SQLITE_COMMAND_3} sqlite3 /emby/config/data/library.db ".tables" |grep Chapters3 > /dev/null ; then
+    if ${SQLITE_COMMAND_3} sqlite3 /emby/config/data/library.db ".tables" | grep Chapters3 > /dev/null; then
         cp -f $MEDIA_DIR/temp/config/data/library.db* $MEDIA_DIR/config/data/
         ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db "DROP TABLE IF EXISTS UserDatas;"
         ${SQLITE_COMMAND_2} sqlite3 /emby/config/data/library.db ".read /tmp/emby_user.sql"
@@ -463,16 +463,15 @@ function sync_emby_config() {
     wait_emby_start
 
     EMBY_COMMAND="docker run -i --security-opt seccomp=unconfined --rm --net=host -v /tmp/emby.response:/tmp/emby.response -e LANG=C.UTF-8 xiaoyaliu/glue:latest"
-    USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response |wc -l)
-    for(( i=0 ; i < USER_COUNT ; i++ ))
-    do
+    USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response | wc -l)
+    for ((i = 0; i < USER_COUNT; i++)); do
         if [[ "$USER_COUNT" -gt 25 ]]; then
             WARN "用户超过25位，跳过更新用户 Policy！"
             exit 1
         fi
         id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response | tr -d '[:space:]')
         name=$(${EMBY_COMMAND} jq -r ".[$i].Name" /tmp/emby.response | tr -d '[:space:]')
-        policy=$(${EMBY_COMMAND} jq -r ".[$i].Policy | to_entries | from_entries | tojson" /tmp/emby.response |tr -d '[:space:]')
+        policy=$(${EMBY_COMMAND} jq -r ".[$i].Policy | to_entries | from_entries | tojson" /tmp/emby.response | tr -d '[:space:]')
         USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_APIKEY}"
         status_code=$(curl -s -w "%{http_code}" -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2")
         if [ "$status_code" == "204" ]; then
