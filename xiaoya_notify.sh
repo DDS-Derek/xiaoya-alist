@@ -703,6 +703,10 @@ if [ -z ${EMBY_NAME} ]; then
     EMBY_NAME=emby
 fi
 
+if [ -z ${EMBY_APIKEY} ]; then
+    EMBY_APIKEY=e825ed6f7f8f44ffa0563cddaddce14d
+fi
+
 if [ -z ${RESILIO_NAME} ]; then
     RESILIO_NAME=resilio
 fi
