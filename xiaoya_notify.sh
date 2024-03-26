@@ -234,8 +234,8 @@ function wait_emby_start() {
         fi
         current_time=$(date +%s)
         elapsed_time=$((current_time - start_time))
-        if [ "$elapsed_time" -gt 300 ]; then
-            WARN "Emby未正常启动超时5分钟，终止脚本！"
+        if [ "$elapsed_time" -gt 600 ]; then
+            WARN "Emby 未正常启动超时 10 分钟，终止脚本！"
             exit 1
         fi
         sleep 3
@@ -354,13 +354,15 @@ function sync_emby_config() {
 
     SQLITE_COMMAND="docker run -i \
         --security-opt seccomp=unconfined \
-        --rm --net=host \
+        --rm \
+        --net=host \
         -v $MEDIA_DIR/config/data:/emby/config/data \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest"
     SQLITE_COMMAND_2="docker run -i \
         --security-opt seccomp=unconfined \
-        --rm --net=host \
+        --rm \
+        --net=host \
         -v $MEDIA_DIR/config/data:/emby/config/data \
         -v /tmp/emby_user.sql:/tmp/emby_user.sql \
         -v /tmp/emby_library_mediaconfig.sql:/tmp/emby_library_mediaconfig.sql \
@@ -368,8 +370,16 @@ function sync_emby_config() {
         xiaoyaliu/glue:latest"
     SQLITE_COMMAND_3="docker run -i \
         --security-opt seccomp=unconfined \
-        --rm --net=host \
+        --rm \
+        --net=host \
         -v $MEDIA_DIR/temp/config/data:/emby/config/data \
+        -e LANG=C.UTF-8 \
+        xiaoyaliu/glue:latest"
+    EMBY_COMMAND="docker run -i \
+        --security-opt seccomp=unconfined \
+        --rm \
+        --net=host \
+        -v /tmp/emby.response:/tmp/emby.response \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest"
 
@@ -394,7 +404,7 @@ function sync_emby_config() {
         fi
     fi
 
-    INFO "保留用户Policy中..."
+    INFO "保留用户 Policy 中..."
     status=$(docker inspect -f '{{.State.Status}}' "${EMBY_NAME}")
     if [ "$status" == "exited" ]; then
         docker start "${EMBY_NAME}"
@@ -402,7 +412,7 @@ function sync_emby_config() {
     fi
     curl -s "${EMBY_URL}/Users?api_key=${EMBY_APIKEY}" > /tmp/emby.response
 
-    INFO "Emby关闭中..."
+    INFO "Emby 关闭中..."
     docker stop "${EMBY_NAME}"
 
     sleep 4
@@ -420,10 +430,10 @@ function sync_emby_config() {
     extra_parameters="--workdir=/media/temp"
     _os_all=$(uname -a)
     if echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
-        INFO "绿联NAS使用wget下载"
+        INFO "绿联NAS使用 wget 下载"
         pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"
     else
-        INFO "使用aria2下载"
+        INFO "使用 aria2 下载"
         pull_run_glue aria2c -o config.mp4 --continue=true -x6 --conditional-get=true --allow-overwrite=true "${xiaoya_addr}/d/元数据/config.mp4"
     fi
     # 在temp下面解压，最终新config文件路径为temp/config
@@ -462,11 +472,10 @@ function sync_emby_config() {
 
     wait_emby_start
 
-    EMBY_COMMAND="docker run -i --security-opt seccomp=unconfined --rm --net=host -v /tmp/emby.response:/tmp/emby.response -e LANG=C.UTF-8 xiaoyaliu/glue:latest"
     USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response | wc -l)
     for ((i = 0; i < USER_COUNT; i++)); do
-        if [[ "$USER_COUNT" -gt 25 ]]; then
-            WARN "用户超过25位，跳过更新用户 Policy！"
+        if [[ "$USER_COUNT" -gt 30 ]]; then
+            WARN "用户超过 30 位，跳过更新用户 Policy！"
             exit 1
         fi
         id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response | tr -d '[:space:]')
