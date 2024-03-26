@@ -221,6 +221,28 @@ function test_xiaoya_status() {
 
 }
 
+function wait_emby_start() {
+
+    start_time=$(date +%s)
+    CONTAINER_NAME=${EMBY_NAME}
+    TARGET_LOG_LINE_SUCCESS="All entry points have started"
+    while true; do
+        line=$(docker logs "$CONTAINER_NAME" 2>&1| tail -n 10)
+        echo "$line"
+        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
+        break
+        fi
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ "$elapsed_time" -gt 300 ]; then
+            WARN "Emby未正常启动超时5分钟，终止脚本！"
+            exit 1
+        fi      
+        sleep 3
+    done
+
+}
+
 function update_media() {
 
     INFO "开始更新 ${1}"
@@ -304,6 +326,164 @@ function update_media() {
 
 }
 
+function sync_emby_config() {
+
+    MEDIA_DIR=$1
+    if [ "$2" ]; then
+        EMBY_URL=$(cat $2/emby_server.txt)
+        CONFIG_DIR=$2
+    else
+        EMBY_URL=$(cat /etc/xiaoya/emby_server.txt)
+        CONFIG_DIR=/etc/xiaoya
+    fi
+    if [ "$3" ]; then
+        EMBY_NAME=$3
+    else
+        EMBY_NAME=emby
+    fi
+    if [ "$4" ]; then
+        RESILIO_NAME=$4
+    else
+        RESILIO_NAME=resilio
+    fi
+    if [ "$5" ]; then
+        EMBY_APIKEY=$5
+    else
+        EMBY_APIKEY=e825ed6f7f8f44ffa0563cddaddce14d
+    fi
+
+    SQLITE_COMMAND="docker run -i \
+        --security-opt seccomp=unconfined \
+        --rm --net=host \
+        -v $MEDIA_DIR/config/data:/emby/config/data \
+        -e LANG=C.UTF-8 \
+        xiaoyaliu/glue:latest"
+    SQLITE_COMMAND_2="docker run -i \
+        --security-opt seccomp=unconfined \
+        --rm --net=host \
+        -v $MEDIA_DIR/config/data:/emby/config/data \
+        -v /tmp/emby_user.sql:/tmp/emby_user.sql \
+        -v /tmp/emby_library_mediaconfig.sql:/tmp/emby_library_mediaconfig.sql \
+        -e LANG=C.UTF-8 \
+        xiaoyaliu/glue:latest"
+    SQLITE_COMMAND_3="docker run -i \
+        --security-opt seccomp=unconfined \
+        --rm --net=host \
+        -v $MEDIA_DIR/temp/config/data:/emby/config/data \
+        -e LANG=C.UTF-8 \
+        xiaoyaliu/glue:latest"
+
+    if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ ! "$local_sha" == "$remote_sha" ]; then
+            docker rmi xiaoyaliu/glue:latest
+            if docker pull xiaoyaliu/glue:latest; then
+                INFO "镜像拉取成功！"
+            else
+                ERROR "镜像拉取失败！"
+                exit 1
+            fi
+        fi
+    else
+        if docker pull xiaoyaliu/glue:latest; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+    fi
+
+    INFO "保留用户Policy中..."
+    status=$(docker inspect -f '{{.State.Status}}' "${EMBY_NAME}")
+    if [ "$status" == "exited" ]; then
+        docker start "${EMBY_NAME}"
+        wait_emby_start
+    fi
+    curl -s "${EMBY_URL}/Users?api_key=${EMBY_APIKEY}" > /tmp/emby.response
+
+    INFO "Emby关闭中..."
+    docker stop "${EMBY_NAME}"
+
+    sleep 4
+
+    INFO "导出数据库中..."
+    ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db ".dump UserDatas" > /tmp/emby_user.sql
+    ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db ".dump ItemExtradata" > /tmp/emby_library_mediaconfig.sql
+
+    INFO "清理旧数据..."
+    rm -f $MEDIA_DIR/config/data/library.db*
+    rm -f $MEDIA_DIR/temp/config.mp4
+
+    test_xiaoya_status
+
+    extra_parameters="--workdir=/media/temp"
+    _os_all=$(uname -a)
+    if echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        INFO "绿联NAS使用wget下载"
+        pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"
+    else
+        INFO "使用aria2下载"
+        pull_run_glue aria2c -o config.mp4 --continue=true -x6 --conditional-get=true --allow-overwrite=true "${xiaoya_addr}/d/元数据/config.mp4"
+    fi
+    # 在temp下面解压，最终新config文件路径为temp/config
+    if pull_run_glue 7z x -aoa -mmt=16 config.mp4; then
+        INFO "下载解压元数据完成"
+    else
+        ERROR "解压元数据失败"
+        exit 1
+    fi
+
+    if ${SQLITE_COMMAND_3} sqlite3 /emby/config/data/library.db ".tables" |grep Chapters3 > /dev/null ; then
+        cp -f $MEDIA_DIR/temp/config/data/library.db* $MEDIA_DIR/config/data/
+        ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db "DROP TABLE IF EXISTS UserDatas;"
+        ${SQLITE_COMMAND_2} sqlite3 /emby/config/data/library.db ".read /tmp/emby_user.sql"
+        ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db "DROP TABLE IF EXISTS ItemExtradata;"
+        ${SQLITE_COMMAND_2} sqlite3 /emby/config/data/library.db ".read /tmp/emby_library_mediaconfig.sql"
+        INFO "保存用户信息完成"
+        INFO "文件复制中..."
+        mkdir -p $MEDIA_DIR/config/cache
+        mkdir -p $MEDIA_DIR/config/metadata
+        cp -rf $MEDIA_DIR/temp/config/cache/* $MEDIA_DIR/config/cache/
+        cp -rf $MEDIA_DIR/temp/config/metadata/* $MEDIA_DIR/config/metadata/
+        rm -rf $MEDIA_DIR/temp/config/*
+        INFO "文件复制完成"
+        chmod -R 777 \
+            $MEDIA_DIR/config/data \
+            $MEDIA_DIR/config/cache \
+            $MEDIA_DIR/config/metadata
+        INFO "Emby 重启中..."
+        docker start ${EMBY_NAME}
+        sleep 30
+    else
+        ERROR "解压数据库不完整，跳过复制..."
+        exit 1
+    fi
+
+    wait_emby_start
+
+    EMBY_COMMAND="docker run -i --security-opt seccomp=unconfined --rm --net=host -v /tmp/emby.response:/tmp/emby.response -e LANG=C.UTF-8 xiaoyaliu/glue:latest"
+    USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response |wc -l)
+    for(( i=0 ; i < USER_COUNT ; i++ ))
+    do
+        if [[ "$USER_COUNT" -gt 25 ]]; then
+            WARN "用户超过25位，跳过更新用户 Policy！"
+            exit 1
+        fi
+        id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response | tr -d '[:space:]')
+        name=$(${EMBY_COMMAND} jq -r ".[$i].Name" /tmp/emby.response | tr -d '[:space:]')
+        policy=$(${EMBY_COMMAND} jq -r ".[$i].Policy | to_entries | from_entries | tojson" /tmp/emby.response |tr -d '[:space:]')
+        USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_APIKEY}"
+        status_code=$(curl -s -w "%{http_code}" -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2")
+        if [ "$status_code" == "204" ]; then
+            INFO "成功更新 $name 用户Policy"
+        else
+            ERROR "返回错误代码 $status_code"
+        fi
+    done
+
+}
+
 function compare_metadata_size() {
 
     pull_run_glue_xh xh --headers --follow --timeout=10 -o /media/headers.log "${xiaoya_addr}/d/元数据/${1}"
@@ -354,13 +534,13 @@ function detection_all_pikpak_update() {
 function detection_config_update() {
 
     if [ "${FORCE_UPDATE_CONFIG}" == "yes" ]; then
-        bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
+        sync_emby_config ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
     else
         compare_metadata_size "config.mp4"
         if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
             INFO "跳过 config.mp4 更新"
         else
-            bash -c "$(curl http://docker.xiaoya.pro/sync_emby_config.sh.bak)" -s ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
+            sync_emby_config ${MEDIA_DIR} ${CONFIG_DIR} ${EMBY_NAME} ${RESILIO_NAME} ${EMBY_APIKEY}
         fi
     fi
 
