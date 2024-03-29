@@ -559,13 +559,17 @@ function detection_xiaoya_version_update() {
     REMOTE_XIAOYA_VERSION=$(curl -skL https://docker.xiaoya.pro/version.txt | head -n 1 | sed "s/\r$//g")
 
     docker cp ${XIAOYA_NAME}:/version.txt ${MEDIA_DIR}
-    LOCAL_XIAOYA_VERSION=$(cat ${MEDIA_DIR}/version.txt | head -n 1 | sed "s/\r$//g")
-    rm -f cat ${MEDIA_DIR}/version.txt
+    if [ -f "${MEDIA_DIR}/version.txt" ]; then
+        LOCAL_XIAOYA_VERSION=$(cat ${MEDIA_DIR}/version.txt | head -n 1 | sed "s/\r$//g")
+        rm -f cat ${MEDIA_DIR}/version.txt
+    else
+        LOCAL_XIAOYA_VERSION="error"
+    fi
 
     INFO "REMOTE_XIAOYA_VERSION: ${REMOTE_XIAOYA_VERSION}"
     INFO "LOCAL_XIAOYA_VERSION: ${LOCAL_XIAOYA_VERSION}"
 
-    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] || [ "${REMOTE_XIAOYA_VERSION}" == "" ]; then
+    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] || [ "${REMOTE_XIAOYA_VERSION}" == "" ] || [ "${LOCAL_XIAOYA_VERSION}" == "error" ]; then
         INFO "跳过小雅容器重启"
     else
         docker restart ${XIAOYA_NAME}
@@ -581,7 +585,7 @@ function detection_xiaoya_image_update() {
             remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
             INFO "remote_sha: ${remote_sha}"
             INFO "local_sha: ${local_sha}"
-            if [ ! "${local_sha}" == "${remote_sha}" ]; then
+            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
                 container_update "${XIAOYA_NAME}"
             else
                 INFO "跳过小雅容器更新"
@@ -593,7 +597,7 @@ function detection_xiaoya_image_update() {
             remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/hostmode" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
             INFO "remote_sha: ${remote_sha}"
             INFO "local_sha: ${local_sha}"
-            if [ ! "${local_sha}" == "${remote_sha}" ]; then
+            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
                 container_update "${XIAOYA_NAME}"
             else
                 INFO "跳过小雅容器更新"
