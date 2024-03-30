@@ -574,11 +574,11 @@ function detection_xiaoya_version_update() {
     INFO "REMOTE_XIAOYA_VERSION: ${REMOTE_XIAOYA_VERSION}"
     INFO "LOCAL_XIAOYA_VERSION: ${LOCAL_XIAOYA_VERSION}"
 
-    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] || \
-    [ "${REMOTE_XIAOYA_VERSION}" == "" ] || \
-    [ "${LOCAL_XIAOYA_VERSION}" == "error" ] || \
-    [ "${REMOTE_XIAOYA_VERSION}" == "error" ] || \
-    [ -z "${REMOTE_XIAOYA_VERSION}" ]; then
+    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] ||
+        [ "${REMOTE_XIAOYA_VERSION}" == "" ] ||
+        [ "${LOCAL_XIAOYA_VERSION}" == "error" ] ||
+        [ "${REMOTE_XIAOYA_VERSION}" == "error" ] ||
+        [ -z "${REMOTE_XIAOYA_VERSION}" ]; then
         INFO "跳过小雅容器重启"
     else
         docker restart ${XIAOYA_NAME}
