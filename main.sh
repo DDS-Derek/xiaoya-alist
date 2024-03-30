@@ -944,6 +944,11 @@ function unzip_xiaoya_emby() {
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ..."
 
+    if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+        ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，文件不完整！"
+        exit 1
+    fi
+
     start_time1=$(date +%s)
 
     if [ "${1}" == "config.mp4" ]; then
@@ -1063,6 +1068,11 @@ function unzip_appoint_xiaoya_emby() {
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
 
+    if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+        ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，文件不完整！"
+        exit 1
+    fi
+
     start_time1=$(date +%s)
 
     if [ "${1}" == "all.mp4" ]; then
@@ -1113,6 +1123,9 @@ function download_xiaoya_emby() {
     if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
         INFO "清理旧 ${1} 中..."
         rm -f ${MEDIA_DIR}/temp/${1}
+        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
+        fi
     fi
 
     INFO "开始下载 ${1} ..."
@@ -1121,7 +1134,12 @@ function download_xiaoya_emby() {
     extra_parameters="--workdir=/media/temp"
 
     if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
-        INFO "${1} 下载成功！"
+        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+            ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
+            exit 1
+        else
+            INFO "${1} 下载成功！"
+        fi
     else
         ERROR "${1} 下载失败！"
         exit 1
@@ -1154,6 +1172,9 @@ function download_wget_xiaoya_emby() {
     if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
         INFO "清理旧 ${1} 中..."
         rm -f ${MEDIA_DIR}/temp/${1}
+        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
+        fi
     fi
 
     INFO "开始下载 ${1} ..."
@@ -1161,7 +1182,17 @@ function download_wget_xiaoya_emby() {
 
     extra_parameters="--workdir=/media/temp"
 
-    pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"
+    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
+        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+            ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
+            exit 1
+        else
+            INFO "${1} 下载成功！"
+        fi
+    else
+        ERROR "${1} 下载失败！"
+        exit 1
+    fi
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
@@ -1226,19 +1257,34 @@ function download_wget_unzip_xiaoya_all_emby() {
 
     extra_parameters="--workdir=/media/temp"
     if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"; then
-        INFO "config.mp4 下载成功！"
+        if [ -f "${MEDIA_DIR}/temp/config.mp4.aria2" ]; then
+            ERROR "存在 ${MEDIA_DIR}/temp/config.mp4.aria2 文件，下载不完整！"
+            exit 1
+        else
+            INFO "config.mp4 下载成功！"
+        fi
     else
         ERROR "config.mp4 下载失败！"
         exit 1
     fi
     if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"; then
-        INFO "all.mp4 下载成功！"
+        if [ -f "${MEDIA_DIR}/temp/all.mp4.aria2" ]; then
+            ERROR "存在 ${MEDIA_DIR}/temp/all.mp4.aria2 文件，下载不完整！"
+            exit 1
+        else
+            INFO "all.mp4 下载成功！"
+        fi
     else
         ERROR "all.mp4 下载失败！"
         exit 1
     fi
     if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"; then
-        INFO "pikpak.mp4 下载成功！"
+        if [ -f "${MEDIA_DIR}/temp/pikpak.mp4.aria2" ]; then
+            ERROR "存在 ${MEDIA_DIR}/temp/pikpak.mp4.aria2 文件，下载不完整！"
+            exit 1
+        else
+            INFO "pikpak.mp4 下载成功！"
+        fi
     else
         ERROR "pikpak.mp4 下载失败！"
         exit 1

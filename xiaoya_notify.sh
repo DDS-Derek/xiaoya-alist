@@ -272,6 +272,11 @@ function update_media() {
         pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"
     fi
 
+    if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+        ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
+        exit 1
+    fi
+
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
     chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
@@ -435,6 +440,10 @@ function sync_emby_config() {
     else
         INFO "使用 aria2 下载"
         pull_run_glue aria2c -o config.mp4 --continue=true -x6 --conditional-get=true --allow-overwrite=true "${xiaoya_addr}/d/元数据/config.mp4"
+    fi
+    if [ -f "${MEDIA_DIR}/temp/config.mp4.aria2" ]; then
+        ERROR "存在 ${MEDIA_DIR}/temp/config.mp4.aria2 文件，下载不完整！"
+        exit 1
     fi
     # 在temp下面解压，最终新config文件路径为temp/config
     if pull_run_glue 7z x -aoa -mmt=16 config.mp4; then
