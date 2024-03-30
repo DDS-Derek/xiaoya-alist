@@ -30,7 +30,7 @@ function container_update() {
             REMOVE_WATCHTOWER_IMAGE=true
         else
             ERROR "镜像拉取失败！"
-            exit 1
+            return 1
         fi
     fi
 
@@ -236,7 +236,7 @@ function wait_emby_start() {
         elapsed_time=$((current_time - start_time))
         if [ "$elapsed_time" -gt 600 ]; then
             WARN "Emby 未正常启动超时 10 分钟，终止脚本！"
-            exit 1
+            return 1
         fi
         sleep 3
     done
@@ -274,7 +274,7 @@ function update_media() {
 
     if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
         ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
-        exit 1
+        return 1
     fi
 
     INFO "设置目录权限..."
@@ -297,7 +297,7 @@ function update_media() {
         all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
         if [[ "$all_size" -le 30000000 ]]; then
             ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
-            exit 1
+            return 1
         else
             INFO "all.mp4 文件大小验证正常"
             pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
@@ -313,7 +313,7 @@ function update_media() {
         pikpak_size=$(du -k ${MEDIA_DIR}/temp/pikpak.mp4 | cut -f1)
         if [[ "$pikpak_size" -le 14000000 ]]; then
             ERROR "pikpak.mp4 下载不完整，文件大小(in KB):$pikpak_size 小于预期"
-            exit 1
+            return 1
         else
             INFO "pikpak.mp4 文件大小验证正常"
             pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
@@ -397,7 +397,7 @@ function sync_emby_config() {
                 INFO "镜像拉取成功！"
             else
                 ERROR "镜像拉取失败！"
-                exit 1
+                return 1
             fi
         fi
     else
@@ -405,7 +405,7 @@ function sync_emby_config() {
             INFO "镜像拉取成功！"
         else
             ERROR "镜像拉取失败！"
-            exit 1
+            return 1
         fi
     fi
 
@@ -413,7 +413,9 @@ function sync_emby_config() {
     status=$(docker inspect -f '{{.State.Status}}' "${EMBY_NAME}")
     if [ "$status" == "exited" ]; then
         docker start "${EMBY_NAME}"
-        wait_emby_start
+        if ! wait_emby_start; then
+            return 1
+        fi
     fi
     curl -s "${EMBY_URL}/Users?api_key=${EMBY_APIKEY}" > /tmp/emby.response
 
@@ -443,14 +445,14 @@ function sync_emby_config() {
     fi
     if [ -f "${MEDIA_DIR}/temp/config.mp4.aria2" ]; then
         ERROR "存在 ${MEDIA_DIR}/temp/config.mp4.aria2 文件，下载不完整！"
-        exit 1
+        return 1
     fi
     # 在temp下面解压，最终新config文件路径为temp/config
     if pull_run_glue 7z x -aoa -mmt=16 config.mp4; then
         INFO "下载解压元数据完成"
     else
         ERROR "解压元数据失败"
-        exit 1
+        return 1
     fi
 
     if ${SQLITE_COMMAND_3} sqlite3 /emby/config/data/library.db ".tables" | grep Chapters3 > /dev/null; then
@@ -476,16 +478,18 @@ function sync_emby_config() {
         sleep 30
     else
         ERROR "解压数据库不完整，跳过复制..."
-        exit 1
+        return 1
     fi
 
-    wait_emby_start
+    if ! wait_emby_start; then
+        return 1
+    fi
 
     USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response | wc -l)
     for ((i = 0; i < USER_COUNT; i++)); do
         if [[ "$USER_COUNT" -gt 30 ]]; then
             WARN "用户超过 30 位，跳过更新用户 Policy！"
-            exit 1
+            return 1
         fi
         id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response)
         name=$(${EMBY_COMMAND} jq -r ".[$i].Name" /tmp/emby.response)
@@ -496,6 +500,7 @@ function sync_emby_config() {
             INFO "成功更新 $name 用户Policy"
         else
             ERROR "返回错误代码 $status_code"
+            return 1
         fi
     done
 
@@ -534,14 +539,18 @@ function detection_all_pikpak_update() {
     if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
         INFO "跳过 all.mp4 更新"
     else
-        update_media "all.mp4"
+        if ! update_media "all.mp4"; then
+            ERROR "all.mp4 元数据更新失败！"
+        fi
     fi
 
     compare_metadata_size "pikpak.mp4"
     if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
         INFO "跳过 pikpak.mp4 更新"
     else
-        update_media "pikpak.mp4"
+        if ! update_media "pikpak.mp4"; then
+            ERROR "pikpak.mp4 元数据更新失败！"
+        fi
     fi
 
     INFO "全部媒体元数据更新完成！"
@@ -603,7 +612,9 @@ function detection_xiaoya_image_update() {
             INFO "remote_sha: ${remote_sha}"
             INFO "local_sha: ${local_sha}"
             if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
-                container_update "${XIAOYA_NAME}"
+                if ! container_update "${XIAOYA_NAME}"; then
+                    ERROR "小雅容器更新失败！"
+                fi
             else
                 INFO "跳过小雅容器更新"
             fi
@@ -615,7 +626,9 @@ function detection_xiaoya_image_update() {
             INFO "remote_sha: ${remote_sha}"
             INFO "local_sha: ${local_sha}"
             if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
-                container_update "${XIAOYA_NAME}"
+                if ! container_update "${XIAOYA_NAME}"; then
+                    ERROR "小雅容器更新失败！"
+                fi
             else
                 INFO "跳过小雅容器更新"
             fi
@@ -656,7 +669,11 @@ EOF
     fi
     # config.mp4
     if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
-        detection_config_update
+        if ! detection_config_update; then
+            ERROR "Emby config sync 运行失败！"
+        else
+            INFO "Emby config sync 运行成功！"
+        fi
     else
         INFO "Emby config sync 已关闭"
     fi
