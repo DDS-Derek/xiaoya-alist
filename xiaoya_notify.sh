@@ -487,9 +487,9 @@ function sync_emby_config() {
             WARN "用户超过 30 位，跳过更新用户 Policy！"
             exit 1
         fi
-        id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response | tr -d '[:space:]')
-        name=$(${EMBY_COMMAND} jq -r ".[$i].Name" /tmp/emby.response | tr -d '[:space:]')
-        policy=$(${EMBY_COMMAND} jq -r ".[$i].Policy | to_entries | from_entries | tojson" /tmp/emby.response | tr -d '[:space:]')
+        id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response)
+        name=$(${EMBY_COMMAND} jq -r ".[$i].Name" /tmp/emby.response)
+        policy=$(${EMBY_COMMAND} jq -r ".[$i].Policy | to_entries | from_entries | tojson" /tmp/emby.response)
         USER_URL_2="${EMBY_URL}/Users/$id/Policy?api_key=${EMBY_APIKEY}"
         status_code=$(curl -s -w "%{http_code}" -H "Content-Type: application/json" -X POST -d "$policy" "$USER_URL_2")
         if [ "$status_code" == "204" ]; then
