@@ -2032,6 +2032,21 @@ function install_resilio() {
     install_xiaoya_notify_cron
 
     INFO "安装完成！"
+    INFO "请浏览器访问 ${Sky_Blue}http://IP:${HT_PORT}${Font} 进行 Resilio 设置并自行添加下面的同步密钥："
+    echo -e "/每日更新/电视剧 （保存到 /sync/xiaoya/每日更新/电视剧 ）
+${Sky_Blue}BHB7NOQ4IQKOWZPCLK7BIZXDGIOVRKBUL${Font}
+/每日更新/电影 （保存到 /sync/xiaoya/每日更新/电影 ）
+${Sky_Blue}BCFQAYSMIIDJBWJ6DB7JXLHBXUGYKEQ43${Font}
+/电影/2023 （保存到 /sync/xiaoya/电影/2023 ）
+${Sky_Blue}BGUXZBXWJG6J47XVU4HSNJEW4HRMZGOPL${Font}
+/纪录片（已刮削） （保存到 /sync/xiaoya/纪录片（已刮削） ）
+${Sky_Blue}BDBOMKR6WP7A4X55Z6BY7IA4HUQ3YO4BH${Font}
+/音乐 （保存到 /sync/xiaoya/音乐 ）
+${Sky_Blue}BHAYCNF5MJSGUF2RVO6XDA55X5PVBKDUB${Font}
+/每日更新/动漫 （保存到 /sync/xiaoya/每日更新/动漫 ）
+${Sky_Blue}BQEIV6B3DKPZWAFHO7V6QQJO2X3DOQSJ4${Font}
+/每日更新/动漫剧场版 （保存到 /sync/xiaoya/每日更新/动漫剧场版 ）
+${Sky_Blue}B42SOXBKLMRWHRZMCAIQZWNOBLUUH3HO3${Font}"
 
 }
 
