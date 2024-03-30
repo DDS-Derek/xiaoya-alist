@@ -487,6 +487,7 @@ function sync_emby_config() {
             INFO "成功更新 $name 用户Policy"
         else
             ERROR "返回错误代码 $status_code"
+            exit 1
         fi
     done
 
@@ -558,6 +559,10 @@ function detection_xiaoya_version_update() {
 
     REMOTE_XIAOYA_VERSION=$(curl -skL https://docker.xiaoya.pro/version.txt | head -n 1 | sed "s/\r$//g")
 
+    if ! echo "${REMOTE_XIAOYA_VERSION}" | awk -F '[^0-9.]' '{print NF-1}' | grep -q '^0$'; then
+        REMOTE_XIAOYA_VERSION=error
+    fi
+
     docker cp ${XIAOYA_NAME}:/version.txt ${MEDIA_DIR}
     if [ -f "${MEDIA_DIR}/version.txt" ]; then
         LOCAL_XIAOYA_VERSION=$(cat ${MEDIA_DIR}/version.txt | head -n 1 | sed "s/\r$//g")
@@ -569,7 +574,11 @@ function detection_xiaoya_version_update() {
     INFO "REMOTE_XIAOYA_VERSION: ${REMOTE_XIAOYA_VERSION}"
     INFO "LOCAL_XIAOYA_VERSION: ${LOCAL_XIAOYA_VERSION}"
 
-    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] || [ "${REMOTE_XIAOYA_VERSION}" == "" ] || [ "${LOCAL_XIAOYA_VERSION}" == "error" ]; then
+    if [ "${REMOTE_XIAOYA_VERSION}" == "${LOCAL_XIAOYA_VERSION}" ] || \
+    [ "${REMOTE_XIAOYA_VERSION}" == "" ] || \
+    [ "${LOCAL_XIAOYA_VERSION}" == "error" ] || \
+    [ "${REMOTE_XIAOYA_VERSION}" == "error" ] || \
+    [ -z "${REMOTE_XIAOYA_VERSION}" ]; then
         INFO "跳过小雅容器重启"
     else
         docker restart ${XIAOYA_NAME}
