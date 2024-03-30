@@ -496,7 +496,6 @@ function sync_emby_config() {
             INFO "成功更新 $name 用户Policy"
         else
             ERROR "返回错误代码 $status_code"
-            exit 1
         fi
     done
 
