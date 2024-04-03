@@ -428,8 +428,24 @@ function sync_emby_config() {
     ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db ".dump UserDatas" > /tmp/emby_user.sql
     ${SQLITE_COMMAND} sqlite3 /emby/config/data/library.db ".dump ItemExtradata" > /tmp/emby_library_mediaconfig.sql
 
+    INFO "备份数据中..."
+    files=(
+        "library.db"
+        "library.db-shm"
+        "library.db-wal"
+    )
+    for file in "${files[@]}"; do
+        src_file="$MEDIA_DIR/config/data/$file"
+        dest_file="$src_file.backup"
+        if [ -f "$src_file" ]; then
+            if [ -f "$dest_file" ]; then
+                rm -f "$dest_file"
+            fi
+            mv -f "$src_file" "$dest_file"
+        fi
+    done
+
     INFO "清理旧数据..."
-    rm -f $MEDIA_DIR/config/data/library.db*
     rm -f $MEDIA_DIR/temp/config.mp4
 
     test_xiaoya_status
@@ -478,6 +494,14 @@ function sync_emby_config() {
         sleep 30
     else
         ERROR "解压数据库不完整，跳过复制..."
+        INFO "恢复旧数据中..."
+        for file in "${files[@]}"; do
+            src_file="$MEDIA_DIR/config/data/$file"
+            dest_file="$src_file.backup"
+            if [ -f "$dest_file" ]; then
+                mv -f "$dest_file" "$src_file"
+            fi
+        done
         return 1
     fi
 
