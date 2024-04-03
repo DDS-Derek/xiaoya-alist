@@ -2051,7 +2051,7 @@ function install_resilio() {
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
             -p ${HT_PORT}:8888 \
-            -p ${SYNC_PORT}:55555 \
+            -p ${SYNC_PORT}:${SYNC_PORT} \
             -v "${CONFIG_DIR}:/config" \
             -v "${CONFIG_DIR}/downloads:/downloads" \
             -v "${MEDIA_DIR}:/sync" \
@@ -2067,12 +2067,28 @@ function install_resilio() {
             -e PGID=0 \
             -e TZ=Asia/Shanghai \
             -p ${HT_PORT}:8888 \
-            -p ${SYNC_PORT}:55555 \
+            -p ${SYNC_PORT}:${SYNC_PORT} \
             -v "${CONFIG_DIR}:/config" \
             -v "${CONFIG_DIR}/downloads:/downloads" \
             -v "${MEDIA_DIR}:/sync" \
             --restart=always \
             linuxserver/resilio-sync:latest
+    fi
+
+    if [ "${SYNC_PORT}" != "55555" ]; then
+        start_time=$(date +%s)
+        while true; do
+            if [ -f "${CONFIG_DIR}/sync.conf" ]; then
+                sed -i "/\"listening_port\"/c\    \"listening_port\": ${SYNC_PORT}," ${CONFIG_DIR}/sync.conf
+                docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+            fi
+            current_time=$(date +%s)
+            elapsed_time=$((current_time - start_time))
+            if ((elapsed_time >= 300)); then
+                break
+            fi
+            sleep 1
+        done
     fi
 
     install_xiaoya_notify_cron
