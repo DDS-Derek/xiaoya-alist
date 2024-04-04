@@ -11,13 +11,11 @@
 - [main.sh](#mainsh)
   - [使用](#使用)
   - [功能列表](#功能列表)
-- [emby\_config\_editor.sh](#emby_config_editorsh)
-  - [介绍](#介绍)
-  - [使用](#使用-1)
 - [相关地址](#相关地址)
 - [通用兼容性测试报告](#通用兼容性测试报告)
 - [免责声明](#免责声明)
 - [Star History](#star-history)
+- [小雅周边工具集合](#小雅周边工具集合)
 - [感谢](#感谢)
 - [捐赠](#捐赠)
 
@@ -106,28 +104,6 @@ Docker启动容器名称设置 -> 7 1
 开启/关闭 小雅连通性检测 -> 7 5
 ```
 
-## emby_config_editor.sh
-
-### 介绍
-
-emby_config.txt 的命令行的图形化编辑器，内置纠错。
-
-### 使用
-
-```shell
-bash -c "$(curl -sLk https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s xiaoya配置目录
-```
-
-**备用地址**
-
-```shell
-bash -c "$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/emby_config_editor.sh)" -s xiaoya配置目录
-```
-
-```shell
-bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/emby_config_editor.sh)" -s xiaoya配置目录
-```
-
 ## 相关地址
 
 [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
@@ -178,6 +154,14 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 
 [![Star History Chart](https://api.star-history.com/svg?repos=DDS-Derek/xiaoya-alist&type=Date)](https://star-history.com/#DDS-Derek/xiaoya-alist)
 
+## 小雅周边工具集合
+
+- [CatVod](https://pcoof.com/git/https://github.com/catvod/CatVodOpen): 猫影视
+- [Xiaoya-convert](https://github.com/ypq123456789/xiaoya-convert): 自动批量将阿里云盘分享链接转换为小雅`alishare_list.txt`中的格式
+- [Xiaoyahelper](https://github.com/DDS-Derek/xiaoya-alist/tree/master/xiaoyahelper): 一劳永逸的小雅转存清理工具
+- [Alist-TVBox](https://hub.docker.com/r/haroldli/alist-tvbox): 一个基于`AList`和`xiaoya`的`TVBox`管理工具
+- [`strm`文件生成](https://xiaoyaliu.notion.site/strm-2c8d136ceb37445fb6c0222eafb966ce): 小雅官方提供的一键生成`strm`文件脚本
+
 ## 感谢
 
 - [xiaoyaLiu](http://alist.xiaoya.pro/)
@@ -185,7 +169,6 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 - [alist-tvbox](https://github.com/power721/alist-tvbox)
 - [Auto_Symlink](https://github.com/shenxianmq/Auto_Symlink)
 - [Portainer](https://github.com/portainer/portainer)
-- [CatVod](https://pcoof.com/git/https://github.com/catvod/CatVodOpen)
 - [AI老G](https://space.bilibili.com/252166818)
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
