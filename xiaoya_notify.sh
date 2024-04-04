@@ -284,6 +284,7 @@ function update_media() {
     INFO "${1} 下载完成！"
 
     if docker container inspect "${RESILIO_NAME}" > /dev/null 2>&1; then
+        INFO "Resilio 关闭中..."
         docker stop ${RESILIO_NAME}
     fi
 
@@ -511,8 +512,8 @@ function sync_emby_config() {
 
     USER_COUNT=$(${EMBY_COMMAND} jq '.[].Name' /tmp/emby.response | wc -l)
     for ((i = 0; i < USER_COUNT; i++)); do
-        if [[ "$USER_COUNT" -gt 30 ]]; then
-            WARN "用户超过 30 位，跳过更新用户 Policy！"
+        if [[ "$USER_COUNT" -gt 50 ]]; then
+            WARN "用户超过 50 位，跳过更新用户 Policy！"
             return 1
         fi
         id=$(${EMBY_COMMAND} jq -r ".[$i].Id" /tmp/emby.response)
