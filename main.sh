@@ -2081,6 +2081,7 @@ function install_resilio() {
             if [ -f "${CONFIG_DIR}/sync.conf" ]; then
                 sed -i "/\"listening_port\"/c\    \"listening_port\": ${SYNC_PORT}," ${CONFIG_DIR}/sync.conf
                 docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
+                break
             fi
             current_time=$(date +%s)
             elapsed_time=$((current_time - start_time))
