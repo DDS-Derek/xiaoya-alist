@@ -175,7 +175,6 @@ Docker启动容器名称设置 -> 7 1
 
 ## 捐赠
 
-> 注：以下捐赠不包含此项目作者（DDSRem）的捐赠！
-
+- [捐赠项目作者DDSRem](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ddsrem.png)
 - [捐赠小雅](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-xiaoya.png)
 - [捐赠AI老G](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ailaog.png)
