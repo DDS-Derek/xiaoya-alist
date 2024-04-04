@@ -686,9 +686,9 @@ function main_xiaoya_alist() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -702,13 +702,13 @@ function main_xiaoya_alist() {
         clear
         uninstall_xiaoya_alist
         ;;
-    4)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_xiaoya_alist
         ;;
     esac
@@ -1348,9 +1348,9 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "8、下载 pikpak.mp4"
     echo -e "9、解压 pikpak.mp4"
     echo -e "10、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
-    echo -e "11、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-11]:" num
+    read -erp "请输入数字 [0-10]:" num
     case "$num" in
     1)
         clear
@@ -1415,13 +1415,13 @@ function main_download_unzip_xiaoya_emby() {
         clear
         main_download_unzip_xiaoya_emby
         ;;
-    11)
+    0)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-11]'
+        ERROR '请输入正确数字 [0-10]'
         main_download_unzip_xiaoya_emby
         ;;
     esac
@@ -2170,9 +2170,9 @@ function main_resilio() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -2186,13 +2186,13 @@ function main_resilio() {
         clear
         unisntall_resilio
         ;;
-    4)
+    0)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_resilio
         ;;
     esac
@@ -2391,9 +2391,9 @@ function main_xiaoya_all_emby() {
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
     echo -e "9、卸载Emby全家桶"
-    echo -e "10、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-10]:" num
+    read -erp "请输入数字 [0-9]:" num
     case "$num" in
     1)
         clear
@@ -2486,13 +2486,13 @@ function main_xiaoya_all_emby() {
         clear
         uninstall_xiaoya_all_emby
         ;;
-    10)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-10]'
+        ERROR '请输入正确数字 [0-9]'
         main_xiaoya_all_emby
         ;;
     esac
@@ -2574,9 +2574,9 @@ function main_xiaoyahelper() {
     echo -e "1、安装/更新"
     echo -e "2、一次性运行"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -2590,13 +2590,13 @@ function main_xiaoyahelper() {
         clear
         uninstall_xiaoyahelper
         ;;
-    4)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_xiaoyahelper
         ;;
     esac
@@ -2723,9 +2723,9 @@ function main_xiaoya_alist_tvbox() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -2739,13 +2739,13 @@ function main_xiaoya_alist_tvbox() {
         clear
         uninstall_xiaoya_alist_tvbox
         ;;
-    4)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_xiaoya_alist_tvbox
         ;;
     esac
@@ -2835,9 +2835,9 @@ function main_onelist() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -2851,13 +2851,13 @@ function main_onelist() {
         clear
         uninstall_onelist
         ;;
-    4)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_onelist
         ;;
     esac
@@ -2954,9 +2954,9 @@ function main_portainer() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -2970,13 +2970,13 @@ function main_portainer() {
         clear
         uninstall_portainer
         ;;
-    4)
+    0)
         clear
         main_other_tools
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_portainer
         ;;
     esac
@@ -3081,9 +3081,9 @@ function main_auto_symlink() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -3097,13 +3097,13 @@ function main_auto_symlink() {
         clear
         uninstall_auto_symlink
         ;;
-    4)
+    0)
         clear
         main_other_tools
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_auto_symlink
         ;;
     esac
@@ -3191,9 +3191,9 @@ function container_name_settings() {
     echo -e "5、更改 Onelist 容器名              （当前：${Green}${xiaoya_onelist_name}${Font}）"
     echo -e "6、更改 Portainer 容器名            （当前：${Green}${portainer_name}${Font}）"
     echo -e "7、更改 Auto_Symlink 容器名         （当前：${Green}${auto_symlink_name}${Font}）"
-    echo -e "8、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-8]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         change_container_name "xiaoya_alist_name"
@@ -3216,13 +3216,13 @@ function container_name_settings() {
     7)
         change_container_name "auto_symlink_name"
         ;;
-    8)
+    0)
         clear
         main_advanced_configuration
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-8]'
+        ERROR '请输入正确数字 [0-7]'
         container_name_settings
         ;;
     esac
@@ -3303,9 +3303,9 @@ function main_advanced_configuration() {
     echo -e "3、重置脚本配置"
     echo -e "4、开启/关闭 磁盘容量检测                     当前状态：${_disk_capacity_detection}"
     echo -e "5、开启/关闭 小雅连通性检测                   当前状态：${_xiaoya_connectivity_detection}"
-    echo -e "6、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-6]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         clear
@@ -3346,13 +3346,13 @@ function main_advanced_configuration() {
         clear
         main_advanced_configuration
         ;;
-    6)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-6]'
+        ERROR '请输入正确数字 [0-5]'
         main_advanced_configuration
         ;;
     esac
@@ -3366,9 +3366,9 @@ function main_other_tools() {
     echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
     echo -e "3、查看系统磁盘挂载"
-    echo -e "4、返回上级"
+    echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-4]:" num
+    read -erp "请输入数字 [0-3]:" num
     case "$num" in
     1)
         clear
@@ -3387,13 +3387,13 @@ function main_other_tools() {
         clear
         main_other_tools
         ;;
-    4)
+    0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-4]'
+        ERROR '请输入正确数字 [0-3]'
         main_other_tools
         ;;
     esac
@@ -3411,9 +3411,9 @@ function main_return() {
     echo -e "5、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "6、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
     echo -e "7、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
-    echo -e "8、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
+    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-8]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         clear
@@ -3443,13 +3443,13 @@ function main_return() {
         clear
         main_advanced_configuration
         ;;
-    8)
+    0)
         clear
         exit 0
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-8]'
+        ERROR '请输入正确数字 [0-7]'
         main_return
         ;;
     esac
