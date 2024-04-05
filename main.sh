@@ -1674,6 +1674,9 @@ function get_nsswitch_conf_path() {
         NSSWITCH="/etc/nsswitch.conf"
     else
         CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        if [ -d "${CONFIG_DIR}/nsswitch.conf" ]; then
+            rm -rf ${CONFIG_DIR}/nsswitch.conf
+        fi
         echo -e "hosts:\tfiles dns" > ${CONFIG_DIR}/nsswitch.conf
         echo -e "networks:\tfiles" >> ${CONFIG_DIR}/nsswitch.conf
         NSSWITCH="${CONFIG_DIR}/nsswitch.conf"
