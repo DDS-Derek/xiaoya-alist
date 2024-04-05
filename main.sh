@@ -1432,7 +1432,6 @@ function install_emby_embyserver() {
 
     cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
-    INFO "您的架构是：$cpu_arch"
     case $cpu_arch in
     "x86_64" | *"amd64"*)
         if docker pull emby/embyserver:4.8.0.56; then
@@ -1516,57 +1515,46 @@ function install_emby_embyserver() {
 
 function install_amilys_embyserver() {
 
-    cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
-    INFO "您的架构是：$cpu_arch"
-    case $cpu_arch in
-    "x86_64" | *"amd64"*)
-        if docker pull amilys/embyserver:4.8.0.56; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver:4.8.0.56
-        else
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver:4.8.0.56
-        fi
-        ;;
-    *)
-        ERROR "目前只支持amd64架构，你的架构是：$cpu_arch"
+
+    if docker pull amilys/embyserver:4.8.0.56; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
         exit 1
-        ;;
-    esac
+    fi
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            ${extra_parameters} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            amilys/embyserver:4.8.0.56
+    else
+        docker run -itd \
+            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            amilys/embyserver:4.8.0.56
+    fi
 
 }
 
 function install_lovechen_embyserver() {
 
-    cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
-    INFO "您的架构是：$cpu_arch"
 
     INFO "开始转换数据库..."
 
@@ -1585,46 +1573,38 @@ function install_lovechen_embyserver() {
     INFO "数据库转换成功！"
     rm -rf ${MEDIA_DIR}/temp.sql
 
-    case $cpu_arch in
-    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if docker pull lovechen/embyserver:4.7.14.0; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                lovechen/embyserver:4.7.14.0
-        else
-            docker run -itd \
-                --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                lovechen/embyserver:4.7.14.0
-        fi
-        ;;
-    *)
-        ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
+    if docker pull lovechen/embyserver:4.7.14.0; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
         exit 1
-        ;;
-    esac
+    fi
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            ${extra_parameters} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            lovechen/embyserver:4.7.14.0
+    else
+        docker run -itd \
+            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            lovechen/embyserver:4.7.14.0
+    fi
 
 }
 
@@ -1652,19 +1632,42 @@ function choose_network_mode() {
 
 function choose_emby_image() {
 
-    INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver(目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 2）"
-    read -erp "IMAGE:" IMAGE
-    [[ -z "${IMAGE}" ]] && IMAGE="2"
-    if [[ ${IMAGE} == [1] ]]; then
-        install_amilys_embyserver
-    elif [[ ${IMAGE} == [2] ]]; then
-        install_emby_embyserver
-    elif [[ ${IMAGE} == [3] ]]; then
-        install_lovechen_embyserver
-    else
-        ERROR "输入无效，请重新选择"
-        choose_emby_image
-    fi
+    cpu_arch=$(uname -m)
+    INFO "您的架构是：$cpu_arch"
+    case $cpu_arch in
+    "x86_64" | *"amd64"*)
+        INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver(不推荐！目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 2）"
+        read -erp "IMAGE:" IMAGE
+        [[ -z "${IMAGE}" ]] && IMAGE="2"
+        if [[ ${IMAGE} == [1] ]]; then
+            install_amilys_embyserver
+        elif [[ ${IMAGE} == [2] ]]; then
+            install_emby_embyserver
+        elif [[ ${IMAGE} == [3] ]]; then
+            install_lovechen_embyserver
+        else
+            ERROR "输入无效，请重新选择"
+            choose_emby_image
+        fi
+        ;;
+    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "请选择使用的Emby镜像 [ 1:emby/embyserver | 2:lovechen/embyserver(不推荐！目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 1）"
+        read -erp "IMAGE:" IMAGE
+        [[ -z "${IMAGE}" ]] && IMAGE="1"
+        if [[ ${IMAGE} == [1] ]]; then
+            install_emby_embyserver
+        elif [[ ${IMAGE} == [2] ]]; then
+            install_lovechen_embyserver
+        else
+            ERROR "输入无效，请重新选择"
+            choose_emby_image
+        fi
+        ;;
+    *)
+        ERROR "全家桶 Emby 目前只支持 amd64 和 arm64 架构，你的架构是：$cpu_arch"
+        exit 1
+        ;;
+    esac
 
 }
 
