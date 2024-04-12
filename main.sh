@@ -2517,12 +2517,21 @@ function install_xiaoyahelper() {
     read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
-        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" -tg
+        TG_CHOOSE="-tg"
     fi
-    if [[ ${TG} == [Nn] ]]; then
-        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}"
+
+    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
+    if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" ${TG_CHOOSE}; then
+        INFO "安装完成！"
+    else
+        XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+        if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" ${TG_CHOOSE}; then
+            INFO "安装完成！"
+        else
+            ERROR "安装失败！"
+            exit 1
+        fi
     fi
-    INFO "安装完成！"
 
 }
 
@@ -2532,12 +2541,21 @@ function once_xiaoyahelper() {
     read -erp "TG:" TG
     [[ -z "${TG}" ]] && TG="n"
     if [[ ${TG} == [Yy] ]]; then
-        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 -tg
-    fi
-    if [[ ${TG} == [Nn] ]]; then
-        bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1
+        TG_CHOOSE="-tg"
     fi
 
+    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
+    if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
+        INFO "运行完成！"
+    else
+        XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+        if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
+            INFO "安装完成！"
+        else
+            ERROR "安装失败！"
+            exit 1
+        fi
+    fi
 }
 
 function uninstall_xiaoyahelper() {
@@ -2572,8 +2590,6 @@ function uninstall_xiaoyahelper() {
 }
 
 function main_xiaoyahelper() {
-
-    XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅助手（xiaoyahelper）${Font}\n"
