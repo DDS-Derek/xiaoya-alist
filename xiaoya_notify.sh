@@ -704,6 +704,7 @@ EOF
     fi
     # xiaoya image
     detection_xiaoya_image_update
+    sleep 20
     # xiaoya version
     detection_xiaoya_version_update
 
