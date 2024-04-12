@@ -3152,6 +3152,13 @@ function init_container_name() {
         xiaoya_emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
     fi
 
+    if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt ]; then
+        xiaoya_jellyfin_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)
+    else
+        echo 'jellyfin' > ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt
+        xiaoya_jellyfin_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)
+    fi
+
     if [ -f ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt ]; then
         xiaoya_resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)
     else
@@ -3213,9 +3220,10 @@ function container_name_settings() {
     echo -e "5、更改 Onelist 容器名              （当前：${Green}${xiaoya_onelist_name}${Font}）"
     echo -e "6、更改 Portainer 容器名            （当前：${Green}${portainer_name}${Font}）"
     echo -e "7、更改 Auto_Symlink 容器名         （当前：${Green}${auto_symlink_name}${Font}）"
+    echo -e "8、更改 Jellyfin 容器名             （当前：${Green}${xiaoya_jellyfin_name}${Font}）"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-7]:" num
+    read -erp "请输入数字 [0-8]:" num
     case "$num" in
     1)
         change_container_name "xiaoya_alist_name"
@@ -3238,13 +3246,16 @@ function container_name_settings() {
     7)
         change_container_name "auto_symlink_name"
         ;;
+    8)
+        change_container_name "xiaoya_jellyfin_name"
+        ;;
     0)
         clear
         main_advanced_configuration
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-7]'
+        ERROR '请输入正确数字 [0-8]'
         container_name_settings
         ;;
     esac
@@ -3428,14 +3439,15 @@ function main_return() {
 
     echo -e "1、安装/更新/卸载 小雅Alist                   当前状态：$(judgment_container "${xiaoya_alist_name}")"
     echo -e "2、安装/卸载 小雅Emby全家桶                   当前状态：$(judgment_container "${xiaoya_emby_name}")"
-    echo -e "3、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)"
-    echo -e "4、安装/更新/卸载 小雅Alist-TVBox             当前状态：$(judgment_container "${xiaoya_tvbox_name}")"
-    echo -e "5、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
-    echo -e "6、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
-    echo -e "7、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
+    echo -e "3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")"
+    echo -e "4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)"
+    echo -e "5、安装/更新/卸载 小雅Alist-TVBox             当前状态：$(judgment_container "${xiaoya_tvbox_name}")"
+    echo -e "6、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
+    echo -e "7、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
+    echo -e "8、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
     echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-7]:" num
+    read -erp "请输入数字 [0-8]:" num
     case "$num" in
     1)
         clear
@@ -3447,21 +3459,27 @@ function main_return() {
         ;;
     3)
         clear
-        main_xiaoyahelper
+        TODO
+        exit 0
+        main_xiaoya_all_jellyfin
         ;;
     4)
         clear
-        main_xiaoya_alist_tvbox
+        main_xiaoyahelper
         ;;
     5)
         clear
-        main_onelist
+        main_xiaoya_alist_tvbox
         ;;
     6)
         clear
-        main_other_tools
+        main_onelist
         ;;
     7)
+        clear
+        main_other_tools
+        ;;
+    8)
         clear
         main_advanced_configuration
         ;;
@@ -3471,7 +3489,7 @@ function main_return() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-7]'
+        ERROR '请输入正确数字 [0-8]'
         main_return
         ;;
     esac
