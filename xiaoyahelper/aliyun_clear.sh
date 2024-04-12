@@ -254,7 +254,7 @@ delete_File(){
 
 get_Xiaoya(){
     #echo -e "$(docker ps --filter "ancestor=xiaoyaliu/alist:latest" --format '{{.Names}}')\n$(docker ps --filter "ancestor=xiaoyaliu/alist:hostmode" --format '{{.Names}}')"
-    docker ps | grep "xiaoyaliu/alist\|haroldli/xiaoya-tvbox" | grep -v "xiaoyakeeper" | awk '{print $NF}'
+    docker ps | grep "xiaoyaliu/alist\|haroldli/xiaoya-tvbox\|ailg/alist" | grep -v "xiaoyakeeper" | awk '{print $NF}'
 }
 
 # 签到是抄小雅的
