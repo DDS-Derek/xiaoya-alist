@@ -110,10 +110,10 @@ function root_need() {
 
 function ___install_docker() {
 
-    if ! which docker; then
+    if ! command -v docker; then
         WARN "docker 未安装，脚本尝试自动安装..."
         wget -qO- get.docker.com | bash
-        if which docker; then
+        if command -v docker; then
             INFO "docker 安装成功！"
         else
             ERROR "docker 安装失败，请手动安装！"
@@ -126,7 +126,7 @@ function ___install_docker() {
 function packages_need() {
 
     if [ "$1" == "apt" ]; then
-        if ! which curl; then
+        if ! command -v curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
             apt update -y
             if apt install -y curl; then
@@ -136,7 +136,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             WARN "wget 未安装，脚本尝试自动安装..."
             apt update -y
             if apt install -y wget; then
@@ -148,7 +148,7 @@ function packages_need() {
         fi
         ___install_docker
     elif [ "$1" == "yum" ]; then
-        if ! which curl; then
+        if ! command -v curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
             if yum install -y curl; then
                 INFO "curl 安装成功！"
@@ -157,7 +157,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             WARN "wget 未安装，脚本尝试自动安装..."
             if yum install -y wget; then
                 INFO "wget 安装成功！"
@@ -168,7 +168,7 @@ function packages_need() {
         fi
         ___install_docker
     elif [ "$1" == "zypper" ]; then
-        if ! which curl; then
+        if ! command -v curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
             zypper refresh
             if zypper install curl; then
@@ -178,7 +178,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             WARN "wget 未安装，脚本尝试自动安装..."
             zypper refresh
             if zypper install wget; then
@@ -190,7 +190,7 @@ function packages_need() {
         fi
         ___install_docker
     elif [ "$1" == "apk_alpine" ]; then
-        if ! which curl; then
+        if ! command -v curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
             if apk add curl; then
                 INFO "curl 安装成功！"
@@ -199,7 +199,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             WARN "wget 未安装，脚本尝试自动安装..."
             if apk add wget; then
                 INFO "wget 安装成功！"
@@ -208,7 +208,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which docker; then
+        if ! command -v docker; then
             WARN "docker 未安装，脚本尝试自动安装..."
             if apk add docker; then
                 INFO "docker 安装成功！"
@@ -218,7 +218,7 @@ function packages_need() {
             fi
         fi
     elif [ "$1" == "pacman" ]; then
-        if ! which curl; then
+        if ! command -v curl; then
             WARN "curl 未安装，脚本尝试自动安装..."
             if pacman -Sy --noconfirm curl; then
                 INFO "curl 安装成功！"
@@ -227,7 +227,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             WARN "wget 未安装，脚本尝试自动安装..."
             if pacman -Sy --noconfirm wget; then
                 INFO "wget 安装成功！"
@@ -236,7 +236,7 @@ function packages_need() {
                 exit 1
             fi
         fi
-        if ! which docker; then
+        if ! command -v docker; then
             WARN "docker 未安装，脚本尝试自动安装..."
             if pacman -Sy --noconfirm docker; then
                 INFO "docker 安装成功！"
@@ -246,15 +246,15 @@ function packages_need() {
             fi
         fi
     else
-        if ! which curl; then
+        if ! command -v curl; then
             ERROR "curl 未安装，请手动安装！"
             exit 1
         fi
-        if ! which wget; then
+        if ! command -v wget; then
             ERROR "wget 未安装，请手动安装！"
             exit 1
         fi
-        if ! which docker; then
+        if ! command -v docker; then
             ERROR "docker 未安装，请手动安装！"
             exit 1
         fi
@@ -264,7 +264,7 @@ function packages_need() {
 
 function get_os() {
 
-    if which getconf > /dev/null 2>&1; then
+    if command -v getconf > /dev/null 2>&1; then
         is64bit="$(getconf LONG_BIT)bit"
     else
         is64bit="unknow"
