@@ -109,6 +109,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 1 3
 卸载 Emby全家桶 -> 2 9
+卸载 卸载Jellyfin全家桶 -> 3 4
 卸载 Resilio-Sync（单独） -> 2 5 3
 卸载 小雅助手（xiaoyahelper）-> 4 3
 卸载 小雅Alist-TVBox -> 5 3

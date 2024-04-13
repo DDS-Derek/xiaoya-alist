@@ -3136,6 +3136,40 @@ function uninstall_xiaoya_all_emby() {
 
 }
 
+function uninstall_xiaoya_all_jellyfin() {
+
+    OLD_MEDIA_DIR=$(docker inspect \
+        --format='{{range .Mounts}}{{if eq .Destination "/config"}}{{.Source}}{{end}}{{end}}' \
+        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)" \
+        | sed 's!/[^/]*$!!')
+    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
+    INFO "配置文件路径：${OLD_MEDIA_DIR}"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载小雅Jellyfin全家桶${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)"
+    docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)"
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"*)
+        docker rmi nyanmisaka/jellyfin:240220-amd64-legacy
+        ;;
+    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        docker rmi nyanmisaka/jellyfin:240220-arm64
+        ;;
+    esac
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        rm -rf "${OLD_MEDIA_DIR}"
+    fi
+
+    INFO "Jellyfin 全家桶卸载成功！"
+
+}
+
 function main_xiaoya_all_emby() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -3263,12 +3297,16 @@ function main_xiaoya_all_jellyfin() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Jellyfin全家桶${Font}\n"
+    echo -e "${Sky_Blue}Jellyfin全家桶安装前提条件："
+    echo -e "1. 硬盘140G以上（如果无需完整安装则 60G 以上即可）"
+    echo -e "2. 内存3.5G以上空余空间${Font}\n"
     echo -e "1、一键安装Jellyfin全家桶"
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Jellyfin"
+    echo -e "4、卸载Jellyfin全家桶"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-3]:" num
+    read -erp "请输入数字 [0-4]:" num
     case "$num" in
     1)
         clear
@@ -3286,13 +3324,17 @@ function main_xiaoya_all_jellyfin() {
         get_media_dir
         install_jellyfin_xiaoya_all_jellyfin
         ;;
+    4)
+        clear
+        uninstall_xiaoya_all_jellyfin
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-3]'
+        ERROR '请输入正确数字 [0-4]'
         main_xiaoya_all_jellyfin
         ;;
     esac
