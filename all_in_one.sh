@@ -472,6 +472,27 @@ function wait_jellyfin_start() {
 
 }
 
+function wait_xiaoya_start() {
+
+	start_time=$(date +%s)
+	TARGET_LOG_LINE_SUCCESS="success load storage: [/©️"
+	while true; do
+		line=$(docker logs "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" 2>&1 | tail -n 10)
+		echo $line
+		if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
+			break
+		fi
+		current_time=$(date +%s)
+		elapsed_time=$((current_time - start_time))
+		if [ "$elapsed_time" -gt 300 ]; then
+			WARN "小雅alist 未正常启动超时 5 分钟！"
+			break
+		fi	
+		sleep 3
+	done
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -2471,6 +2492,7 @@ function install_emby_xiaoya_all_emby() {
     if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
         INFO "重启小雅容器中..."
         docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        wait_xiaoya_start
     fi
 
     INFO "Emby安装完成！"
@@ -2553,6 +2575,7 @@ function install_jellyfin_xiaoya_all_jellyfin() {
     if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
         INFO "重启小雅容器中..."
         docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        wait_xiaoya_start
     fi
 
     INFO "Jellyfin 安装完成！"
