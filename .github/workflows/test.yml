@@ -31,6 +31,7 @@ jobs:
             shellcheck main.sh
             shellcheck emby_config_editor.sh
             shellcheck xiaoya_notify.sh
+            shellcheck all_in_one.sh
 
   shfmt:
     runs-on: ubuntu-latest
@@ -50,3 +51,4 @@ jobs:
             ./shfmt -d -i 4 -sr main.sh
             ./shfmt -d -i 4 -sr emby_config_editor.sh
             ./shfmt -d -i 4 -sr xiaoya_notify.sh
+            ./shfmt -d -i 4 -sr all_in_one.sh

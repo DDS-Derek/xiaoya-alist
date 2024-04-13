@@ -32,7 +32,7 @@ bash -c "$(curl -sLk https://ddsrem.com/xiaoya_install.sh)"
 **备用地址**
 
 ```shell
-bash -c "$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+bash -c "$(curl -sLk https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
 ```
 
 ```shell
@@ -50,14 +50,15 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 ```shell
 ———————————————————————————————————————安装———————————————————————————————————————
 安装 小雅Alist -> 1 1
-安装 小雅Alist-TVBox -> 4 1
-安装/更新 小雅助手（xiaoyahelper）-> 3 1
-安装 Onelist -> 5 1
-安装 Portainer -> 6 1 1
+安装 小雅Alist-TVBox -> 5 1
+安装/更新 小雅助手（xiaoyahelper）-> 4 1
+安装 Onelist -> 6 1
+安装 Portainer -> 7 1 1
 安装 Emby全家桶（一键） -> 2 1
+安装 Jellyfin全家桶（一键） -> 3 1
 安装 Resilio-Sync（单独） -> 2 5 1
-安装 Auto_Symlink -> 6 2 1
-————————————————————————————————手动全家桶配置————————————————————————————————————
+安装 Auto_Symlink -> 7 2 1
+——————————————————————————————Emby手动全家桶配置————————————————————————————————————
 单独 下载并解压 全部元数据 -> 2 2 1
 单独 解压 全部元数据 -> 2 2 2
 单独 下载 all.mp4 -> 2 2 3
@@ -72,36 +73,48 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 立即 同步小雅Emby的config目录 -> 2 6
 单独 创建/删除 同步定时更新任务 -> 2 7
 图形化编辑 emby_config.txt -> 2 8
+————————————————————————————Jellyfin手动全家桶配置——————————————————————————————————
+单独 下载并解压 全部元数据 -> 3 2 1
+单独 解压 全部元数据 -> 3 2 2
+单独 下载 all_jf.mp4 -> 3 2 3
+单独 解压 all_jf.mp4 -> 3 2 4
+解压 all_jf.mp4 的指定元数据目录【非全部解压】-> 3 2 5
+单独 下载 config_jf.mp4 -> 3 2 6
+单独 解压 config_jf.mp4 -> 3 2 7
+单独 下载 PikPak_jf.mp4 -> 3 2 8
+单独 解压 PikPak_jf.mp4 -> 3 2 9
+选择 下载器【aria2/wget】-> 3 2 10
+单独 安装Jellyfin-> 3 3
 ———————————————————————————————————————更新———————————————————————————————————————
-更新 小雅Alist-TVBox -> 4 2
+更新 小雅Alist-TVBox -> 5 2
 更新 小雅Alist -> 1 2
 更新 Resilio-Sync（单独） -> 2 5 2
-更新 Onelist -> 5 2
-更新 Portainer -> 6 1 2
-更新 Auto_Symlink -> 6 2 2
+更新 Onelist -> 6 2
+更新 Portainer -> 7 1 2
+更新 Auto_Symlink -> 7 2 2
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 1 3
 卸载 Emby全家桶 -> 2 9
 卸载 Resilio-Sync（单独） -> 2 5 3
-卸载 小雅助手（xiaoyahelper）-> 3 3
-卸载 小雅Alist-TVBox -> 4 3
-卸载 Onelist -> 5 3
-卸载 Portainer -> 6 1 3
-卸载 Auto_Symlink -> 6 2 3
+卸载 小雅助手（xiaoyahelper）-> 4 3
+卸载 小雅Alist-TVBox -> 5 3
+卸载 Onelist -> 6 3
+卸载 Portainer -> 7 1 3
+卸载 Auto_Symlink -> 7 2 3
 ——————————————————————————————————————系统工具——————————————————————————————————————
-查看系统磁盘挂载 -> 6 3
+查看系统磁盘挂载 -> 7 3
 ———————————————————————————————————————其他———————————————————————————————————————
-一次性运行 小雅助手（xiaoyahelper）-> 3 2
+一次性运行 小雅助手（xiaoyahelper）-> 4 2
 ```
 
 **高级功能**
 
 ```shell
-Docker启动容器名称设置 -> 7 1
-是否开启容器运行额外参数添加 -> 7 2
-重置脚本配置 -> 7 3
-开启/关闭 磁盘容量检测 -> 7 4
-开启/关闭 小雅连通性检测 -> 7 5
+Docker启动容器名称设置 -> 8 1
+是否开启容器运行额外参数添加 -> 8 2
+重置脚本配置 -> 8 3
+开启/关闭 磁盘容量检测 -> 8 4
+开启/关闭 小雅连通性检测 -> 8 5
 ```
 
 ## 相关地址
