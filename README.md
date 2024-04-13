@@ -41,6 +41,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 
 ### 功能列表
 
+> [!NOTE]
 > 数字代表先选x，再选x，再选x
 > 
 > PS: 2 2 8代表先选2，再选2，最后选8
