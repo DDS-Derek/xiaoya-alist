@@ -2525,14 +2525,36 @@ function install_jellyfin_xiaoya_all_jellyfin() {
         ;;
     esac
 
-    sleep 10
+    sleep 4
 
+    start_time=$(date +%s)
+    CONTAINER_NAME="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)"
+    TARGET_LOG_LINE_SUCCESS="All entry points have started"
+    while true; do
+        if [ "$(docker inspect --format='{{json .State.Health.Status}}' "${CONTAINER_NAME}" | sed 's/"//g')" == "healthy" ]; then
+            break
+        fi
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ "$elapsed_time" -gt 900 ]; then
+            WARN "Jellyfin 未正常启动超时 15 分钟，终止脚本！"
+            exit 1
+        fi
+        sleep 3
+        INFO "等待 Jellyfin 初始化完成中..."
+    done
     if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
         INFO "重启小雅容器中..."
         docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
     fi
 
     INFO "Jellyfin 安装完成！"
+    if command -v ifconfig > /dev/null 2>&1; then
+        localip=$(ifconfig -a | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1)
+    else
+        localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+    fi
+    INFO "请浏览器访问 ${Sky_Blue}http://${localip}:2345${Font} 登入 Jellyfin，用户名：${Sky_Blue}ailg${Font}   密码：${Sky_Blue}5678${Font}"
 
 }
 
