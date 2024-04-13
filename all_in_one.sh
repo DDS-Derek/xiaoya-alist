@@ -3140,8 +3140,8 @@ function uninstall_xiaoya_all_jellyfin() {
 
     OLD_MEDIA_DIR=$(docker inspect \
         --format='{{range .Mounts}}{{if eq .Destination "/config"}}{{.Source}}{{end}}{{end}}' \
-        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)" \
-        | sed 's!/[^/]*$!!')
+        "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)" |
+        sed 's!/[^/]*$!!')
     INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
     INFO "配置文件路径：${OLD_MEDIA_DIR}"
     read -erp "Clean config:" CLEAN_CONFIG
@@ -3297,7 +3297,8 @@ function main_xiaoya_all_jellyfin() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Jellyfin全家桶${Font}\n"
-    echo -e "${Sky_Blue}Jellyfin全家桶安装前提条件："
+    echo -e "${Sky_Blue}Jellyfin 全家桶元数据由 AI老G 更新维护，在此表示感谢！"
+    echo -e "Jellyfin 全家桶安装前提条件："
     echo -e "1. 硬盘140G以上（如果无需完整安装则 60G 以上即可）"
     echo -e "2. 内存3.5G以上空余空间${Font}\n"
     echo -e "1、一键安装Jellyfin全家桶"
