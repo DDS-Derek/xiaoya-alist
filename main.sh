@@ -1521,9 +1521,6 @@ function download_wget_unzip_xiaoya_all_jellyfin() {
     INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
 
-    host=$(echo $xiaoya_addr | cut -f1,2 -d:)
-    INFO "刮削数据已经下载解压完成，请登入${host}:2345，用户名:xiaoya   密码:1234"
-
 }
 
 function download_unzip_xiaoya_all_jellyfin() {
@@ -1618,9 +1615,6 @@ function download_unzip_xiaoya_all_jellyfin() {
     INFO "设置目录权限..."
     INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
-
-    host=$(echo $xiaoya_addr | cut -f1,2 -d:)
-    INFO "刮削数据已经下载解压完成，请登入${host}:2345，用户名:xiaoya   密码:1234"
 
 }
 
