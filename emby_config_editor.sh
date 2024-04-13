@@ -21,7 +21,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.0.1-2024_02_19_19_08"
+DATE_VERSION="v1.0.2-2024_04_13_20_37"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -152,9 +152,9 @@ function main_return() {
     echo -e "3、Emby镜像                当前配置：${Sky_Blue}${image}${Font}"
     echo -e "4、媒体库路径              当前配置：${Sky_Blue}${media_dir}${Font}"
     echo -e "5、是否安装Resilio         当前配置：$(get_resilio)"
-    echo -e "6、退出脚本 | Script info: ${DATE_VERSION} Thanks: ${Blue}xiaoyaLiu${Font}"
+    echo -e "0、退出脚本 | Script info: ${DATE_VERSION} Thanks: ${Blue}xiaoyaLiu${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [1-6]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         set_dev_dri
@@ -182,13 +182,13 @@ function main_return() {
         clear
         main_return
         ;;
-    6)
+    0)
         clear
         exit 0
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [1-6]'
+        ERROR '请输入正确数字 [0-5]'
         main_return
         ;;
     esac
