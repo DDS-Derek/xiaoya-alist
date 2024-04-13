@@ -430,6 +430,48 @@ function container_update() {
 
 }
 
+function wait_emby_start() {
+
+    start_time=$(date +%s)
+    CONTAINER_NAME="$(cat "${DDSREM_CONFIG_DIR}"/container_name/xiaoya_emby_name.txt)"
+    TARGET_LOG_LINE_SUCCESS="All entry points have started"
+    while true; do
+        line=$(docker logs "$CONTAINER_NAME" 2>&1 | tail -n 10)
+        echo "$line"
+        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
+            break
+        fi
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ "$elapsed_time" -gt 600 ]; then
+            WARN "Emby 未正常启动超时 10 分钟！"
+            break
+        fi
+        sleep 3
+    done
+
+}
+
+function wait_jellyfin_start() {
+
+    start_time=$(date +%s)
+    CONTAINER_NAME="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)"
+    while true; do
+        if [ "$(docker inspect --format='{{json .State.Health.Status}}' "${CONTAINER_NAME}" | sed 's/"//g')" == "healthy" ]; then
+            break
+        fi
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ "$elapsed_time" -gt 900 ]; then
+            WARN "Jellyfin 未正常启动超时 15 分钟！"
+            break
+        fi
+        sleep 10
+        INFO "等待 Jellyfin 初始化完成中..."
+    done
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -2422,22 +2464,7 @@ function install_emby_xiaoya_all_emby() {
 
     set_emby_server_infuse_api_key
 
-    start_time=$(date +%s)
-    CONTAINER_NAME=$(cat "${DDSREM_CONFIG_DIR}"/container_name/xiaoya_emby_name.txt)
-    TARGET_LOG_LINE_SUCCESS="All entry points have started"
-    while true; do
-        line=$(docker logs "$CONTAINER_NAME" 2>&1 | tail -n 10)
-        echo "$line"
-        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
-            break
-        fi
-        current_time=$(date +%s)
-        elapsed_time=$((current_time - start_time))
-        if ((elapsed_time >= 300)); then
-            break
-        fi
-        sleep 3
-    done
+    wait_emby_start
 
     sleep 2
 
@@ -2519,24 +2546,10 @@ function install_jellyfin_xiaoya_all_jellyfin() {
         ;;
     esac
 
+    wait_jellyfin_start
+
     sleep 4
 
-    start_time=$(date +%s)
-    CONTAINER_NAME="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)"
-    TARGET_LOG_LINE_SUCCESS="All entry points have started"
-    while true; do
-        if [ "$(docker inspect --format='{{json .State.Health.Status}}' "${CONTAINER_NAME}" | sed 's/"//g')" == "healthy" ]; then
-            break
-        fi
-        current_time=$(date +%s)
-        elapsed_time=$((current_time - start_time))
-        if [ "$elapsed_time" -gt 900 ]; then
-            WARN "Jellyfin 未正常启动超时 15 分钟，终止脚本！"
-            exit 1
-        fi
-        sleep 3
-        INFO "等待 Jellyfin 初始化完成中..."
-    done
     if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
         INFO "重启小雅容器中..."
         docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
@@ -3110,7 +3123,7 @@ function main_xiaoya_all_emby() {
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
-    echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
+    echo -e "5、安装/更新/卸载 Resilio-Sync                当前安装状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、立即同步小雅Emby config目录"
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
@@ -4154,8 +4167,8 @@ function main_other_tools() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}其他工具${Font}\n"
-    echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
-    echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
+    echo -e "1、安装/更新/卸载 Portainer                   当前安装状态：$(judgment_container "${portainer_name}")"
+    echo -e "2、安装/更新/卸载 Auto_Symlink                当前安装状态：$(judgment_container "${auto_symlink_name}")"
     echo -e "3、查看系统磁盘挂载"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -4195,12 +4208,12 @@ function main_return() {
 
     cat /tmp/xiaoya_alist
 
-    echo -e "1、安装/更新/卸载 小雅Alist                   当前状态：$(judgment_container "${xiaoya_alist_name}")"
-    echo -e "2、安装/卸载 小雅Emby全家桶                   当前状态：$(judgment_container "${xiaoya_emby_name}")"
-    echo -e "3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")"
-    echo -e "4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)"
-    echo -e "5、安装/更新/卸载 小雅Alist-TVBox             当前状态：$(judgment_container "${xiaoya_tvbox_name}")"
-    echo -e "6、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
+    echo -e "1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")"
+    echo -e "2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")"
+    echo -e "3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")"
+    echo -e "4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)"
+    echo -e "5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")"
+    echo -e "6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "7、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
     echo -e "8、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
     echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
