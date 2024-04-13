@@ -21,22 +21,35 @@
 
 ## main.sh
 
-整合安装脚本，内置所有相关软件的安装。
+> [!NOTE]
+> 整合安装脚本，内置所有相关软件的安装。
 
 ### 使用
 
 ```shell
-bash -c "$(curl -sLk https://ddsrem.com/xiaoya_install.sh)"
+bash -c "$(curl --insecure -fsSL https://ddsrem.com/xiaoya_install.sh)"
 ```
 
 **备用地址**
 
 ```shell
-bash -c "$(curl -sLk https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+bash <(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh)
 ```
 
 ```shell
-bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
+bash <(curl --insecure -fsSL https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/all_in_one.sh)
+```
+
+```shell
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/all_in_one.sh)
+```
+
+```shell
+bash -c "$(curl --insecure -fsSL https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+```
+
+```shell
+bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/main.sh)"
 ```
 
 ### 功能列表
