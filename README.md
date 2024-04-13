@@ -32,7 +32,7 @@ bash -c "$(curl -sLk https://ddsrem.com/xiaoya_install.sh)"
 **备用地址**
 
 ```shell
-bash -c "$(curl -sLk https://cdn.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
+bash -c "$(curl -sLk https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/main.sh)"
 ```
 
 ```shell
