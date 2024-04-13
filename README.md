@@ -55,7 +55,7 @@ bash -c "$(curl -sLk https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/ma
 安装 Onelist -> 6 1
 安装 Portainer -> 7 1 1
 安装 Emby全家桶（一键） -> 2 1
-TODO 安装 Jellyfin全家桶（一键） -> 3 1
+安装 Jellyfin全家桶（一键） -> 3 1
 安装 Resilio-Sync（单独） -> 2 5 1
 安装 Auto_Symlink -> 7 2 1
 ——————————————————————————————Emby手动全家桶配置————————————————————————————————————
@@ -74,7 +74,17 @@ TODO 安装 Jellyfin全家桶（一键） -> 3 1
 单独 创建/删除 同步定时更新任务 -> 2 7
 图形化编辑 emby_config.txt -> 2 8
 ————————————————————————————Jellyfin手动全家桶配置——————————————————————————————————
-TODO
+单独 下载并解压 全部元数据 -> 3 2 1
+单独 解压 全部元数据 -> 3 2 2
+单独 下载 all_jf.mp4 -> 3 2 3
+单独 解压 all_jf.mp4 -> 3 2 4
+解压 all_jf.mp4 的指定元数据目录【非全部解压】-> 3 2 5
+单独 下载 config_jf.mp4 -> 3 2 6
+单独 解压 config_jf.mp4 -> 3 2 7
+单独 下载 PikPak_jf.mp4 -> 3 2 8
+单独 解压 PikPak_jf.mp4 -> 3 2 9
+选择 下载器【aria2/wget】-> 3 2 10
+单独 安装Jellyfin-> 3 3
 ———————————————————————————————————————更新———————————————————————————————————————
 更新 小雅Alist-TVBox -> 5 2
 更新 小雅Alist -> 1 2
