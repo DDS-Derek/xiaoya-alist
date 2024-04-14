@@ -98,6 +98,20 @@ function set_image() {
 
 }
 
+function set_version() {
+
+    if [ "${version}" == "4.8.0.56" ]; then
+        new_version=latest
+    elif [ "${version}" == "latest" ]; then
+        new_version=4.8.0.56
+    else
+        new_version=4.8.0.56
+    fi
+
+    sed -i "s/version=.*/version=${new_version}/" "${config_dir}/emby_config.txt"
+
+}
+
 function get_media_dir() {
 
     if [ "$media_dir" != "" ]; then
@@ -150,11 +164,12 @@ function main_return() {
     echo -e "1、开启/关闭硬解GPU映射    当前配置：$(get_dev_dri)"
     echo -e "2、Emby容器网络模式        当前配置：${Sky_Blue}${mode}模式${Font}"
     echo -e "3、Emby镜像                当前配置：${Sky_Blue}${image}${Font}"
-    echo -e "4、媒体库路径              当前配置：${Sky_Blue}${media_dir}${Font}"
-    echo -e "5、是否安装Resilio         当前配置：$(get_resilio)"
+    echo -e "4、Emby镜像版              当前配置：${Sky_Blue}${version}${Font}"
+    echo -e "5、媒体库路径              当前配置：${Sky_Blue}${media_dir}${Font}"
+    echo -e "6、是否安装Resilio         当前配置：$(get_resilio)"
     echo -e "0、退出脚本 | Script info: ${DATE_VERSION} Thanks: ${Blue}xiaoyaLiu${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-5]:" num
+    read -erp "请输入数字 [0-6]:" num
     case "$num" in
     1)
         set_dev_dri
@@ -172,12 +187,17 @@ function main_return() {
         main_return
         ;;
     4)
+        set_version
+        clear
+        main_return
+        ;;
+    5)
         clear
         get_media_dir
         clear
         main_return
         ;;
-    5)
+    6)
         set_resilio
         clear
         main_return
@@ -188,7 +208,7 @@ function main_return() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-5]'
+        ERROR '请输入正确数字 [0-6]'
         main_return
         ;;
     esac
@@ -221,6 +241,7 @@ if [ ! -s "${config_dir}/emby_config.txt" ]; then
         echo "image=emby"
         echo "media_dir="
         echo "resilio=no"
+        echo "version=4.8.0.56"
     } >> "${config_dir}/emby_config.txt"
 fi
 
