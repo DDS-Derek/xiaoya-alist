@@ -2590,7 +2590,7 @@ function install_jellyfin_xiaoya_all_jellyfin() {
 
     sleep 4
 
-    if ! curl -I -s http://$docker0:2345/ | grep -q "302"; then
+    if ! curl -I -s http://$docker0:2346/ | grep -q "302"; then
         INFO "重启小雅容器中..."
         docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
         wait_xiaoya_start
