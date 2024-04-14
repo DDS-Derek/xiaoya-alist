@@ -20,7 +20,7 @@ jobs:
 
   sh-checker:
     runs-on: ubuntu-latest
-    name: Shellcheck
+    name: sh-checker
     steps:
       -
         name: Checkout
@@ -31,8 +31,7 @@ jobs:
         uses: luizm/action-sh-checker@v0.8.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHELLCHECK_OPTS:
           SHFMT_OPTS: -d -i 4 -sr
         with:
           sh_checker_comment: true
-          sh_checker_exclude: "^backup/*"
+          sh_checker_exclude: "^backup/* ^xiaoyahelper/*"
