@@ -243,6 +243,26 @@ if [ ! -s "${config_dir}/emby_config.txt" ]; then
         echo "resilio=no"
         echo "version=4.8.0.56"
     } >> "${config_dir}/emby_config.txt"
+else
+    source "${config_dir}/emby_config.txt"
+    if [ -z "${dev_dri}" ]; then
+        echo "dev_dri=no" >> "${config_dir}/emby_config.txt"
+    fi
+    if [ -z "${mode}" ]; then
+        echo "mode=host" >> "${config_dir}/emby_config.txt"
+    fi
+    if [ -z "${image}" ]; then
+        echo "image=emby" >> "${config_dir}/emby_config.txt"
+    fi
+    if [ -z "${media_dir}" ]; then
+        echo "media_dir=" >> "${config_dir}/emby_config.txt"
+    fi
+    if [ -z "${resilio}" ]; then
+        echo "resilio=no" >> "${config_dir}/emby_config.txt"
+    fi
+    if [ -z "${version}" ]; then
+        echo "version=4.8.0.56" >> "${config_dir}/emby_config.txt"
+    fi
 fi
 
 if [ -f /tmp/xiaoya_alist ]; then
