@@ -709,13 +709,10 @@ function uninstall_xiaoya_alist() {
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"
         sleep 1
     done
+    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-    if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
-        docker rmi xiaoyaliu/alist:latest
-    elif docker inspect xiaoyaliu/alist:hostmode > /dev/null 2>&1; then
-        docker rmi xiaoyaliu/alist:hostmode
-    fi
+    docker rmi "${IMAGE_NAME}"
     if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -2113,7 +2110,7 @@ function install_emby_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if docker pull emby/embyserver:4.8.0.56; then
+        if docker pull emby/embyserver:${IMAGE_VERSION}; then
             INFO "镜像拉取成功！"
         else
             ERROR "镜像拉取失败！"
@@ -2132,7 +2129,7 @@ function install_emby_embyserver() {
                 -e UID=0 \
                 -e GID=0 \
                 --restart=always \
-                emby/embyserver:4.8.0.56
+                emby/embyserver:${IMAGE_VERSION}
         else
             docker run -itd \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2145,11 +2142,11 @@ function install_emby_embyserver() {
                 -e UID=0 \
                 -e GID=0 \
                 --restart=always \
-                emby/embyserver:4.8.0.56
+                emby/embyserver:${IMAGE_VERSION}
         fi
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if docker pull emby/embyserver_arm64v8:4.8.0.56; then
+        if docker pull emby/embyserver_arm64v8:${IMAGE_VERSION}; then
             INFO "镜像拉取成功！"
         else
             ERROR "镜像拉取失败！"
@@ -2168,7 +2165,7 @@ function install_emby_embyserver() {
                 -e UID=0 \
                 -e GID=0 \
                 --restart=always \
-                emby/embyserver_arm64v8:4.8.0.56
+                emby/embyserver_arm64v8:${IMAGE_VERSION}
         else
             docker run -itd \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2181,7 +2178,7 @@ function install_emby_embyserver() {
                 -e UID=0 \
                 -e GID=0 \
                 --restart=always \
-                emby/embyserver_arm64v8:4.8.0.56
+                emby/embyserver_arm64v8:${IMAGE_VERSION}
         fi
         ;;
     *)
@@ -2196,7 +2193,7 @@ function install_amilys_embyserver() {
 
     INFO "开始安装Emby容器....."
 
-    if docker pull amilys/embyserver:4.8.0.56; then
+    if docker pull amilys/embyserver:${IMAGE_VERSION}; then
         INFO "镜像拉取成功！"
     else
         ERROR "镜像拉取失败！"
@@ -2214,7 +2211,7 @@ function install_amilys_embyserver() {
             -e UID=0 \
             -e GID=0 \
             --restart=always \
-            amilys/embyserver:4.8.0.56
+            amilys/embyserver:${IMAGE_VERSION}
     else
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2226,7 +2223,7 @@ function install_amilys_embyserver() {
             -e UID=0 \
             -e GID=0 \
             --restart=always \
-            amilys/embyserver:4.8.0.56
+            amilys/embyserver:${IMAGE_VERSION}
     fi
 
 }
@@ -2459,6 +2456,12 @@ function install_emby_xiaoya_all_emby() {
 
         get_nsswitch_conf_path
 
+        if [ -n "${version}" ]; then
+            IMAGE_VERSION="${version}"
+        else
+            IMAGE_VERSION=4.8.0.56
+        fi
+
         if [ "${image}" == "emby" ]; then
             install_emby_embyserver
         else
@@ -2479,6 +2482,21 @@ function install_emby_xiaoya_all_emby() {
         fi
 
         get_nsswitch_conf_path
+
+        while true; do
+            INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
+            read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+            [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+            if [[ ${CHOOSE_IMAGE_VERSION} == [1] ]]; then
+                IMAGE_VERSION=4.8.0.56
+                break
+            elif [[ ${CHOOSE_IMAGE_VERSION} == [2] ]]; then
+                IMAGE_VERSION=latest
+                break
+            else
+                ERROR "输入无效，请重新选择"
+            fi
+        done
 
         choose_emby_image
     fi
@@ -3107,21 +3125,10 @@ function uninstall_xiaoya_all_emby() {
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"
         sleep 1
     done
+    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
-    cpu_arch=$(uname -m)
-    case $cpu_arch in
-    "x86_64" | *"amd64"*)
-        if docker inspect amilys/embyserver:4.8.0.56 > /dev/null 2>&1; then
-            docker rmi amilys/embyserver:4.8.0.56
-        elif docker inspect emby/embyserver:4.8.0.56 > /dev/null 2>&1; then
-            docker rmi emby/embyserver:4.8.0.56
-        fi
-        ;;
-    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        docker rmi emby/embyserver_arm64v8:4.8.0.56
-        ;;
-    esac
+    docker rmi "${IMAGE_NAME}"
     if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
@@ -3275,6 +3282,7 @@ function main_xiaoya_all_emby() {
         clear
         get_config_dir
         bash -c "$(curl -sLk https://ddsrem.com/xiaoya/emby_config_editor.sh)" -s ${CONFIG_DIR}
+        main_xiaoya_all_emby
         ;;
     9)
         clear
