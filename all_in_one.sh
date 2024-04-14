@@ -4289,7 +4289,7 @@ function main_return() {
     echo -e "5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")"
     echo -e "6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "7、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
-    echo -e "8、高级配置 | Docker version: $(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
+    echo -e "8、高级配置 | Docker version: ${DOCKER_VERSION} City: ${CITY}"
     echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-8]:" num
@@ -4343,28 +4343,14 @@ function main() {
     main_return
 }
 
-function ci_test() {
-
-    docker pull xiaoyaliu/alist:latest
-    docker pull xiaoyaliu/alist:hostmode
-    docker pull xiaoyaliu/glue:latest
-    docker pull ddsderek/xiaoya-glue:latest
-    docker pull linuxserver/resilio-sync:latest
-    docker pull ddsderek/xiaoya-emby-library:latest
-    docker pull haroldli/xiaoya-tvbox:latest
-    docker pull msterzhang/onelist:latest
-    docker pull portainer/portainer-ce
-    docker pull amilys/embyserver:4.8.0.56
-    docker pull emby/embyserver:4.8.0.56
-    docker pull shenxianmq/auto_symlink:latest
-
-}
-
 function first_init() {
 
     root_need
 
     get_os
+
+    CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
+    DOCKER_VERSION="$(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
 
     if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
         mkdir -p ${DDSREM_CONFIG_DIR}
@@ -4428,9 +4414,6 @@ if [ ! "$*" ]; then
     first_init
     clear
     main
-elif [ "$*" == test ]; then
-    INFO "Test"
-    ci_test
 else
     first_init
     clear
