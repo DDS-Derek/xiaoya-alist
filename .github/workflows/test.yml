@@ -18,7 +18,7 @@ jobs:
   #       run: |
   #           bash main.sh test
 
-  shellcheck:
+  sh-checker:
     runs-on: ubuntu-latest
     name: Shellcheck
     steps:
@@ -26,29 +26,13 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
 
-      - name: Shellcheck
-        run: |
-            shellcheck main.sh
-            shellcheck emby_config_editor.sh
-            shellcheck xiaoya_notify.sh
-            shellcheck all_in_one.sh
-
-  shfmt:
-    runs-on: ubuntu-latest
-    name: shfmt
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Prepare
-        run: |
-            wget https://github.com/mvdan/sh/releases/download/v3.3.1/shfmt_v3.3.1_linux_amd64 -O ./shfmt
-            chmod +x shfmt
-
-      - name: shfmt
-        run: |
-            ./shfmt -d -i 4 -sr main.sh
-            ./shfmt -d -i 4 -sr emby_config_editor.sh
-            ./shfmt -d -i 4 -sr xiaoya_notify.sh
-            ./shfmt -d -i 4 -sr all_in_one.sh
+      - 
+        name: Run sh-checker
+        uses: luizm/action-sh-checker@v0.8.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHELLCHECK_OPTS:
+          SHFMT_OPTS: -d -i 4 -sr
+        with:
+          sh_checker_comment: true
+          sh_checker_exclude: "^backup/*"
