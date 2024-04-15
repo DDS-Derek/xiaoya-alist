@@ -125,7 +125,7 @@ function pull_run_glue() {
 
 function pull_run_glue_xh() {
 
-    BUILDER_NAME="xiaoya_builder_$(date -u +"T%H%M%S%3NZ")"
+    BUILDER_NAME="xiaoya_builder_$(date +%S%N | cut -c 7-11)"
 
     if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
         local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
