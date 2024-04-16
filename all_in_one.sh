@@ -2548,13 +2548,13 @@ function install_emby_xiaoya_all_emby() {
             if [ "${CHOOSE_EMBY}" == "amilys_embyserver" ]; then
                 cpu_arch=$(uname -m)
                 case $cpu_arch in
-                    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-                        WARN "amilys/embyserver_arm64v8镜像无法指定版本号，默认拉取latest镜像！"
-                        IMAGE_VERSION=latest
-                        break
-                        ;;
-                    *)
-                        ;;
+                "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+                    WARN "amilys/embyserver_arm64v8镜像无法指定版本号，默认拉取latest镜像！"
+                    IMAGE_VERSION=latest
+                    break
+                    ;;
+                *)
+                    ;;
                 esac
             fi
 
@@ -2563,30 +2563,30 @@ function install_emby_xiaoya_all_emby() {
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
 
             case ${CHOOSE_IMAGE_VERSION} in
-                1)
-                    IMAGE_VERSION=4.8.0.56
-                    break
-                    ;;
-                2)
-                    IMAGE_VERSION=latest
-                    break
-                    ;;
-                *)
-                    ERROR "输入无效，请重新选择"
-                    ;;
+            1)
+                IMAGE_VERSION=4.8.0.56
+                break
+                ;;
+            2)
+                IMAGE_VERSION=latest
+                break
+                ;;
+            *)
+                ERROR "输入无效，请重新选择"
+                ;;
             esac
         done
 
         case ${CHOOSE_EMBY} in
-            emby_embyserver)
-                install_emby_embyserver
-                ;;
-            lovechen_embyserver)
-                install_lovechen_embyserver
-                ;;
-            amilys_embyserver)
-                install_amilys_embyserver
-                ;;
+        emby_embyserver)
+            install_emby_embyserver
+            ;;
+        lovechen_embyserver)
+            install_lovechen_embyserver
+            ;;
+        amilys_embyserver)
+            install_amilys_embyserver
+            ;;
         esac
 
     fi
