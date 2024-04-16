@@ -2553,8 +2553,7 @@ function install_emby_xiaoya_all_emby() {
                     IMAGE_VERSION=latest
                     break
                     ;;
-                *)
-                    ;;
+                *) ;;
                 esac
             fi
 
