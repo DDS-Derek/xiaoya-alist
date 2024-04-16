@@ -2414,12 +2414,22 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
         if [ "$MODE" == "host" ]; then
             echo -e "127.0.0.1\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
             xiaoya_host="127.0.0.1"
-        fi
-        if [ "$MODE" == "bridge" ]; then
+        elif [ "$MODE" == "bridge" ]; then
             echo -e "$docker0\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
             xiaoya_host="$docker0"
         fi
     else
+        if [ "$MODE" == "host" ]; then
+            if grep -q "^${docker0}.*xiaoya\.host" ${HOSTS_FILE_PATH}; then
+                sed -i '/xiaoya.host/d' ${HOSTS_FILE_PATH}
+                echo -e "127.0.0.1\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
+            fi
+        elif [ "$MODE" == "bridge" ]; then
+            if grep -q "^127\.0\.0\.1.*xiaoya\.host" ${HOSTS_FILE_PATH}; then
+                sed -i '/xiaoya.host/d' ${HOSTS_FILE_PATH}
+                echo -e "$docker0\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
+            fi
+        fi
         xiaoya_host=$(grep xiaoya.host ${HOSTS_FILE_PATH} | awk '{print $1}' | head -n1)
     fi
 
@@ -2447,9 +2457,9 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
     #     fi
     # fi
     if echo "${XIAOYA_HOSTS_SHOW}" | awk '{ if($1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $2 ~ /^[^\t]+$/) exit 0; else exit 1 }'; then
-        INFO "hosts 文件设置正确！"
+        INFO "hosts 文件格式设置正确！"
     else
-        WARN "hosts 文件设置错误！"
+        WARN "hosts 文件格式设置错误！"
         INFO "是否使用脚本自动纠错（只支持单机部署自动纠错，如果小雅和全家桶不在同一台机器上，请手动修改）[Y/n]（默认 Y）"
         read -erp "自动纠错:" FIX_HOST_ERROR
         [[ -z "${FIX_HOST_ERROR}" ]] && FIX_HOST_ERROR="y"
@@ -2458,6 +2468,21 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
             sed -i '/xiaoya\.host/d' /etc/hosts
             get_xiaoya_hosts
         else
+            exit 1
+        fi
+    fi
+
+    INFO "${XIAOYA_HOSTS_SHOW}"
+
+    response="$(curl -s -o /dev/null -w '%{http_code}' http://${xiaoya_host}:5678)"
+    if [[ "$response" == "302" || "$response" == "200" ]]; then
+        INFO "hosts 文件设置正确，本机可以正常访问小雅容器！"
+    else
+        response="$(curl -s -o /dev/null -w '%{http_code}' http://${xiaoya_host}:5678)"
+        if [[ "$response" == "302" || "$response" == "200" ]]; then
+            INFO "hosts 文件设置正确，本机可以正常访问小雅容器！"
+        else
+            ERROR "hosts 文件设置错误，本机无法正常访问小雅容器！"
             exit 1
         fi
     fi
@@ -2547,20 +2572,15 @@ function install_emby_xiaoya_all_emby() {
         while true; do
             if [ "${CHOOSE_EMBY}" == "amilys_embyserver" ]; then
                 cpu_arch=$(uname -m)
-                case $cpu_arch in
-                "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+                if [[ $cpu_arch == "aarch64" || $cpu_arch == *"arm64"* || $cpu_arch == *"armv8"* || $cpu_arch == *"arm/v8"* ]]; then
                     WARN "amilys/embyserver_arm64v8镜像无法指定版本号，默认拉取latest镜像！"
                     IMAGE_VERSION=latest
                     break
-                    ;;
-                *) ;;
-                esac
+                fi
             fi
-
             INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
             read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
-
             case ${CHOOSE_IMAGE_VERSION} in
             1)
                 IMAGE_VERSION=4.8.0.56
@@ -2609,6 +2629,8 @@ function install_emby_xiaoya_all_emby() {
 function install_jellyfin_xiaoya_all_jellyfin() {
 
     get_docker0_url
+
+    MODE=bridge
 
     get_xiaoya_hosts
 
