@@ -2191,40 +2191,82 @@ function install_emby_embyserver() {
 
 function install_amilys_embyserver() {
 
+    cpu_arch=$(uname -m)
     INFO "开始安装Emby容器....."
-
-    if docker pull amilys/embyserver:${IMAGE_VERSION}; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
+    case $cpu_arch in
+    "x86_64" | *"amd64"*)
+        if docker pull amilys/embyserver:${IMAGE_VERSION}; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                ${extra_parameters} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                amilys/embyserver:${IMAGE_VERSION}
+        else
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                amilys/embyserver:${IMAGE_VERSION}
+        fi
+        ;;
+    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        if docker pull amilys/embyserver_arm64v8:${IMAGE_VERSION}; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+        if [ -n "${extra_parameters}" ]; then
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                ${extra_parameters} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                amilys/embyserver_arm64v8:${IMAGE_VERSION}
+        else
+            docker run -itd \
+                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+                -v "${MEDIA_DIR}/config:/config" \
+                -v "${MEDIA_DIR}/xiaoya:/media" \
+                -v ${NSSWITCH}:/etc/nsswitch.conf \
+                --add-host="xiaoya.host:$xiaoya_host" \
+                ${NET_MODE} \
+                -e UID=0 \
+                -e GID=0 \
+                --restart=always \
+                amilys/embyserver_arm64v8:${IMAGE_VERSION}
+        fi
+        ;;
+    *)
+        ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
         exit 1
-    fi
-    if [ -n "${extra_parameters}" ]; then
-        docker run -itd \
-            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -v "${MEDIA_DIR}/config:/config" \
-            -v "${MEDIA_DIR}/xiaoya:/media" \
-            -v ${NSSWITCH}:/etc/nsswitch.conf \
-            --add-host="xiaoya.host:$xiaoya_host" \
-            ${NET_MODE} \
-            ${extra_parameters} \
-            -e UID=0 \
-            -e GID=0 \
-            --restart=always \
-            amilys/embyserver:${IMAGE_VERSION}
-    else
-        docker run -itd \
-            --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-            -v "${MEDIA_DIR}/config:/config" \
-            -v "${MEDIA_DIR}/xiaoya:/media" \
-            -v ${NSSWITCH}:/etc/nsswitch.conf \
-            --add-host="xiaoya.host:$xiaoya_host" \
-            ${NET_MODE} \
-            -e UID=0 \
-            -e GID=0 \
-            --restart=always \
-            amilys/embyserver:${IMAGE_VERSION}
-    fi
+        ;;
+    esac
 
 }
 
@@ -2316,24 +2358,26 @@ function choose_emby_image() {
         read -erp "IMAGE:" IMAGE
         [[ -z "${IMAGE}" ]] && IMAGE="2"
         if [[ ${IMAGE} == [1] ]]; then
-            install_amilys_embyserver
+            CHOOSE_EMBY=amilys_embyserver
         elif [[ ${IMAGE} == [2] ]]; then
-            install_emby_embyserver
+            CHOOSE_EMBY=emby_embyserver
         elif [[ ${IMAGE} == [3] ]]; then
-            install_lovechen_embyserver
+            CHOOSE_EMBY=lovechen_embyserver
         else
             ERROR "输入无效，请重新选择"
             choose_emby_image
         fi
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        INFO "请选择使用的Emby镜像 [ 1:emby/embyserver | 2:lovechen/embyserver(不推荐！目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 1）"
+        INFO "请选择使用的Emby镜像 [ 1:amilys/embyserver | 2:emby/embyserver | 3:lovechen/embyserver(不推荐！目前不能直接同步config数据，且还存在一些已知问题未修复) ]（默认 2）"
         read -erp "IMAGE:" IMAGE
-        [[ -z "${IMAGE}" ]] && IMAGE="1"
+        [[ -z "${IMAGE}" ]] && IMAGE="2"
         if [[ ${IMAGE} == [1] ]]; then
-            install_emby_embyserver
+            CHOOSE_EMBY=amilys_embyserver
         elif [[ ${IMAGE} == [2] ]]; then
-            install_lovechen_embyserver
+            CHOOSE_EMBY=emby_embyserver
+        elif [[ ${IMAGE} == [3] ]]; then
+            CHOOSE_EMBY=lovechen_embyserver
         else
             ERROR "输入无效，请重新选择"
             choose_emby_image
@@ -2364,7 +2408,7 @@ function get_nsswitch_conf_path() {
 
 }
 
-function get_xiaoya_hosts() {
+function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
 
     if ! grep -q xiaoya.host ${HOSTS_FILE_PATH}; then
         if [ "$MODE" == "host" ]; then
@@ -2465,10 +2509,27 @@ function install_emby_xiaoya_all_emby() {
         if [ "${image}" == "emby" ]; then
             install_emby_embyserver
         else
-            install_amilys_embyserver
+            # 因为amilys embyserver arm64镜像没有4.8.0.56这个版本号，所以这边规定只能使用latest
+            cpu_arch=$(uname -m)
+            case $cpu_arch in
+            "x86_64" | *"amd64"*)
+                install_amilys_embyserver
+                ;;
+            "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+                WARN "amilys/embyserver_arm64v8镜像无法指定版本号，忽略镜像版本号设置，默认拉取latest镜像！"
+                IMAGE_VERSION=latest
+                install_amilys_embyserver
+                ;;
+            *)
+                ERROR "全家桶 Emby 目前只支持 amd64 和 arm64 架构，你的架构是：$cpu_arch"
+                exit 1
+                ;;
+            esac
         fi
 
     else
+        choose_emby_image
+
         choose_network_mode
 
         get_xiaoya_hosts
@@ -2484,21 +2545,50 @@ function install_emby_xiaoya_all_emby() {
         get_nsswitch_conf_path
 
         while true; do
+            if [ "${CHOOSE_EMBY}" == "amilys_embyserver" ]; then
+                cpu_arch=$(uname -m)
+                case $cpu_arch in
+                    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+                        WARN "amilys/embyserver_arm64v8镜像无法指定版本号，默认拉取latest镜像！"
+                        IMAGE_VERSION=latest
+                        break
+                        ;;
+                    *)
+                        ;;
+                esac
+            fi
+
             INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
             read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
-            if [[ ${CHOOSE_IMAGE_VERSION} == [1] ]]; then
-                IMAGE_VERSION=4.8.0.56
-                break
-            elif [[ ${CHOOSE_IMAGE_VERSION} == [2] ]]; then
-                IMAGE_VERSION=latest
-                break
-            else
-                ERROR "输入无效，请重新选择"
-            fi
+
+            case ${CHOOSE_IMAGE_VERSION} in
+                1)
+                    IMAGE_VERSION=4.8.0.56
+                    break
+                    ;;
+                2)
+                    IMAGE_VERSION=latest
+                    break
+                    ;;
+                *)
+                    ERROR "输入无效，请重新选择"
+                    ;;
+            esac
         done
 
-        choose_emby_image
+        case ${CHOOSE_EMBY} in
+            emby_embyserver)
+                install_emby_embyserver
+                ;;
+            lovechen_embyserver)
+                install_lovechen_embyserver
+                ;;
+            amilys_embyserver)
+                install_amilys_embyserver
+                ;;
+        esac
+
     fi
 
     set_emby_server_infuse_api_key
