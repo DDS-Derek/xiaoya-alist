@@ -315,6 +315,8 @@ function get_os() {
     elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
         OSNAME='libreelec'
         DDSREM_CONFIG_DIR=/storage/DDSRem
+        ERROR "LibreELEC 系统目前不支持！"
+        exit 1
     elif grep -Eqi "openSUSE" /etc/*-release; then
         OSNAME='opensuse'
         packages_need "zypper"

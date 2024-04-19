@@ -170,7 +170,7 @@ Docker启动容器名称设置 -> 8 1
 |  TrueNAS CORE   |    ✅    |           ✅           |
 |  TrueNAS SCALE  |    ✅    |           ✅           |
 |     UGREEN      |    ✅    |           ✅           |
-|   LibreELEC     |    ✅    |           ✅           |
+|   LibreELEC     |    ❌    |           ❌           |
 
 ## 免责声明
 
