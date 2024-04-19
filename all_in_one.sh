@@ -437,7 +437,7 @@ function wait_emby_start() {
     TARGET_LOG_LINE_SUCCESS="All entry points have started"
     while true; do
         line=$(docker logs "$CONTAINER_NAME" 2>&1 | tail -n 10)
-        echo "$line"
+        echo -e "$line"
         if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
             break
         fi
@@ -478,12 +478,14 @@ function wait_xiaoya_start() {
     TARGET_LOG_LINE_SUCCESS="success load storage: [/©️"
     while true; do
         line=$(docker logs "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" 2>&1 | tail -n 10)
-        echo $line
-        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
-            break
-        fi
+        echo -e "$line"
         current_time=$(date +%s)
         elapsed_time=$((current_time - start_time))
+        if [[ "$line" == *"$TARGET_LOG_LINE_SUCCESS"* ]]; then
+            if [ "$elapsed_time" -gt 20 ]; then
+                break
+            fi
+        fi
         if [ "$elapsed_time" -gt 300 ]; then
             WARN "小雅alist 未正常启动超时 5 分钟！"
             break
