@@ -613,6 +613,21 @@ function install_xiaoya_alist() {
         fi
     fi
 
+    if [ ! -f "${CONFIG_DIR}/pikpak.txt" ]; then
+        INFO "是否继续配置 PikPak 账号密码 [Y/n]（默认 n 不配置）"
+        read -erp "PikPak_Set:" PikPak_Set
+        [[ -z "${PikPak_Set}" ]] && PikPak_Set="n"
+        if [[ ${PikPak_Set} == [Yy] ]]; then
+            touch ${CONFIG_DIR}/pikpak.txt
+            INFO "输入你的 PikPak 账号（手机号或邮箱）"
+            INFO "如果手机号，要\"+区号\"，比如你的手机号\"12345678900\"那么就填\"+8612345678900\""
+            read -erp "PikPak_Username:" PikPak_Username
+            INFO "输入你的 PikPak 账号密码"
+            read -erp "PikPak_Password:" PikPak_Password
+            echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\"" > ${CONFIG_DIR}/pikpak.txt
+        fi
+    fi
+
     if command -v ifconfig > /dev/null 2>&1; then
         localip=$(ifconfig -a | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1)
     else
