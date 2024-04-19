@@ -4395,14 +4395,14 @@ function main_return() {
 
     cat /tmp/xiaoya_alist
 
-    echo -e "1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")"
-    echo -e "2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")"
-    echo -e "3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")"
-    echo -e "4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)"
-    echo -e "5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")"
-    echo -e "6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
+    echo -e "1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")
+2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")
+3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")
+4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)
+5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")
+6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
     echo -e "7、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
-    echo -e "8、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} IP City: ${Yellow}${CITY}${Font}"
+    echo -e "8、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}"
     echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-8]:" num
@@ -4463,6 +4463,10 @@ function first_init() {
     get_os
 
     CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
+    if [ -n "${CITY}" ]; then
+        IP_CITY="IP City: ${Yellow}${CITY}${Font}"
+    fi
+
     DOCKER_VERSION="$(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
 
     if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
