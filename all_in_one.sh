@@ -2655,7 +2655,7 @@ function install_jellyfin_xiaoya_all_jellyfin() {
 
     get_nsswitch_conf_path
 
-    echo "http://$docker0:6909" > "${CONFIG_DIR}"/emby_server.txt
+    echo "http://$docker0:6909" > "${CONFIG_DIR}"/jellyfin_server.txt
 
     if [ ! -f "${CONFIG_DIR}"/infuse_api_key.txt ]; then
         echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
