@@ -3480,6 +3480,20 @@ function main_xiaoya_all_jellyfin() {
 
 }
 
+function xiaoyahelper_install_check() {
+    local URL="$1"
+    if bash -c "$(curl --insecure -fsSL ${URL} | tail -n +2)" -s "${MODE}" ${TG_CHOOSE}; then
+        if docker container inspect xiaoyakeeper > /dev/null 2>&1; then
+            INFO "安装完成！"
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
 function install_xiaoyahelper() {
 
     INFO "选择模式：[3/5]（默认 3）"
@@ -3496,17 +3510,15 @@ function install_xiaoyahelper() {
     fi
 
     XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
-    if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" ${TG_CHOOSE}; then
-        INFO "安装完成！"
-    else
-        XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
-        if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s "${MODE}" ${TG_CHOOSE}; then
-            INFO "安装完成！"
-        else
-            ERROR "安装失败！"
-            exit 1
-        fi
+    if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
+        exit 0
     fi
+    XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
+    if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
+        exit 0
+    fi
+    ERROR "安装失败！"
+    exit 1
 
 }
 
@@ -3520,11 +3532,11 @@ function once_xiaoyahelper() {
     fi
 
     XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
-    if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
+    if bash -c "$(curl --insecure -fsSL ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
         INFO "运行完成！"
     else
         XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
-        if bash -c "$(curl -s ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
+        if bash -c "$(curl --insecure -fsSL ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
             INFO "安装完成！"
         else
             ERROR "安装失败！"
