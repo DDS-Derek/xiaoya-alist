@@ -197,6 +197,9 @@ Docker启动容器名称设置 -> 8 1
 - [Xiaoyahelper](https://github.com/DDS-Derek/xiaoya-alist/tree/master/xiaoyahelper): 一劳永逸的小雅转存清理工具
 - [Alist-TVBox](https://hub.docker.com/r/haroldli/alist-tvbox): 一个基于`AList`和`xiaoya`的`TVBox`管理工具
 - [`strm`文件生成](https://xiaoyaliu.notion.site/strm-2c8d136ceb37445fb6c0222eafb966ce): 小雅官方提供的一键生成`strm`文件脚本
+- [AI佬G脚本推荐](https://b23.tv/3Zo0IvD)
+  - [玩客云刷casaos小雅emby全家桶](https://b23.tv/KTIHxyT): `bash <(curl -sSLf https://xy.ggbond.org/xy/wky_xy_emby_ailg.sh)`
+  - 小雅jellyfin全家桶安装脚本: `bash <(curl -sSLf https://xy.ggbond.org/xy/xyjf_install.sh)`
 
 ## 感谢
 
