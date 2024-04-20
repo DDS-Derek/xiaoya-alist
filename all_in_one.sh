@@ -4119,6 +4119,37 @@ function main_auto_symlink() {
 
 }
 
+function main_casaos() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}CasaOS${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-2]:" num
+    case "$num" in
+    1)
+        clear
+        curl -fsSL https://get.casaos.io | sudo bash
+        ;;
+    2)
+        clear
+        casaos-uninstall
+        ;;
+    0)
+        clear
+        main_other_tools
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-2]'
+        main_casaos
+        ;;
+    esac
+
+}
+
 function init_container_name() {
 
     if [ ! -d ${DDSREM_CONFIG_DIR}/container_name ]; then
@@ -4386,9 +4417,10 @@ function main_other_tools() {
     echo -e "1、安装/更新/卸载 Portainer                   当前安装状态：$(judgment_container "${portainer_name}")"
     echo -e "2、安装/更新/卸载 Auto_Symlink                当前安装状态：$(judgment_container "${auto_symlink_name}")"
     echo -e "3、查看系统磁盘挂载"
+    echo -e "4、安装/卸载 CasaOS"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-3]:" num
+    read -erp "请输入数字 [0-4]:" num
     case "$num" in
     1)
         clear
@@ -4407,13 +4439,17 @@ function main_other_tools() {
         clear
         main_other_tools
         ;;
+    4)
+        clear
+        main_casaos
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-3]'
+        ERROR '请输入正确数字 [0-4]'
         main_other_tools
         ;;
     esac

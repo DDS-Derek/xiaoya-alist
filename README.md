@@ -72,6 +72,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 安装 Jellyfin全家桶（一键） -> 3 1
 安装 Resilio-Sync（单独） -> 2 5 1
 安装 Auto_Symlink -> 7 2 1
+安装 CasaOS -> 7 4 1
 ——————————————————————————————Emby手动全家桶配置————————————————————————————————————
 单独 下载并解压 全部元数据 -> 2 2 1
 单独 解压 全部元数据 -> 2 2 2
@@ -116,6 +117,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 卸载 Onelist -> 6 3
 卸载 Portainer -> 7 1 3
 卸载 Auto_Symlink -> 7 2 3
+卸载 CasaOS -> 7 4 2
 ——————————————————————————————————————系统工具——————————————————————————————————————
 查看系统磁盘挂载 -> 7 3
 ———————————————————————————————————————其他———————————————————————————————————————
