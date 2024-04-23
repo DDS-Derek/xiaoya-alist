@@ -252,9 +252,20 @@ delete_File(){
     return 0
 }
 
+get_docker_info(){
+    if [ "$1"x != x ];then
+        get_docker_info | awk '"'$1'"==$1'
+        return
+    fi
+    images=$(docker images --no-trunc)
+    for line in $(docker ps | tail -n +2 | grep -v "xiaoyakeeper" | awk '{print $NF}');do
+        id=$(docker inspect --format='{{.Image}}' $line | awk -F: '{print $2}')
+        echo "$line $(echo "$images" | grep $id | head -n 1)" | tr ':' ' ' | awk '{printf("%s %s %s\n",$1,$2,$5)}'
+    done
+}
+
 get_Xiaoya(){
-    #echo -e "$(docker ps --filter "ancestor=xiaoyaliu/alist:latest" --format '{{.Names}}')\n$(docker ps --filter "ancestor=xiaoyaliu/alist:hostmode" --format '{{.Names}}')"
-    docker ps | grep "xiaoyaliu/alist\|haroldli/xiaoya-tvbox\|ailg/alist" | grep -v "xiaoyakeeper" | awk '{print $NF}'
+    get_docker_info | grep "xiaoyaliu/alist\|haroldli/xiaoya-tvbox\|ailg/alist" | awk '{print $1}'
 }
 
 # 签到是抄小雅的
@@ -592,16 +603,21 @@ update_xiaoya(){
     para_v="$(docker inspect --format='{{range $v,$conf := .Mounts}}-v {{$conf.Source}}:{{$conf.Destination}} {{$conf.Type}}~{{end}}' $XIAOYA_NAME | tr '~' '\n' | grep bind | sed 's/bind//g' | grep -Eo "\-v .*:.*" | tr '\n' ' ')"
     para_n="$(docker inspect --format='{{range $m, $conf := .NetworkSettings.Networks}}--network={{$m}}{{end}}' $XIAOYA_NAME | grep -Eo "\-\-network=host")"
     para_p="$(docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}~{{$p}}{{$conf}} {{end}}' $XIAOYA_NAME | tr '~' '\n' | tr '/' ' ' | tr -d '[]{}' | awk '{printf("-p %s:%s\n",$3,$1)}' | grep -Eo "\-p [0-9]{1,10}:[0-9]{1,10}" | tr '\n' ' ')"
-    para_i="$(docker inspect --format='{{range $v, $conf := .Config}}{{if eq $v "Image"}}{{$conf}}{{end}}{{end}}' $XIAOYA_NAME)"
+    para_i="$(get_docker_info $XIAOYA_NAME | awk '{print $2}'):latest"
     para_e="$(docker inspect --format='{{range $p, $conf := .Config.Env}}~{{$conf}}{{end}}' $XIAOYA_NAME 2>/dev/null | sed '/^$/d' | tr '~' '\n' | sed '/^$/d' | awk '{printf("-e \"%s\"\n",$0)}' | tr '\n' ' ')"
-    if [ -n "$(docker pull "$para_i" 2>&1 | grep newer)" ];then
+    docker pull "$para_i" 2>&1
+    cur_image=$(get_docker_info $XIAOYA_NAME | awk '{print $3}')
+    latest_image=$(docker images --no-trunc | tail -n +2 | tr ':' ' ' | awk '{printf("%s:%s %s\n",$1,$2,$4)}' | grep "$para_i" | awk '{print $2}')
+    
+    if [ "$cur_image"x != "$latest_image"x ];then
     docker stop "$XIAOYA_NAME"
     docker rm -v "$XIAOYA_NAME"
     eval "$(echo docker run -d "$para_n" "$para_v" "$para_p" "$para_e" --restart=always --name="$XIAOYA_NAME" "$para_i")"
-    docker rmi -f $(docker images | grep "$(echo $para_i | awk -F: '{print $1}')" | grep none | grep -Eo "[0-9a-f]{6,128}")
-else
-    docker restart "$XIAOYA_NAME"
-fi
+    else
+        docker restart "$XIAOYA_NAME"
+    fi
+    
+    docker rmi -f $(docker images | grep "$(echo $para_i | awk -F: '{print $1}')" | grep none | grep -Eo "[0-9a-f]{6,128}") >/dev/null 2>&1
 }
 
 session="$((RANDOM%90000000+10000000))"
@@ -649,8 +665,8 @@ install_env(){
     
     #http://mirrors.ustc.edu.cn/alpine/v3.18/main
     #http://mirrors.ustc.edu.cn/alpine/v3.18/community
-    echo 'https://mirrors.nju.edu.cn/alpine/v3.18/main
-https://mirrors.nju.edu.cn/alpine/v3.18/community' > /etc/apk/repositories
+    #echo 'https://mirrors.nju.edu.cn/alpine/v3.18/main
+#https://mirrors.nju.edu.cn/alpine/v3.18/community' > /etc/apk/repositories
     
     if ! docker --help &>/dev/null;then
         apk add docker-cli
