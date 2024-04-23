@@ -68,9 +68,9 @@ fast_triger_update()
     fi
     fi
     
-    newsh=$(curl -k -s "$upgrade_url" 2>/dev/null)
+    newsh=$(curl --connect-timeout 5 -m 5 -k -s "$upgrade_url" 2>/dev/null)
     if [ -z "$(echo "$newsh" | grep "^#!/bin/bash")" ];then
-        newsh=$(curl -k -s "$upgrade_url_backup" 2>/dev/null)
+        newsh=$(curl --connect-timeout 5 -m 5 -k -s "$upgrade_url_backup" 2>/dev/null)
     fi
 latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
     if [ "$latest_ver"x = x ] || [ "$ver"x = "$latest_ver"x ];then
@@ -83,6 +83,15 @@ latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
     sleep 60
     #docker restart xiaoyakeeper
     exit 0
+}
+
+g_p=$@
+para(){
+    i=$(echo ~$1 | tr -d '~' | tr '-' '~')
+    if [ "$(echo ~$g_p | tr -d '~' | tr '-' '~' | grep -Eo "$i")"x = x ];then
+        return 1
+    fi
+    return 0
 }
 
 retry_command() {
@@ -116,9 +125,9 @@ retry_command() {
 
 #检查脚本更新
 if which curl &>/dev/null;then
-newsh=$(retry_command "curl -k -s \"$upgrade_url\" 2>/dev/null")
+newsh=$(retry_command "curl --connect-timeout 5 -m 5 -k -s \"$upgrade_url\" 2>/dev/null")
 if [ -z "$(echo "$newsh" | grep "^#!/bin/bash")" ];then
-    newsh=$(retry_command "curl -k -s \"$upgrade_url_backup\" 2>/dev/null")
+    newsh=$(retry_command "curl --connect-timeout 5 -m 5 -k -s \"$upgrade_url_backup\" 2>/dev/null")
 fi
 fi
 latest_ver=$(echo "$newsh" | grep "^ver=" | tr -d '"ver=')
@@ -148,7 +157,7 @@ fi
 fi
 
 get_Header(){
-    response=$(curl --connect-timeout 10 -m 10 -s -H "Content-Type: application/json" \
+    response=$(curl --connect-timeout 5 -m 5 -s -H "Content-Type: application/json" \
   -d '{"grant_type":"refresh_token", "refresh_token":"'$refresh_token'"}' \
   https://api.aliyundrive.com/v2/account/token)
 
@@ -160,7 +169,7 @@ get_Header(){
         return 1
     fi
     
-    response="$(curl --connect-timeout 10 -m 10 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{}' "https://user.aliyundrive.com/v2/user/get")"
+    response="$(curl --connect-timeout 5 -m 5 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{}' "https://user.aliyundrive.com/v2/user/get")"
     
     lagacy_drive_id=$(echo "$response" | sed -n 's/.*"default_drive_id":"\([^"]*\).*/\1/p')
     
@@ -189,7 +198,7 @@ get_rawList(){
     if [ -n "$1" ];then
         waittime="$1"
     fi
-    _res=$(curl --connect-timeout 10 -m 10 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{"drive_id": "'$drive_id'","parent_file_id": "'$file_id'"}' "https://api.aliyundrive.com/adrive/v2/file/list")
+    _res=$(curl --connect-timeout 5 -m 5 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{"drive_id": "'$drive_id'","parent_file_id": "'$file_id'"}' "https://api.aliyundrive.com/adrive/v2/file/list")
     if [ ! $? -eq 0 ] || [ -z "$(echo "$_res" | grep "items")" ];then
         echo "获取文件列表失败：folder_id=$file_id,drive_id=$drive_id" >&2
         return 1
@@ -209,7 +218,7 @@ get_List(){
 }
 
 get_Path(){
-    _path="$(curl -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d "{\"drive_id\": \"$drive_id\", \"file_id\": \"$file_id\"}" "https://api.aliyundrive.com/adrive/v1/file/get_path" | grep -o "\"name\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' | tr '\n' '/' | awk -F'/' '{for(i=NF-1;i>0;i--){printf("/%s",$i)}; printf("%s\n",$NF)}')"
+    _path="$(curl --connect-timeout 5 -m 5 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d "{\"drive_id\": \"$drive_id\", \"file_id\": \"$file_id\"}" "https://api.aliyundrive.com/adrive/v1/file/get_path" | grep -o "\"name\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' | tr '\n' '/' | awk -F'/' '{for(i=NF-1;i>0;i--){printf("/%s",$i)}; printf("%s\n",$NF)}')"
     if [ -z "$_path" ];then
         return 1
     fi
@@ -221,7 +230,7 @@ delete_File(){
     _file_id=$1
     _name="$(echo "$raw_list" | grep -o "\"name\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' | grep -n . | grep "^$(echo "$raw_list" | grep -o "\"file_id\":\"[^\"]*\"" | cut -d':' -f2- | tr -d '"' | grep -n . | grep "$_file_id" | awk -F: '{print $1}'):" | awk -F: '{print $2}')"
   
-    _res=$(curl --connect-timeout 10 -m 10 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{
+    _res=$(curl --connect-timeout 5 -m 5 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{
   "requests": [
     {
       "body": {
@@ -284,7 +293,7 @@ get_json_value(){
 }
 
 get_Reward(){
-    _res=$(curl -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{"signInDay": '$day'}' "https://member.aliyundrive.com/v1/activity/sign_in_reward?_rx-s=mobile" | grep "success") 
+    _res=$(curl --connect-timeout 5 -m 5 -s -H "$HEADER" -H "Content-Type: application/json" -X POST -d '{"signInDay": '$day'}' "https://member.aliyundrive.com/v1/activity/sign_in_reward?_rx-s=mobile" | grep "success") 
     if [ -z "$_res" ];then
         reurn 1
     fi
@@ -296,7 +305,7 @@ get_Reward(){
 
 checkin(){
     local _refresh_token=$1
-    local _token=$(curl -s  -X POST -H "Content-Type: application/json" -d '{"grant_type": "refresh_token", "refresh_token":                 "'"$_refresh_token"'"}' https://auth.aliyundrive.com/v2/account/token)
+    local _token=$(curl --connect-timeout 5 -m 5 -s  -X POST -H "Content-Type: application/json" -d '{"grant_type": "refresh_token", "refresh_token":                 "'"$_refresh_token"'"}' https://auth.aliyundrive.com/v2/account/token)
 local _access_token=$(get_json_value $_token "access_token")
 
     nick_name=$(get_json_value $_token "nick_name")
@@ -309,7 +318,7 @@ local _access_token=$(get_json_value $_token "access_token")
 
     HEADER="Authorization:Bearer $_access_token"
 
-    local _sign=$(curl -s -X POST -H "Content-Type: application/json" -H "$HEADER" -d '{"grant_type":           "refresh_token", "refresh_token": "'"$_refresh_token"'"}' https://member.aliyundrive.com/v1/activity/sign_in_list)
+    local _sign=$(curl --connect-timeout 5 -m 5 -s -X POST -H "Content-Type: application/json" -H "$HEADER" -d '{"grant_type":           "refresh_token", "refresh_token": "'"$_refresh_token"'"}' https://member.aliyundrive.com/v1/activity/sign_in_list)
     
     local _fmt_sign=$(echo "$_sign" | tr -d '\n' | sed 's/{"day"/\n{"day"/g' | tr -d ' ')
      
@@ -364,7 +373,7 @@ aliyun_update_checkin_single(){
     tokens="$(retry_command "read_File $1")"
     echo "$tokens" | sed '/^$/d' | while read token; do
         retry_command "checkin $token"
-        response=$(curl -s -H "Content-Type: application/json" \
+        response=$(curl --connect-timeout 5 -m 5 -s -H "Content-Type: application/json" \
         -d '{"grant_type":"refresh_token", "refresh_token":"'$token'"}' \
         https://api.aliyundrive.com/v2/account/token)
         new_refresh_token=$(echo "$response" | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
@@ -715,8 +724,12 @@ install_keeper(){
     
     #echo "$newsh" > "$XIAOYA_ROOT/aliyun_clear.sh"
     docker rm -f -v xiaoyakeeper >/dev/null 2>&1
-    docker run --name xiaoyakeeper --restart=always --network=host --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
-    docker run --name xiaoyakeeper --restart=always --network=host --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
+    network="--network=host"
+    if para -b;then
+        network=""
+    fi
+    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
+    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
     docker exec xiaoyakeeper touch /docker-entrypoint.sh
     docker exec xiaoyakeeper mkdir /etc/xiaoya
     #docker cp $XIAOYA_ROOT/aliyun_clear.sh xiaoyakeeper:/etc/xiaoya/aliyun_clear.sh
@@ -801,7 +814,7 @@ get_ChatId(){
     echo "请先发送验证码$code给机器人@xiaoyahelper_bot，发送成功后请敲回车键继续，不发验证码直接敲回车表示用上次验证的账号推送，如果从来没有验证过则不推送。请2分钟内完成，超时自动跳过。"
     sleep 2
     read -t 120 line
-    chat_id="$(curl -H "User-Agent: xiaoyapush" $tg_push_api_url/getUpdates -d "$code" 2>/dev/null | sed 's/{"message_id"/\n{"message_id"/g' | grep "$code" | grep -Eo '"id":[0-9]{1,20}' | tail -n 1 | tr -d '"' | awk -F: '{print $2}')"
+    chat_id="$(curl --connect-timeout 5 -m 5 -H "User-Agent: xiaoyapush" $tg_push_api_url/getUpdates -d "$code" 2>/dev/null | sed 's/{"message_id"/\n{"message_id"/g' | grep "$code" | grep -Eo '"id":[0-9]{1,20}' | tail -n 1 | tr -d '"' | awk -F: '{print $2}')"
     if [ -z "$chat_id" ];then
         return 0
     fi
@@ -827,7 +840,7 @@ push_msg(){
     fi
     text="$(echo "$@" | grep -v 'chat_id:')"
     if [ -n "$chat_id" ] && [ -n "$text" ];then
-        curl -s -X POST -H "User-Agent: xiaoyapush;ver=$ver" -H 'Content-Type: application/json' -d '{"chat_id": '$chat_id',"text": "'"$text"'"}' "$tg_push_api_url/sendMessage" &> /dev/null
+        curl --connect-timeout 5 -m 5 -s -X POST -H "User-Agent: xiaoyapush;ver=$ver" -H 'Content-Type: application/json' -d '{"chat_id": '$chat_id',"text": "'"$text"'"}' "$tg_push_api_url/sendMessage" &> /dev/null
     fi
 }
 
@@ -839,7 +852,7 @@ fi
 exec 6<>$tmp_fifofile
 rm -f $tmp_fifofile
 
-if [ "$2"x = "-tg"x ];then
+if para -tg;then
     get_ChatId
 fi
 
