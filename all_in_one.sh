@@ -658,6 +658,7 @@ function install_xiaoya_alist() {
                 --env no_proxy="*.aliyundrive.com" \
                 --network=host \
                 -v "${CONFIG_DIR}:/data" \
+                -v /tmp:/www/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
@@ -665,6 +666,7 @@ function install_xiaoya_alist() {
             docker run -itd \
                 --network=host \
                 -v "${CONFIG_DIR}:/data" \
+                -v /tmp:/www/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:hostmode
@@ -690,6 +692,7 @@ function install_xiaoya_alist() {
                 --env HTTPS_PROXY="$proxy_url" \
                 --env no_proxy="*.aliyundrive.com" \
                 -v "${CONFIG_DIR}:/data" \
+                -v /tmp:/www/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
@@ -699,11 +702,15 @@ function install_xiaoya_alist() {
                 -p 2345:2345 \
                 -p 2346:2346 \
                 -v "${CONFIG_DIR}:/data" \
+                -v /tmp:/www/data \
                 --restart=always \
                 --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
                 xiaoyaliu/alist:latest
         fi
     fi
+
+    wait_xiaoya_start
+
     INFO "安装完成！"
 
 }
