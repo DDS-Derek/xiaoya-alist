@@ -621,7 +621,7 @@ update_xiaoya() {
     if [ "$cur_image"x != "$latest_image"x ]; then
         docker stop "$XIAOYA_NAME"
         docker rm -v "$XIAOYA_NAME"
-        eval "$(echo docker run -d "$para_n" "$para_v" "$para_p" "$para_e" --restart=always --name="$XIAOYA_NAME" "$para_i")"
+        docker run -d "$para_n" "$para_v" "$para_p" "$para_e" --restart=always --name="$XIAOYA_NAME" "$para_i"
     else
         docker restart "$XIAOYA_NAME"
     fi
