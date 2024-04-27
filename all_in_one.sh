@@ -580,6 +580,10 @@ function install_xiaoya_alist() {
         fi
     fi
 
+    if [ ! -d "${CONFIG_DIR}/data" ]; then
+        mkdir -p "${CONFIG_DIR}/data"
+    fi
+
     if [ ! -f "${CONFIG_DIR}/mytoken.txt" ]; then
         touch ${CONFIG_DIR}/mytoken.txt
     fi
