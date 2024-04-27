@@ -42,10 +42,18 @@ base_urls=(
     "https://cors.zme.ink/https://raw.githubusercontent.com/xiaoyaliu00/data/main/"
 )
 
+
+if [ -z "${1}" ]; then
+    ERROR "请配置小雅Alist配置文件目录后重试！"
+    exit 1
+else
+    data_dir="${1}/data"
+fi
+
 for file in "${files[@]}"; do
     success=false
     for base_url in "${base_urls[@]}"; do
-        if curl --insecure -fsSL -o "/tmp/$file" "$base_url$file"; then
+        if curl --insecure -fsSL -o "${data_dir}/${file}" "${base_url}${file}"; then
             success=true
             INFO "$base_url$file 下载成功"
             break
