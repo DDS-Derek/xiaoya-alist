@@ -42,7 +42,6 @@ base_urls=(
     "https://cors.zme.ink/https://raw.githubusercontent.com/xiaoyaliu00/data/main/"
 )
 
-
 if [ -z "${1}" ]; then
     ERROR "请配置小雅Alist配置文件目录后重试！"
     exit 1
