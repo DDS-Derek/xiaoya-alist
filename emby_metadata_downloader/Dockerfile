@@ -9,9 +9,17 @@ RUN set -ex && \
         git \
         tini \
         tzdata && \
+    apk add --no-cache --virtual=build-dependencies \
+        build-base \
+        gcc \
+        g++ && \
     git clone -b main https://github.com/Rik-F5/xiaoya_db.git /app && \
     python3 -m pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /app/requirements.txt
+    pip install --no-cache-dir -r /app/requirements.txt && \
+    apk del --purge build-dependencies && \
+    rm -rf \
+        /root/.cache \
+        /tmp/*
 
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
