@@ -879,7 +879,7 @@ function main_xiaoya_alist() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、创建/删除 定时同步更新数据                 当前状态：$(judgment_xiaoya_alist_sync_data_status)"
+    echo -e "4、创建/删除 定时同步更新数据                  当前状态：$(judgment_xiaoya_alist_sync_data_status)"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-4]:" num
@@ -3435,6 +3435,105 @@ function judgment_xiaoya_notify_status() {
 
 }
 
+function install_xiaoya_emd() {
+
+    get_media_dir
+
+    while true; do
+        INFO "请输入您希望的爬虫同步间隔"
+        WARN "循环时间必须大于12h，为了减轻服务器压力，请用户理解！"
+        read -erp "请输入以小时为单位的正整数同步间隔时间（默认：12）：" sync_interval
+        [[ -z "${sync_interval}" ]] && sync_interval="12"
+        if [[ "$sync_interval" -ge 12 ]]; then
+            break
+        else
+            ERROR "输入错误，请重新输入。同步间隔时间必须为12以上的正整数。"
+        fi
+    done
+
+    cycle=$((sync_interval * 60 * 60))
+
+    if docker pull ddsderek/xiaoya-emd:latest; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
+        exit 1
+    fi
+
+    docker run -d \
+        --name=xiaoya-emd \
+        --restart=always \
+        --net=host \
+        -v "${MEDIA_DIR}/xiaoya:/media" \
+        -e CYCLE=${cycle} \
+        ddsderek/xiaoya-emd:latest \
+        --media /media
+
+    INFO "安装完成！"
+
+}
+
+function update_xiaoya_emd() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    container_update xiaoya-emd
+
+}
+
+function unisntall_xiaoya_emd() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载小雅元数据定时爬虫${Blue} $i ${Font}\r"
+        sleep 1
+    done
+
+    docker stop xiaoya-emd
+    docker rm xiaoya-emd
+    docker rmi ddsderek/xiaoya-emd:latest
+
+    INFO "小雅元数据定时爬虫卸载成功！"
+
+}
+
+function main_xiaoya_emd() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}小雅元数据定时爬虫${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-3]:" num
+    case "$num" in
+    1)
+        clear
+        install_xiaoya_emd
+        ;;
+    2)
+        clear
+        update_xiaoya_emd
+        ;;
+    3)
+        clear
+        unisntall_xiaoya_emd
+        ;;
+    0)
+        clear
+        main_xiaoya_all_emby
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-3]'
+        main_xiaoya_emd
+        ;;
+    esac
+
+}
+
 function uninstall_xiaoya_all_emby() {
 
     INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
@@ -3511,10 +3610,11 @@ function main_xiaoya_all_emby() {
     echo -e "6、立即同步小雅Emby config目录"
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
-    echo -e "9、卸载Emby全家桶"
+    echo -e "9、安装/更新/卸载 小雅元数据定时爬虫          当前安装状态：$(judgment_container xiaoya-emd)"
+    echo -e "10、卸载Emby全家桶"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-9]:" num
+    read -erp "请输入数字 [0-10]:" num
     case "$num" in
     1)
         clear
@@ -3606,6 +3706,10 @@ function main_xiaoya_all_emby() {
         ;;
     9)
         clear
+        main_xiaoya_emd
+        ;;
+    10)
+        clear
         uninstall_xiaoya_all_emby
         ;;
     0)
@@ -3614,7 +3718,7 @@ function main_xiaoya_all_emby() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-9]'
+        ERROR '请输入正确数字 [0-10]'
         main_xiaoya_all_emby
         ;;
     esac

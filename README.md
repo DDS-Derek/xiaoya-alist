@@ -73,6 +73,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 安装 Resilio-Sync（单独） -> 2 5 1
 安装 Auto_Symlink -> 7 2 1
 安装 CasaOS -> 7 4 1
+安装 小雅元数据定时爬虫 -> 2 9 1
 ——————————————————————————————Emby手动全家桶配置————————————————————————————————————
 单独 下载并解压 全部元数据 -> 2 2 1
 单独 解压 全部元数据 -> 2 2 2
@@ -107,9 +108,10 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 更新 Onelist -> 6 2
 更新 Portainer -> 7 1 2
 更新 Auto_Symlink -> 7 2 2
+更新 小雅元数据定时爬虫 -> 2 9 2
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 1 3
-卸载 Emby全家桶 -> 2 9
+卸载 Emby全家桶 -> 2 10
 卸载 卸载Jellyfin全家桶 -> 3 4
 卸载 Resilio-Sync（单独） -> 2 5 3
 卸载 小雅助手（xiaoyahelper）-> 4 3
@@ -118,6 +120,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 卸载 Portainer -> 7 1 3
 卸载 Auto_Symlink -> 7 2 3
 卸载 CasaOS -> 7 4 2
+卸载 小雅元数据定时爬虫 -> 2 9 3
 ——————————————————————————————————————系统工具——————————————————————————————————————
 查看系统磁盘挂载 -> 7 3
 ———————————————————————————————————————其他———————————————————————————————————————

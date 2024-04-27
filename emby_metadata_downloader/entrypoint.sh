@@ -21,11 +21,18 @@ function WARN() {
 
 cd /app || exit
 
-while true; do
-    INFO "开始下载同步！"
-    INFO "python3 solid.py $*"
-    python3 solid.py $@
-    INFO "运行完成！"
-    INFO "等待${CYCLE}秒后下次运行！"
-    sleep "${CYCLE}"
-done
+TWELVE_HOURS=$((12 * 60 * 60))
+
+if [ "$CYCLE" -lt "$TWELVE_HOURS" ]; then
+    WARN "您设置的循环时间小于12h，对于服务器压力过大，同步下载将不会运行！"
+    tail -f /dev/null
+else
+    while true; do
+        INFO "开始下载同步！"
+        INFO "python3 solid.py $*"
+        python3 solid.py $@
+        INFO "运行完成！"
+        INFO "等待${CYCLE}秒后下次运行！"
+        sleep "${CYCLE}"
+    done
+fi
