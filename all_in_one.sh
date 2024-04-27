@@ -785,6 +785,93 @@ function uninstall_xiaoya_alist() {
     INFO "小雅Alist卸载成功！"
 }
 
+function judgment_xiaoya_alist_sync_data_status() {
+
+    if command -v crontab > /dev/null 2>&1; then
+        if crontab -l | grep 'xiaoya_data_downloader' > /dev/null 2>&1; then
+            echo -e "${Green}已创建${Font}"
+        else
+            echo -e "${Red}未创建${Font}"
+        fi
+    elif [ -f /etc/synoinfo.conf ]; then
+        if grep 'xiaoya_data_downloader' /etc/crontab > /dev/null 2>&1; then
+            echo -e "${Green}已创建${Font}"
+        else
+            echo -e "${Red}未创建${Font}"
+        fi
+    else
+        echo -e "${Red}未知${Font}"
+    fi
+
+}
+
+function install_xiaoya_alist_sync_data() {
+
+    if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+        get_config_dir
+    fi
+
+    while true; do
+        INFO "请输入您希望的同步间隔"
+        read -erp "请输入以小时为单位的同步间隔时间（默认：5）：" sync_interval
+        [[ -z "${sync_interval}" ]] && sync_interval="5"
+        if [[ "$sync_interval" -gt 0 && "$sync_interval" -le 23 ]]; then
+            break
+        else
+            ERROR "输入错误，请重新输入。同步间隔时间必须为1到23之间的正整数。"
+        fi
+    done
+
+    bash -c "$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)" -s "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"
+
+    # 组合定时任务命令
+    CRON="0 */${sync_interval} * * *   bash -c \"\$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)\" -s \
+$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) >> \
+$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
+    if command -v crontab > /dev/null 2>&1; then
+        crontab -l | grep -v xiaoya_data_downloader > /tmp/cronjob.tmp
+        echo -e "${CRON}" >> /tmp/cronjob.tmp
+        crontab /tmp/cronjob.tmp
+        INFO '已经添加下面的记录到crontab定时任务'
+        INFO "${CRON}"
+        rm -rf /tmp/cronjob.tmp
+    elif [ -f /etc/synoinfo.conf ]; then
+        # 群晖单独支持
+        cp /etc/crontab /etc/crontab.bak
+        INFO "已创建/etc/crontab.bak备份文件"
+        sed -i '/xiaoya_data_downloader/d' /etc/crontab
+        echo -e "${CRON}" >> /etc/crontab
+        INFO '已经添加下面的记录到crontab定时任务'
+        INFO "${CRON}"
+    fi
+
+    if curl --insecure -fsSL http://172.17.0.1:5678/data/version.txt; then
+        echo "http://172.17.0.1:5678/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
+    elif curl --insecure -fsSL http://127.0.0.1:5678/data/version.txt; then
+        echo "http://127.0.0.1:5678/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
+    elif curl --insecure -fsSL http://127.0.0.1/data/version.txt; then
+        echo "http://127.0.0.1/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
+    else
+        WARN "程序自动编辑download_url.txt失败，请自行编辑${data_dir}/download_url.txt文件！"	 
+    fi
+
+    INFO "设置完成！"
+
+}
+
+function uninstall_xiaoya_alist_sync_data() {
+
+    if command -v crontab > /dev/null 2>&1; then
+        crontab -l > /tmp/cronjob.tmp
+        sed -i '/xiaoya_data_downloader/d' /tmp/cronjob.tmp
+        crontab /tmp/cronjob.tmp
+        rm -f /tmp/cronjob.tmp
+    elif [ -f /etc/synoinfo.conf ]; then
+        sed -i '/xiaoya_data_downloader/d' /etc/crontab
+    fi
+
+}
+
 function main_xiaoya_alist() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -792,9 +879,10 @@ function main_xiaoya_alist() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
+    echo -e "4、创建/删除 定时同步更新数据                 当前状态：$(judgment_xiaoya_alist_sync_data_status)"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-3]:" num
+    read -erp "请输入数字 [0-4]:" num
     case "$num" in
     1)
         clear
@@ -808,13 +896,45 @@ function main_xiaoya_alist() {
         clear
         uninstall_xiaoya_alist
         ;;
+    4)
+        clear
+        if command -v crontab > /dev/null 2>&1; then
+            if crontab -l | grep xiaoya_data_downloader > /dev/null 2>&1; then
+                for i in $(seq -w 3 -1 0); do
+                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    sleep 1
+                done
+                uninstall_xiaoya_alist_sync_data
+                clear
+                INFO "已删除"
+            else
+                install_xiaoya_alist_sync_data
+            fi
+        elif [ -f /etc/synoinfo.conf ]; then
+            if grep 'xiaoya_data_downloader' /etc/crontab > /dev/null 2>&1; then
+                for i in $(seq -w 3 -1 0); do
+                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    sleep 1
+                done
+                uninstall_xiaoya_alist_sync_data
+                clear
+                INFO "已删除"
+            else
+                install_xiaoya_alist_sync_data
+            fi
+        else
+            WARN "目前你的系统不支持脚本自动设置定时任务，请手动将以下命令添加到定时任务，并修改 xiaoya配置文件目录 ！"
+            WARN "bash -c \"\$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)\" -s xiaoya配置文件目录"
+            exit 0
+        fi
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-3]'
+        ERROR '请输入正确数字 [0-4]'
         main_xiaoya_alist
         ;;
     esac
