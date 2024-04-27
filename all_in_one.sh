@@ -548,6 +548,26 @@ function get_media_dir() {
 
 }
 
+function data_crep() { # container_run_extra_parameters
+
+    local MODE="${1}"
+    local DATA="${2}"
+    local DIR="${DDSREM_CONFIG_DIR}/data_crep"
+
+    if [ "${MODE}" == "read" ] || [ "${MODE}" == "r" ]; then
+        if [ -f "${DIR}/${DATA}.txt" ]; then
+            cat ${DIR}/${DATA}.txt | head -n1
+        else
+            echo "None"
+        fi
+    elif [ "${MODE}" == "write" ] || [ "${MODE}" == "w" ]; then
+        echo "${extra_parameters}" > ${DIR}/${DATA}.txt
+    else
+        return 1
+    fi
+
+}
+
 function install_xiaoya_alist() {
 
     get_config_dir
@@ -2588,9 +2608,18 @@ function install_emby_xiaoya_all_emby() {
         INFO "如果需要开启Emby硬件转码请先返回主菜单开启容器运行额外参数添加 -> 72"
         container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
         if [ "${container_run_extra_parameters}" == "true" ]; then
-            INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
-            read -erp "Extra parameters:" extra_parameters
-            [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
+            local RETURN_DATA
+            RETURN_DATA="$(data_crep "r" "install_xiaoya_emby")"
+            if [ "${RETURN_DATA}" == "None" ]; then
+                INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
+                read -erp "Extra parameters:" extra_parameters
+                [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
+                data_crep "write" "install_xiaoya_emby"
+            else
+                INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+                read -erp "Extra parameters:" extra_parameters
+                [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+            fi
         fi
 
         get_nsswitch_conf_path
@@ -2808,16 +2837,31 @@ function install_xiaoya_notify_cron() {
         auto_update_all_pikpak=no
     fi
 
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_notify_cron")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入其他参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+            data_crep "w" "install_xiaoya_notify_cron"
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
+    fi
+
     # 组合定时任务命令
     CRON="${minu} ${hour} */${sync_day} * *   bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh)\" -s \
 --auto_update_all_pikpak=${auto_update_all_pikpak} \
 --auto_update_config=${auto_update_config} \
---force_update_config=no \
 --media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
 --config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
 --emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 --resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
---xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) >> \
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+${extra_parameters} >> \
 $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
     if command -v crontab > /dev/null 2>&1; then
         crontab -l | grep -v sync_emby_config | grep -v xiaoya_notify > /tmp/cronjob.tmp
@@ -2845,12 +2889,12 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
         fi
         CRON_PARAMETERS="--auto_update_all_pikpak=${auto_update_all_pikpak} \
 --auto_update_config=${auto_update_config} \
---force_update_config=no \
 --media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
 --config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt) \
 --emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt) \
 --resilio_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt) \
---xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+--xiaoya_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt) \
+${extra_parameters}"
         docker run -itd \
             --name=xiaoya-cron \
             -e TZ=Asia/Shanghai \
@@ -2918,8 +2962,17 @@ function install_resilio() {
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
-        INFO "请输入其他参数（默认 无 ）"
-        read -erp "Extra parameters:" extra_parameters
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_resilio")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入其他参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+            data_crep "w" "install_xiaoya_resilio"
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
     fi
 
     INFO "是否自动配置系统 inotify watches & instances 的数值 [Y/n]（默认 Y）"
@@ -3117,9 +3170,14 @@ function main_resilio() {
 function once_sync_emby_config() {
 
     if command -v crontab > /dev/null 2>&1; then
-        COMMAND_1=$(crontab -l | grep 'xiaoya_notify' | sed 's/^.*-s//; s/>>.*$//' |
-            sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' |
-            sed 's/--force_update_config=no/--force_update_config=yes/g')
+        COMMAND_1=$(crontab -l | grep 'xiaoya_notify' | sed 's/^.*-s//; s/>>.*$//' | sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g')
+        if [[ $COMMAND_1 == *"--force_update_config"* ]]; then
+            if [[ $COMMAND_1 == *"--force_update_config=no"* ]]; then
+                COMMAND_1="${COMMAND_1/--force_update_config=no/--force_update_config=yes}"
+            fi
+        else
+            COMMAND_1="$COMMAND_1 --force_update_config=yes"
+        fi
         if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
@@ -3136,9 +3194,14 @@ function once_sync_emby_config() {
             COMMAND="bash -c \"\$(curl -k https://ddsrem.com/xiaoya/xiaoya_notify.sh | head -n -2 && echo detection_config_update)\" -s ${COMMAND_1}"
         fi
     elif [ -f /etc/synoinfo.conf ]; then
-        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' |
-            sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g' |
-            sed 's/--force_update_config=no/--force_update_config=yes/g')
+        COMMAND_1=$(grep 'xiaoya_notify' /etc/crontab | sed 's/^.*-s//; s/>>.*$//' | sed 's/--auto_update_all_pikpak=yes/--auto_update_all_pikpak=no/g')
+        if [[ $COMMAND_1 == *"--force_update_config"* ]]; then
+            if [[ $COMMAND_1 == *"--force_update_config=no"* ]]; then
+                COMMAND_1="${COMMAND_1/--force_update_config=no/--force_update_config=yes}"
+            fi
+        else
+            COMMAND_1="$COMMAND_1 --force_update_config=yes"
+        fi
         if [ -z "$COMMAND_1" ]; then
             get_config_dir
             get_media_dir
@@ -3649,8 +3712,17 @@ function install_xiaoya_alist_tvbox() {
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
-        INFO "请输入其他参数（默认 无 ）"
-        read -erp "Extra parameters:" extra_parameters
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_alist_tvbox")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入其他参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+            data_crep "w" "install_xiaoya_alist_tvbox"
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
     fi
 
     if ls ${CONFIG_DIR}/*.txt 1> /dev/null 2>&1; then
@@ -4552,6 +4624,10 @@ function first_init() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt ]; then
         echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
+    fi
+
+    if [ ! -d ${DDSREM_CONFIG_DIR}/data_crep ]; then
+        mkdir -p ${DDSREM_CONFIG_DIR}/data_crep
     fi
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
