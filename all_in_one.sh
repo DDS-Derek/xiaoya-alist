@@ -852,7 +852,7 @@ $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
     elif curl --insecure -fsSL http://127.0.0.1/data/version.txt; then
         echo "http://127.0.0.1/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
     else
-        WARN "程序自动编辑download_url.txt失败，请自行编辑${data_dir}/download_url.txt文件！"	 
+        WARN "程序自动编辑download_url.txt失败，请自行编辑${data_dir}/download_url.txt文件！"
     fi
 
     INFO "设置完成！"
