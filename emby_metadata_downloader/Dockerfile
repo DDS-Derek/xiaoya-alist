@@ -7,6 +7,7 @@ RUN set -ex && \
     apk add --no-cache \
         bash \
         git \
+        tini \
         tzdata && \
     git clone -b main https://github.com/Rik-F5/xiaoya_db.git /app && \
     python3 -m pip install --no-cache-dir --upgrade pip && \
@@ -14,6 +15,6 @@ RUN set -ex && \
 
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT ["tini", "-g", "--", "entrypoint.sh"]
 
 CMD ["--media", "/media"]
