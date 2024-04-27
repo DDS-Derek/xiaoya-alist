@@ -11,5 +11,6 @@ docker run -d \
     --net=host \
     -v 媒体库目录:/media \
     -e CYCLE=86400 \
-    ddsderek/xiaoya-emd:latest
+    ddsderek/xiaoya-emd:latest \
+    --media /media
 ```

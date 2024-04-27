@@ -16,4 +16,4 @@ COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-CMD ["--media", "/media", "--db", "true"]
+CMD ["--media", "/media"]
