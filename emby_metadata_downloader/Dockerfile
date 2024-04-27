@@ -15,6 +15,6 @@ RUN set -ex && \
 
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["tini", "-g", "--", "entrypoint.sh"]
+ENTRYPOINT ["tini", "-g", "--", "/entrypoint.sh"]
 
 CMD ["--media", "/media"]
