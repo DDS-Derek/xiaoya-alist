@@ -32,6 +32,40 @@ function ERROR() {
     echo -e "${Time} ${ERROR} ${1}"
 }
 
+function pull_run_glue() {
+
+    if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ ! "$local_sha" == "$remote_sha" ]; then
+            docker rmi xiaoyaliu/glue:latest
+            if docker pull xiaoyaliu/glue:latest; then
+                INFO "镜像拉取成功！"
+            else
+                ERROR "镜像拉取失败！"
+                exit 1
+            fi
+        fi
+    else
+        if docker pull xiaoyaliu/glue:latest; then
+            INFO "镜像拉取成功！"
+        else
+            ERROR "镜像拉取失败！"
+            exit 1
+        fi
+    fi
+
+    docker run -i \
+        --security-opt seccomp=unconfined \
+        --rm \
+        --net=host \
+        -e LANG=C.UTF-8 \
+        -v "${data_dir}:${data_dir}" \
+        xiaoyaliu/glue:latest \
+        "${@}"
+
+}
+
 files=(tvbox.zip update.zip index.zip version.txt)
 base_urls=(
     "https://gitlab.com/xiaoyaliu/data/-/raw/main/"
@@ -49,16 +83,14 @@ else
     data_dir="${1}/data"
 fi
 
-for file in "${files[@]}"; do
-    success=false
-    for base_url in "${base_urls[@]}"; do
-        if curl --insecure -fsSL -o "${data_dir}/${file}" "${base_url}${file}"; then
-            success=true
-            INFO "$base_url$file 下载成功"
-            break
-        fi
-    done
-    if [ "$success" = false ]; then
-        ERROR "$base_url$file 下载失败"
+for base_url in "${base_urls[@]}"; do
+    if pull_run_glue curl --insecure -fsSL "${base_url}version.txt"; then
+        available_url=${base_url}
+        break
     fi
+done
+
+for file in "${files[@]}"; do
+    pull_run_glue wget --no-check-certificate -nc -O "${data_dir}/${file}" "${available_url}${file}"
+    INFO "$available_url$file 更新成功"
 done
