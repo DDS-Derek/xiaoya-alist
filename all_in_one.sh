@@ -570,8 +570,6 @@ function data_crep() { # container_run_extra_parameters
 
 function install_xiaoya_alist() {
 
-    get_config_dir
-
     if [ ! -d "${CONFIG_DIR}" ]; then
         mkdir -p "${CONFIG_DIR}"
     else
@@ -661,8 +659,10 @@ function install_xiaoya_alist() {
     fi
     INFO "本地IP：${localip}"
 
-    INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
-    read -erp "NET_MODE:" NET_MODE
+    if [ "${SET_NET_MODE}" == true ]; then
+        INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
+        read -erp "NET_MODE:" NET_MODE
+    fi
     [[ -z "${NET_MODE}" ]] && NET_MODE="n"
     if [[ ${NET_MODE} == [Yy] ]]; then
         if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
@@ -849,14 +849,60 @@ $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
         INFO "${CRON}"
     fi
 
-    if curl --insecure -fsSL http://172.17.0.1:5678/data/version.txt; then
-        echo "http://172.17.0.1:5678/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
-    elif curl --insecure -fsSL http://127.0.0.1:5678/data/version.txt; then
-        echo "http://127.0.0.1:5678/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
-    elif curl --insecure -fsSL http://127.0.0.1/data/version.txt; then
-        echo "http://127.0.0.1/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
+    local net_mode
+    net_mode="$(docker inspect --format='{{range $m, $conf := .NetworkSettings.Networks}}{{$m}}{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
+    if [ "$net_mode"x = "bridge"x ]; then
+        echo "http://127.0.0.1:81/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
+    elif [ "$net_mode"x = "host"x ] ; then
+        echo "http://127.0.0.1:5233/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
     else
-        WARN "程序自动编辑download_url.txt失败，请自行编辑${data_dir}/download_url.txt文件！"
+        WARN "程序自动编辑download_url.txt失败，请自行编辑 $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/download_url.txt 文件！" 
+    fi
+
+    if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
+        if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
+            local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/alist:latest | cut -f2 -d:)
+            remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+            INFO "remote_sha: ${remote_sha}"
+            INFO "local_sha: ${local_sha}"
+            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
+                INFO "程序将更新小雅容器！"
+                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker rmi "${IMAGE_NAME}"
+                SET_NET_MODE=false
+                NET_MODE=n
+                install_xiaoya_alist
+            else
+                INFO "跳过小雅容器更新"
+                INFO "重启小雅容器使配置生效！"
+                docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                wait_xiaoya_start
+            fi
+        fi
+    elif docker inspect xiaoyaliu/alist:hostmode > /dev/null 2>&1; then
+        if docker inspect xiaoyaliu/alist:hostmode > /dev/null 2>&1; then
+            local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/alist:hostmode | cut -f2 -d:)
+            remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/hostmode" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+            INFO "remote_sha: ${remote_sha}"
+            INFO "local_sha: ${local_sha}"
+            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
+                INFO "程序将更新小雅容器！"
+                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                docker rmi "${IMAGE_NAME}"
+                SET_NET_MODE=false
+                NET_MODE=y
+                install_xiaoya_alist
+            else
+                INFO "跳过小雅容器更新"
+                INFO "重启小雅容器使配置生效！"
+                docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                wait_xiaoya_start
+            fi
+        fi
     fi
 
     INFO "设置完成！"
@@ -890,6 +936,8 @@ function main_xiaoya_alist() {
     case "$num" in
     1)
         clear
+        get_config_dir
+        SET_NET_MODE=true
         install_xiaoya_alist
         ;;
     2)
