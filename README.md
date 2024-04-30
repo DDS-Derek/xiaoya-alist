@@ -8,6 +8,9 @@
 
 ![](https://count.getloli.com/get/@DDS-Derek.xiaoya-alist.readme?theme=rule34)
 
+> [!IMPORTANT]
+> 脚本作者 DDSRem 维护精力有限，脚本更新速度将放缓！
+
 - [main.sh](#mainsh)
   - [使用](#使用)
   - [功能列表](#功能列表)
