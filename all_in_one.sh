@@ -853,10 +853,10 @@ $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
     net_mode="$(docker inspect --format='{{range $m, $conf := .NetworkSettings.Networks}}{{$m}}{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
     if [ "$net_mode"x = "bridge"x ]; then
         echo "http://127.0.0.1:81/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
-    elif [ "$net_mode"x = "host"x ] ; then
+    elif [ "$net_mode"x = "host"x ]; then
         echo "http://127.0.0.1:5233/data" > "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"/download_url.txt
     else
-        WARN "程序自动编辑download_url.txt失败，请自行编辑 $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/download_url.txt 文件！" 
+        WARN "程序自动编辑download_url.txt失败，请自行编辑 $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/download_url.txt 文件！"
     fi
 
     if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
