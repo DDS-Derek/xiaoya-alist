@@ -759,7 +759,7 @@ function uninstall_xiaoya_alist() {
         echo -en "即将开始卸载小雅Alist${Blue} $i ${Font}\r"
         sleep 1
     done
-    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)")"
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
     docker rmi "${IMAGE_NAME}"
@@ -867,7 +867,7 @@ $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
             INFO "local_sha: ${local_sha}"
             if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
                 INFO "程序将更新小雅容器！"
-                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
                 docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 docker rmi "${IMAGE_NAME}"
@@ -889,7 +889,7 @@ $(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)/data/cron.log 2>&1"
             INFO "local_sha: ${local_sha}"
             if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
                 INFO "程序将更新小雅容器！"
-                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
                 docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 docker rmi "${IMAGE_NAME}"
@@ -953,7 +953,7 @@ function main_xiaoya_alist() {
         if command -v crontab > /dev/null 2>&1; then
             if crontab -l | grep xiaoya_data_downloader > /dev/null 2>&1; then
                 for i in $(seq -w 3 -1 0); do
-                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    echo -en "即将删除同步定时任务${Blue} $i ${Font}\r"
                     sleep 1
                 done
                 uninstall_xiaoya_alist_sync_data
@@ -965,7 +965,7 @@ function main_xiaoya_alist() {
         elif [ -f /etc/synoinfo.conf ]; then
             if grep 'xiaoya_data_downloader' /etc/crontab > /dev/null 2>&1; then
                 for i in $(seq -w 3 -1 0); do
-                    echo -en "即将删除Emby config同步定时任务${Blue} $i ${Font}\r"
+                    echo -en "即将删除同步定时任务${Blue} $i ${Font}\r"
                     sleep 1
                 done
                 uninstall_xiaoya_alist_sync_data
@@ -3596,7 +3596,7 @@ function uninstall_xiaoya_all_emby() {
         echo -en "即将开始卸载小雅Emby全家桶${Blue} $i ${Font}\r"
         sleep 1
     done
-    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)")"
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
     docker rmi "${IMAGE_NAME}"
