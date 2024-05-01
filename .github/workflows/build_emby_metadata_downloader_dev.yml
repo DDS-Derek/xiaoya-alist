@@ -1,13 +1,7 @@
-name: emby metadata downloader
+name: emby metadata downloader dev
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "emby_metadata_downloader/**"
-      - ".github/workflows/build_emby_metadata_downloader.yml"
 
 jobs:
   build:
@@ -24,7 +18,7 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-emd
           tags: |
-            type=raw,value=latest
+            type=raw,value=beta
 
       -
         name: Set Up QEMU
@@ -52,17 +46,7 @@ jobs:
             linux/arm64/v8
             linux/arm/v7
           build-args: |
-            BRANCH=main
+            BRANCH=dev
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - 
-        name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-emd
-          short-description: 小雅Alist的相关周边
-          readme-filepath: ./emby_metadata_downloader/README.md

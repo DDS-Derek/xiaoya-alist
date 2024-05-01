@@ -3,6 +3,8 @@ FROM python:3.12-alpine3.19
 ENV TZ=Asia/Shanghai \
     CYCLE=86400
 
+ARG BRANCH
+
 RUN set -ex && \
     apk add --no-cache \
         bash \
@@ -13,7 +15,7 @@ RUN set -ex && \
         build-base \
         gcc \
         g++ && \
-    git clone -b main https://github.com/Rik-F5/xiaoya_db.git /app && \
+    git clone -b ${BRANCH} https://github.com/Rik-F5/xiaoya_db.git /app && \
     python3 -m pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt && \
     apk del --purge build-dependencies && \
