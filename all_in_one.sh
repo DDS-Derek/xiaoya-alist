@@ -3533,7 +3533,7 @@ function install_xiaoya_emd() {
             read -erp "Extra parameters:" extra_parameters
             data_crep "w" "install_xiaoya_resilio_2"
         else
-            INFO "已读取您上次设置的参数：${RETURN_DATA_2} (默认不更改回车继续，如果需要更改请输入新参数)"
+            INFO "已读取您上次设置的运行容器额外参数：${RETURN_DATA_2} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA_2}
         fi
