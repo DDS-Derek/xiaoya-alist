@@ -1,4 +1,4 @@
-name: emby metadata downloader dev
+name: emby metadata downloader beta
 
 on:
   workflow_dispatch:
@@ -46,7 +46,7 @@ jobs:
             linux/arm64/v8
             linux/arm/v7
           build-args: |
-            BRANCH=dev
+            BRANCH=beta
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
