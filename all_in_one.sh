@@ -3507,6 +3507,39 @@ function install_xiaoya_emd() {
 
     cycle=$((sync_interval * 60 * 60))
 
+    extra_parameters=
+    local RETURN_DATA
+    RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
+    if [ "${RETURN_DATA}" == "None" ]; then
+        INFO "请输入运行参数（默认 --media /media ）"
+        WARN "如果需要更改此设置请注意容器目录映射，默认媒体困路径映射到容器内的 /media 文件夹下！"
+        read -erp "Extra parameters:" extra_parameters
+        [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
+        data_crep "write" "install_xiaoya_emd"
+    else
+        INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+        read -erp "Extra parameters:" extra_parameters
+        [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+    fi
+    script_extra_parameters="${extra_parameters}"
+
+    extra_parameters=
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        local RETURN_DATA_2
+        RETURN_DATA_2="$(data_crep "r" "install_xiaoya_resilio_2")"
+        if [ "${RETURN_DATA_2}" == "None" ]; then
+            INFO "请输入运行容器额外参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+            data_crep "w" "install_xiaoya_resilio_2"
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA_2} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA_2}
+        fi
+    fi
+    run_extra_parameters="${extra_parameters}"
+
     if docker pull ddsderek/xiaoya-emd:latest; then
         INFO "镜像拉取成功！"
     else
@@ -3520,8 +3553,9 @@ function install_xiaoya_emd() {
         --net=host \
         -v "${MEDIA_DIR}/xiaoya:/media" \
         -e CYCLE=${cycle} \
+        ${run_extra_parameters} \
         ddsderek/xiaoya-emd:latest \
-        --media /media
+        ${script_extra_parameters}
 
     INFO "安装完成！"
 
