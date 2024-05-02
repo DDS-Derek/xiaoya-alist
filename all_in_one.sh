@@ -3504,8 +3504,26 @@ function install_xiaoya_emd() {
             ERROR "输入错误，请重新输入。同步间隔时间必须为12以上的正整数。"
         fi
     done
-
     cycle=$((sync_interval * 60 * 60))
+
+    while true; do
+        INFO "请选择镜像版本 [ 1；latest | 2；beta ]（默认 1）"
+        read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+        [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+        case ${CHOOSE_IMAGE_VERSION} in
+        1)
+            IMAGE_VERSION=latest
+            break
+            ;;
+        2)
+            IMAGE_VERSION=beta
+            break
+            ;;
+        *)
+            ERROR "输入无效，请重新选择"
+            ;;
+        esac
+    done
 
     extra_parameters=
     local RETURN_DATA
@@ -3540,7 +3558,7 @@ function install_xiaoya_emd() {
     fi
     run_extra_parameters="${extra_parameters}"
 
-    if docker pull ddsderek/xiaoya-emd:latest; then
+    if docker pull ddsderek/xiaoya-emd:${IMAGE_VERSION}; then
         INFO "镜像拉取成功！"
     else
         ERROR "镜像拉取失败！"
@@ -3554,7 +3572,7 @@ function install_xiaoya_emd() {
         -v "${MEDIA_DIR}/xiaoya:/media" \
         -e CYCLE=${cycle} \
         ${run_extra_parameters} \
-        ddsderek/xiaoya-emd:latest \
+        ddsderek/xiaoya-emd:${IMAGE_VERSION} \
         ${script_extra_parameters}
 
     INFO "安装完成！"
