@@ -3527,11 +3527,11 @@ function install_xiaoya_emd() {
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         local RETURN_DATA_2
-        RETURN_DATA_2="$(data_crep "r" "install_xiaoya_resilio_2")"
+        RETURN_DATA_2="$(data_crep "r" "install_xiaoya_emd_2")"
         if [ "${RETURN_DATA_2}" == "None" ]; then
             INFO "请输入运行容器额外参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_resilio_2"
+            data_crep "w" "install_xiaoya_emd_2"
         else
             INFO "已读取您上次设置的运行容器额外参数：${RETURN_DATA_2} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
