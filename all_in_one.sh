@@ -2723,6 +2723,14 @@ function install_emby_xiaoya_all_emby() {
         exit 1
     fi
 
+    if [ -f "${MEDIA_DIR}/config/data/device.txt" ]; then
+        INFO "检测到存在 device.txt 文件！"
+        if grep -q "1999bfd1661041cd85ff5e260bc04c06" ${MEDIA_DIR}/config/data/device.txt; then
+            INFO "删除 device.txt 文件中..."
+            rm -f ${MEDIA_DIR}/config/data/device.txt
+        fi
+    fi
+
     XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
     if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
         source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
