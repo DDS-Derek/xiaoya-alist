@@ -3538,7 +3538,7 @@ function install_xiaoya_emd() {
     RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
     if [ "${RETURN_DATA}" == "None" ]; then
         INFO "请输入运行参数（默认 --media /media ）"
-        WARN "如果需要更改此设置请注意容器目录映射，默认媒体困路径映射到容器内的 /media 文件夹下！"
+        WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
         read -erp "Extra parameters:" extra_parameters
         [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
         data_crep "write" "install_xiaoya_emd"
