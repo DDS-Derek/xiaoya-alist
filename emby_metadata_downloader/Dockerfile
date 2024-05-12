@@ -1,9 +1,12 @@
 FROM python:3.12-alpine3.19
 
-ENV TZ=Asia/Shanghai \
-    CYCLE=86400
-
 ARG BRANCH
+
+ENV TZ=Asia/Shanghai \
+    CYCLE=86400 \
+    BRANCH=${BRANCH} \
+    REPO_URL="https://github.com/Rik-F5/xiaoya_db.git" \
+    RESTART_AUTO_UPDATE=false
 
 RUN set -ex && \
     apk add --no-cache \
@@ -15,7 +18,9 @@ RUN set -ex && \
         build-base \
         gcc \
         g++ && \
-    git clone -b ${BRANCH} https://github.com/Rik-F5/xiaoya_db.git /app && \
+    mkdir /app && \
+    git config --global --add safe.directory /app && \
+    git clone -b ${BRANCH} ${REPO_URL} /app && \
     python3 -m pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt && \
     apk del --purge build-dependencies && \

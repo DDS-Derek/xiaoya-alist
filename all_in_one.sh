@@ -3515,6 +3515,16 @@ function install_xiaoya_emd() {
     done
     cycle=$((sync_interval * 60 * 60))
 
+    INFO "是否开启重启容器自动更新到最新程序 [Y/n]（默认 n 不开启）"
+    WARN "需要拥有良好的上网环境才可以更新成功，要能访问 Github 和 Python PIP 库！"
+    read -erp "RESTART_AUTO_UPDATE:" RESTART_AUTO_UPDATE
+    [[ -z "${RESTART_AUTO_UPDATE}" ]] && TG="n"
+    if [[ ${RESTART_AUTO_UPDATE} == [Yy] ]]; then
+        RESTART_AUTO_UPDATE=true
+    else
+        RESTART_AUTO_UPDATE=false
+    fi
+
     while true; do
         INFO "请选择镜像版本 [ 1；latest | 2；beta ]（默认 1）"
         read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
@@ -3579,7 +3589,8 @@ function install_xiaoya_emd() {
         --restart=always \
         --net=host \
         -v "${MEDIA_DIR}/xiaoya:/media" \
-        -e CYCLE=${cycle} \
+        -e "CYCLE=${cycle}" \
+        -e "RESTART_AUTO_UPDATE=${RESTART_AUTO_UPDATE}" \
         ${run_extra_parameters} \
         ddsderek/xiaoya-emd:${IMAGE_VERSION} \
         ${script_extra_parameters}

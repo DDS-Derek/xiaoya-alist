@@ -19,6 +19,22 @@ function WARN() {
     echo -e "${WARN} ${1}"
 }
 
+function update_app() {
+
+    cd /app || exit
+    echo "Update xiaoya_db script..."
+    git remote set-url origin "${REPO_URL}"
+    git fetch --all
+    git reset --hard "origin/${BRANCH}"
+    pip install --upgrade pip
+    pip install -r /app/requirements.txt
+
+}
+
+if [ "${RESTART_AUTO_UPDATE}" == "true" ]; then
+    update_app
+fi
+
 cd /app || exit
 
 TWELVE_HOURS=$((12 * 60 * 60))
