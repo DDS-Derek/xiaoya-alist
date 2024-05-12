@@ -2970,6 +2970,7 @@ function install_xiaoya_notify_cron() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
         INFO "请输入Resilio-Sync配置文件目录"
+        WARN "注意：Resilio-Sync 并且必须安装，本次获取目录只用于存放日志文件！"
         read -erp "CONFIG_DIR:" CONFIG_DIR
         touch ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt
