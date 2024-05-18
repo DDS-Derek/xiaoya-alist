@@ -40,7 +40,7 @@ function mount_img() {
         umount /volume_img
         wait ${!}
     fi
-    mount -o loop /media.img /volume_img
+    mount -o loop,offset=10000000 /media.img /volume_img
     INFO "img 镜像挂载成功！"
 
 }
