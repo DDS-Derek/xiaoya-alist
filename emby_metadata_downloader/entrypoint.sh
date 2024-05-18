@@ -31,8 +31,26 @@ function update_app() {
 
 }
 
+function mount_img() {
+
+    if [ ! -d /volume_img ]; then
+        mkdir /volume_img
+    fi
+    if grep -qs '/volume_img' /proc/mounts; then
+        umount /volume_img
+        wait ${!}
+    fi
+    mount -o loop /media.img /volume_img
+    INFO "img 镜像挂载成功！"
+
+}
+
 if [ "${RESTART_AUTO_UPDATE}" == "true" ]; then
     update_app
+fi
+
+if [ -f /media.img ]; then
+    mount_img
 fi
 
 cd /app || exit
