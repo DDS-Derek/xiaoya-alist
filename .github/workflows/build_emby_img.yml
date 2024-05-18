@@ -1,0 +1,183 @@
+name: embyserver img
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 */6 * *'
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.platforms.outputs.matrix }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Create matrix
+        id: platforms
+        run: |
+            if [[ "${{ github.event_name }}" == "schedule" ]]; then
+                echo "matrix=[\"latest\"]" >> $GITHUB_OUTPUT
+            else
+            echo "matrix=$(cat emby_img/matrix.txt)" >> $GITHUB_OUTPUT
+            fi
+      -
+        name: Show matrix
+        run: |
+            echo ${{ steps.platforms.outputs.matrix }}
+
+  amd64_emby:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-embyserver-img
+          tags: |
+            type=raw,value=${{ matrix.version }}
+
+      -
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      -
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      -
+        name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      -
+        name: Build Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./emby_img
+          file: emby_img/Dockerfile
+          platforms: |
+            linux/amd64
+          build-args: |
+            EMBY_VERSION=${{ matrix.version }}
+            EMBY_IMAGE=emby/embyserver
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  arm64v8_emby:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-embyserver_arm64v8-img
+          tags: |
+            type=raw,value=${{ matrix.version }}
+
+      -
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      -
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      -
+        name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      -
+        name: Build Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./emby_img
+          file: emby_img/Dockerfile
+          platforms: |
+            linux/amd64
+          build-args: |
+            EMBY_VERSION=${{ matrix.version }}
+            EMBY_IMAGE=emby/embyserver_arm64v8
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  arm32v7_emby:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-embyserver_arm32v7-img
+          tags: |
+            type=raw,value=${{ matrix.version }}
+
+      -
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      -
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      -
+        name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      -
+        name: Build Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./emby_img
+          file: emby_img/Dockerfile
+          platforms: |
+            linux/amd64
+          build-args: |
+            EMBY_VERSION=${{ matrix.version }}
+            EMBY_IMAGE=emby/embyserver_arm32v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
