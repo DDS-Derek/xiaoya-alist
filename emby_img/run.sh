@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/with-contenv sh
 # shellcheck shell=sh
 # shellcheck disable=SC2114
 
