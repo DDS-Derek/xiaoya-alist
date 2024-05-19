@@ -395,6 +395,20 @@ function judgment_container() {
 
 }
 
+function return_menu() {
+
+    INFO "是否返回菜单继续配置 [Y/n]（默认 n 退出脚本）"
+    read -erp "RETURN_MENU:" __RETURN_MENU
+    [[ -z "${__RETURN_MENU}" ]] && __RETURN_MENU="n"
+    if [[ ${__RETURN_MENU} == [Yy] ]]; then
+        clear
+        "${@}"
+    else
+        exit 0
+    fi
+
+}
+
 function container_update() {
 
     if ! docker inspect containrrr/watchtower:latest > /dev/null 2>&1; then
@@ -941,14 +955,17 @@ function main_xiaoya_alist() {
         get_config_dir
         SET_NET_MODE=true
         install_xiaoya_alist
+        return_menu "main_xiaoya_alist"
         ;;
     2)
         clear
         update_xiaoya_alist
+        return_menu "main_xiaoya_alist"
         ;;
     3)
         clear
         uninstall_xiaoya_alist
+        return_menu "main_xiaoya_alist"
         ;;
     4)
         clear
@@ -981,6 +998,7 @@ function main_xiaoya_alist() {
             WARN "bash -c \"\$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)\" -s xiaoya配置文件目录"
             exit 0
         fi
+        return_menu "main_xiaoya_alist"
         ;;
     0)
         clear
@@ -1639,10 +1657,12 @@ function main_download_unzip_xiaoya_emby() {
         else
             download_unzip_xiaoya_all_emby
         fi
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     2)
         clear
         unzip_xiaoya_all_emby
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     3)
         clear
@@ -1651,14 +1671,17 @@ function main_download_unzip_xiaoya_emby() {
         else
             download_xiaoya_emby "all.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     4)
         clear
         unzip_xiaoya_emby "all.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     5)
         clear
         unzip_appoint_xiaoya_emby "all.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     6)
         clear
@@ -1667,10 +1690,12 @@ function main_download_unzip_xiaoya_emby() {
         else
             download_xiaoya_emby "config.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     7)
         clear
         unzip_xiaoya_emby "config.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     8)
         clear
@@ -1679,10 +1704,12 @@ function main_download_unzip_xiaoya_emby() {
         else
             download_xiaoya_emby "pikpak.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     9)
         clear
         unzip_xiaoya_emby "pikpak.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
         ;;
     10)
         if [ "${__data_downloader}" == "wget" ]; then
@@ -2255,10 +2282,12 @@ function main_download_unzip_xiaoya_jellyfin() {
         else
             download_unzip_xiaoya_all_jellyfin
         fi
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     2)
         clear
         unzip_xiaoya_all_jellyfin
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     3)
         clear
@@ -2267,14 +2296,17 @@ function main_download_unzip_xiaoya_jellyfin() {
         else
             download_xiaoya_jellyfin "all_jf.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     4)
         clear
         unzip_xiaoya_jellyfin "all_jf.mp4"
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     5)
         clear
         unzip_appoint_xiaoya_jellyfin "all_jf.mp4"
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     6)
         clear
@@ -2283,10 +2315,12 @@ function main_download_unzip_xiaoya_jellyfin() {
         else
             download_xiaoya_jellyfin "config_jf.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     7)
         clear
         unzip_xiaoya_jellyfin "config_jf.mp4"
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     8)
         clear
@@ -2295,10 +2329,12 @@ function main_download_unzip_xiaoya_jellyfin() {
         else
             download_xiaoya_jellyfin "PikPak_jf.mp4"
         fi
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     9)
         clear
         unzip_xiaoya_jellyfin "PikPak_jf.mp4"
+        return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     10)
         if [ "${__data_downloader}" == "wget" ]; then
@@ -3328,14 +3364,17 @@ function main_resilio() {
     1)
         clear
         install_resilio
+        return_menu "main_resilio"
         ;;
     2)
         clear
         update_resilio
+        return_menu "main_resilio"
         ;;
     3)
         clear
         unisntall_resilio
+        return_menu "main_resilio"
         ;;
     0)
         clear
@@ -3638,14 +3677,17 @@ function main_xiaoya_emd() {
     1)
         clear
         install_xiaoya_emd
+        return_menu "main_xiaoya_emd"
         ;;
     2)
         clear
         update_xiaoya_emd
+        return_menu "main_xiaoya_emd"
         ;;
     3)
         clear
         unisntall_xiaoya_emd
+        return_menu "main_xiaoya_emd"
         ;;
     0)
         clear
@@ -3761,6 +3803,7 @@ function main_xiaoya_all_emby() {
             fi
         fi
         INFO "Emby 全家桶安装完成！ "
+        return_menu "main_xiaoya_all_emby"
         ;;
     2)
         clear
@@ -3771,10 +3814,12 @@ function main_xiaoya_all_emby() {
         get_config_dir
         get_media_dir
         install_emby_xiaoya_all_emby
+        return_menu "main_xiaoya_all_emby"
         ;;
     4)
         clear
         docker_address_xiaoya_all_emby
+        return_menu "main_xiaoya_all_emby"
         ;;
     5)
         clear
@@ -3823,6 +3868,7 @@ function main_xiaoya_all_emby() {
                 install_xiaoya_notify_cron
             fi
         fi
+        return_menu "main_xiaoya_all_emby"
         ;;
     8)
         clear
@@ -3872,6 +3918,7 @@ function main_xiaoya_all_jellyfin() {
         download_unzip_xiaoya_all_jellyfin
         install_jellyfin_xiaoya_all_jellyfin
         INFO "Jellyfin 全家桶安装完成！ "
+        return_menu "main_xiaoya_all_jellyfin"
         ;;
     2)
         clear
@@ -3882,10 +3929,12 @@ function main_xiaoya_all_jellyfin() {
         get_config_dir
         get_media_dir
         install_jellyfin_xiaoya_all_jellyfin
+        return_menu "main_xiaoya_all_jellyfin"
         ;;
     4)
         clear
         uninstall_xiaoya_all_jellyfin
+        return_menu "main_xiaoya_all_jellyfin"
         ;;
     0)
         clear
@@ -3931,14 +3980,14 @@ function install_xiaoyahelper() {
 
     XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
     if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
-        exit 0
+        return 0
     fi
     XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
     if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
-        exit 0
+        return 0
     fi
     ERROR "安装失败！"
-    exit 1
+    return 1
 
 }
 
@@ -4010,6 +4059,7 @@ function main_xiaoyahelper() {
     1)
         clear
         install_xiaoyahelper
+        return_menu "main_xiaoyahelper"
         ;;
     2)
         clear
@@ -4018,6 +4068,7 @@ function main_xiaoyahelper() {
     3)
         clear
         uninstall_xiaoyahelper
+        return_menu "main_xiaoyahelper"
         ;;
     0)
         clear
@@ -4168,14 +4219,17 @@ function main_xiaoya_alist_tvbox() {
     1)
         clear
         install_xiaoya_alist_tvbox
+        return_menu "main_xiaoya_alist_tvbox"
         ;;
     2)
         clear
         update_xiaoya_alist_tvbox
+        return_menu "main_xiaoya_alist_tvbox"
         ;;
     3)
         clear
         uninstall_xiaoya_alist_tvbox
+        return_menu "main_xiaoya_alist_tvbox"
         ;;
     0)
         clear
@@ -4280,14 +4334,17 @@ function main_onelist() {
     1)
         clear
         install_onelist
+        return_menu "main_onelist"
         ;;
     2)
         clear
         update_onelist
+        return_menu "main_onelist"
         ;;
     3)
         clear
         uninstall_onelist
+        return_menu "main_onelist"
         ;;
     0)
         clear
@@ -4399,14 +4456,17 @@ function main_portainer() {
     1)
         clear
         install_portainer
+        return_menu "main_portainer"
         ;;
     2)
         clear
         update_portainer
+        return_menu "main_portainer"
         ;;
     3)
         clear
         uninstall_portainer
+        return_menu "main_portainer"
         ;;
     0)
         clear
@@ -4526,14 +4586,17 @@ function main_auto_symlink() {
     1)
         clear
         install_auto_symlink
+        return_menu "main_auto_symlink"
         ;;
     2)
         clear
         update_auto_symlink
+        return_menu "main_auto_symlink"
         ;;
     3)
         clear
         uninstall_auto_symlink
+        return_menu "main_auto_symlink"
         ;;
     0)
         clear
@@ -4561,10 +4624,12 @@ function main_casaos() {
     1)
         clear
         curl -fsSL https://get.casaos.io | sudo bash
+        return_menu "main_casaos"
         ;;
     2)
         clear
         casaos-uninstall
+        return_menu "main_casaos"
         ;;
     0)
         clear
@@ -4742,7 +4807,7 @@ function reset_script_configuration() {
         clear
         main
     else
-        exit 0
+        return 0
     fi
 
 }
@@ -4803,6 +4868,7 @@ function main_advanced_configuration() {
     3)
         clear
         reset_script_configuration
+        return_menu "main_advanced_configuration"
         ;;
     4)
         if [ "${__disk_capacity_detection}" == "true" ]; then
