@@ -51,6 +51,7 @@ fi
 
 if [ -f "${data_dir}/version.txt" ]; then
     OLD_VERSION=$(cat "${data_dir}"/version.txt)
+    INFO "本地数据版本：${OLD_VERSION}"
 else
     OLD_VERSION=none
 fi
@@ -59,6 +60,7 @@ for base_url in "${base_urls[@]}"; do
     if curl --insecure -fsSL -o "${data_dir}/version.txt" "${base_url}version.txt"; then
         available_url=${base_url}
         NEW_VERSION=$(cat "${data_dir}"/version.txt)
+        INFO "远端数据版本：${NEW_VERSION}"
         break
     fi
 done
