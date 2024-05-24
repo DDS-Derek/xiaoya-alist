@@ -45,8 +45,13 @@ function mount_img() {
         sleep 30
     done
     if [ -d /media ]; then
-        if ! rm -rf /media; then
-            echo '删除 /media 失败！使用老G速装版emby请勿将任何目录挂载到容器的 /media 目录！程序退出！'
+        if [ -z "$(ls -A /media)" ]; then
+            if ! rm -rf /media; then
+                ERROR '删除 /media 失败！使用老G速装版emby请勿将任何目录挂载到容器的 /media 目录！程序退出！'
+                exit 1
+            fi
+        else
+            ERROR '/media 文件夹不为空！使用老G速装版emby请勿将任何目录挂载到容器的 /media 目录！程序退出！'
             exit 1
         fi
     fi
