@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck shell=bash
 # shellcheck disable=SC2068
+# shellcheck disable=SC2114
 
 Green="\033[32m"
 Red="\033[31m"
@@ -33,18 +34,24 @@ function update_app() {
 
 function mount_img() {
 
-    chmod 777 /media.img
     if [ ! -d /volume_img ]; then
         mkdir /volume_img
     fi
-    if grep -qs '/volume_img' /proc/mounts; then
-        umount /volume_img
-        wait ${!}
+    while true; do
+        if mount /dev/loop10 /volume_img; then
+            INFO "img 镜像挂载成功！"
+            break
+        fi
+        sleep 30
+    done
+    if [ -d /media ]; then
+        if ! rm -rf /media; then
+            echo '删除 /media 失败！使用老G速装版emby请勿将任何目录挂载到容器的 /media 目录！程序退出！'
+            exit 1
+        fi
     fi
-    losetup -o 10000000 /dev/loop10 /media.img
-    mount /dev/loop10 /volume_img
-    wait ${!}
-    INFO "img 镜像挂载成功！"
+	ln -sf /volume_img/xiaoya /media
+	INFO "/media 创建软链接成功！"
 
 }
 
@@ -52,7 +59,7 @@ if [ "${RESTART_AUTO_UPDATE}" == "true" ]; then
     update_app
 fi
 
-if [ -f /media.img ]; then
+if [ "${IMG_VOLUME}" == "true" ]; then
     mount_img
 fi
 
