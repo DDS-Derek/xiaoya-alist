@@ -32,7 +32,7 @@ function ERROR() {
     echo -e "${Time} ${ERROR} ${1}"
 }
 
-files=(tvbox.zip update.zip index.zip version.txt)
+files=(tvbox.zip update.zip index.zip)
 base_urls=(
     "https://gitlab.com/xiaoyaliu/data/-/raw/main/"
     "https://raw.githubusercontent.com/xiaoyaliu00/data/main/"
@@ -49,17 +49,24 @@ else
     data_dir="${1}/data"
 fi
 
+OLD_VERSION=$(cat "${data_dir}"/version.txt)
+
 for base_url in "${base_urls[@]}"; do
-    if curl --insecure -fsSL "${base_url}version.txt"; then
+    if curl --insecure -fsSL -o "${data_dir}/version.txt" "${base_url}version.txt"; then
         available_url=${base_url}
+        NEW_VERSION=$(cat "${data_dir}"/version.txt)
         break
     fi
 done
 
-for file in "${files[@]}"; do
-    if curl --insecure -fsSL -o "${data_dir}/${file}" "${available_url}${file}"; then
-        INFO "$available_url$file 更新成功！"
-    else
-        ERROR "$available_url$file 更新失败！"
-    fi
-done
+if [ "${OLD_VERSION}" == "${NEW_VERSION}" ]; then
+    for file in "${files[@]}"; do
+        if curl --insecure -fsSL -o "${data_dir}/${file}" "${available_url}${file}"; then
+            INFO "$available_url$file 更新成功！"
+        else
+            ERROR "$available_url$file 更新失败！"
+        fi
+    done
+else
+    INFO "无需更新，跳过下载！"
+fi
