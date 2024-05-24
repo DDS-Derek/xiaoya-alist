@@ -33,6 +33,7 @@ function update_app() {
 
 function mount_img() {
 
+    chmod 777 /media.img
     if [ ! -d /volume_img ]; then
         mkdir /volume_img
     fi
@@ -40,7 +41,9 @@ function mount_img() {
         umount /volume_img
         wait ${!}
     fi
-    mount -o loop,offset=10000000 /media.img /volume_img
+    losetup -o 10000000 /dev/loop10 /media.img
+    mount /dev/loop10 /volume_img
+    wait ${!}
     INFO "img 镜像挂载成功！"
 
 }
