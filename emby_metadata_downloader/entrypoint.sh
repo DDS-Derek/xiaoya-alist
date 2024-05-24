@@ -50,8 +50,8 @@ function mount_img() {
             exit 1
         fi
     fi
-	ln -sf /volume_img/xiaoya /media
-	INFO "/media 创建软链接成功！"
+    ln -sf /volume_img/xiaoya /media
+    INFO "/media 创建软链接成功！"
 
 }
 
