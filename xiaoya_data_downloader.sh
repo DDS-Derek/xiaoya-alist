@@ -49,7 +49,11 @@ else
     data_dir="${1}/data"
 fi
 
-OLD_VERSION=$(cat "${data_dir}"/version.txt)
+if [ -f "${data_dir}/version.txt" ]; then
+    OLD_VERSION=$(cat "${data_dir}"/version.txt)
+else
+    OLD_VERSION=none
+fi
 
 for base_url in "${base_urls[@]}"; do
     if curl --insecure -fsSL -o "${data_dir}/version.txt" "${base_url}version.txt"; then
@@ -59,7 +63,7 @@ for base_url in "${base_urls[@]}"; do
     fi
 done
 
-if [ "${OLD_VERSION}" == "${NEW_VERSION}" ]; then
+if [ "${OLD_VERSION}" != "${NEW_VERSION}" ]; then
     for file in "${files[@]}"; do
         if curl --insecure -fsSL -o "${data_dir}/${file}" "${available_url}${file}"; then
             INFO "$available_url$file 更新成功！"
