@@ -38,7 +38,7 @@ function mount_img() {
         mkdir /volume_img
     fi
     while true; do
-        if mount /dev/loop10 /volume_img; then
+        if mount /dev/loop7 /volume_img; then
             INFO "img 镜像挂载成功！"
             break
         fi
