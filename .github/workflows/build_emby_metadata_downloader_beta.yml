@@ -2,6 +2,12 @@ name: emby metadata downloader beta
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "emby_metadata_downloader/**"
+      - ".github/workflows/build_emby_metadata_downloader.yml"
 
 jobs:
   build:
