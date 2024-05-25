@@ -1228,13 +1228,19 @@ function unzip_xiaoya_emby() {
 
 }
 
-function unzip_appoint_xiaoya_emby() {
+function unzip_appoint_xiaoya_emby_jellyfin() {
+
+    if [ "${2}" == "emby" ]; then
+        file_name="all.mp4"
+    elif [ "${2}" == "jellyfin" ]; then
+        file_name="all_jf.mp4"
+    fi
 
     get_config_dir
 
     get_media_dir
 
-    if [ "${1}" == "all.mp4" ]; then
+    if [ "${1}" == "${file_name}" ]; then
         INFO "请选择要解压的压缩包目录 [ 1:动漫 | 2:每日更新 | 3:电影 | 4:电视剧 | 5:纪录片 | 6:纪录片（已刮削）| 7:综艺 ]"
         valid_choice=false
         while [ "$valid_choice" = false ]; do
@@ -1293,18 +1299,18 @@ function unzip_appoint_xiaoya_emby() {
 
     start_time1=$(date +%s)
 
-    if [ "${1}" == "all.mp4" ]; then
+    if [ "${1}" == "${file_name}" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
         mkdir -p "${MEDIA_DIR}"/xiaoya
 
-        all_size=$(du -k ${MEDIA_DIR}/temp/all.mp4 | cut -f1)
+        all_size=$(du -k ${MEDIA_DIR}/temp/${file_name} | cut -f1)
         if [[ "$all_size" -le 30000000 ]]; then
-            ERROR "all.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
+            ERROR "${file_name} 下载不完整，文件大小(in KB):$all_size 小于预期"
             exit 1
         else
-            INFO "all.mp4 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4 ${UNZIP_FOLD}/* -o/media/xiaoya
+            INFO "${file_name} 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/${file_name} ${UNZIP_FOLD}/* -o/media/xiaoya
         fi
 
         INFO "设置目录权限..."
@@ -1600,7 +1606,7 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     5)
         clear
-        unzip_appoint_xiaoya_emby "all.mp4"
+        unzip_appoint_xiaoya_emby "all.mp4" "emby"
         return_menu "main_download_unzip_xiaoya_emby"
         ;;
     6)
@@ -2081,100 +2087,6 @@ function unzip_xiaoya_jellyfin() {
 
 }
 
-function unzip_appoint_xiaoya_jellyfin() {
-
-    get_config_dir
-
-    get_media_dir
-
-    if [ "${1}" == "all_jf.mp4" ]; then
-        INFO "请选择要解压的压缩包目录 [ 1:动漫 | 2:每日更新 | 3:电影 | 4:电视剧 | 5:纪录片 | 6:纪录片（已刮削）| 7:综艺 ]"
-        valid_choice=false
-        while [ "$valid_choice" = false ]; do
-            read -erp "请输入数字 [1-7]:" choice
-            for i in {1..7}; do
-                if [ "$choice" = "$i" ]; then
-                    valid_choice=true
-                    break
-                fi
-            done
-            if [ "$valid_choice" = false ]; then
-                ERROR "请输入正确数字 [1-7]"
-            fi
-        done
-        case $choice in
-        1)
-            UNZIP_FOLD=动漫
-            ;;
-        2)
-            UNZIP_FOLD=每日更新
-            ;;
-        3)
-            UNZIP_FOLD=电影
-            ;;
-        4)
-            UNZIP_FOLD=电视剧
-            ;;
-        5)
-            UNZIP_FOLD=纪录片
-            ;;
-        6)
-            UNZIP_FOLD=纪录片（已刮削）
-            ;;
-        7)
-            UNZIP_FOLD=综艺
-            ;;
-        esac
-    else
-        ERROR "此文件暂时不支持解压指定元数据！"
-    fi
-
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
-
-    chmod 777 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
-
-    INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
-
-    if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-        ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，文件不完整！"
-        exit 1
-    fi
-
-    start_time1=$(date +%s)
-
-    if [ "${1}" == "all_jf.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        all_size=$(du -k ${MEDIA_DIR}/temp/all_jf.mp4 | cut -f1)
-        if [[ "$all_size" -le 30000000 ]]; then
-            ERROR "all_jf.mp4 下载不完整，文件大小(in KB):$all_size 小于预期"
-            exit 1
-        else
-            INFO "all_jf.mp4 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 /media/temp/all_jf.mp4 ${UNZIP_FOLD}/* -o/media/xiaoya
-        fi
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    else
-        ERROR "此文件暂时不支持解压指定元数据！"
-    fi
-
-    end_time1=$(date +%s)
-    total_time1=$((end_time1 - start_time1))
-    total_time1=$((total_time1 / 60))
-    INFO "解压执行时间：$total_time1 分钟"
-
-    INFO "解压完成！"
-
-}
-
 function main_download_unzip_xiaoya_jellyfin() {
 
     __data_downloader=$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)
@@ -2225,7 +2137,7 @@ function main_download_unzip_xiaoya_jellyfin() {
         ;;
     5)
         clear
-        unzip_appoint_xiaoya_jellyfin "all_jf.mp4"
+        unzip_appoint_xiaoya_emby_jellyfin "all_jf.mp4" "jellyfin"
         return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     6)
