@@ -123,128 +123,100 @@ function ___install_docker() {
 
 }
 
+function packages_apt_install() {
+
+    if ! command -v ${1}; then
+        WARN "${1} 未安装，脚本尝试自动安装..."
+        apt update -y
+        if apt install -y ${1}; then
+            INFO "${1} 安装成功！"
+        else
+            ERROR "${1} 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+
+}
+
+function packages_yum_install() {
+
+    if ! command -v ${1}; then
+        WARN "${1} 未安装，脚本尝试自动安装..."
+        if yum install -y ${1}; then
+            INFO "${1} 安装成功！"
+        else
+            ERROR "${1} 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+
+}
+
+function packages_zypper_install() {
+
+    if ! command -v ${1}; then
+        WARN "${1} 未安装，脚本尝试自动安装..."
+        zypper refresh
+        if zypper install ${1}; then
+            INFO "${1} 安装成功！"
+        else
+            ERROR "${1} 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+
+}
+
+function packages_apk_install() {
+
+    if ! command -v ${1}; then
+        WARN "${1} 未安装，脚本尝试自动安装..."
+        if apk add ${1}; then
+            INFO "${1} 安装成功！"
+        else
+            ERROR "${1} 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+
+}
+
+function packages_pacman_install() {
+
+    if ! command -v ${1}; then
+        WARN "${1} 未安装，脚本尝试自动安装..."
+        if pacman -Sy --noconfirm ${1}; then
+            INFO "${1} 安装成功！"
+        else
+            ERROR "${1} 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+
+}
+
 function packages_need() {
 
     if [ "$1" == "apt" ]; then
-        if ! command -v curl; then
-            WARN "curl 未安装，脚本尝试自动安装..."
-            apt update -y
-            if apt install -y curl; then
-                INFO "curl 安装成功！"
-            else
-                ERROR "curl 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v wget; then
-            WARN "wget 未安装，脚本尝试自动安装..."
-            apt update -y
-            if apt install -y wget; then
-                INFO "wget 安装成功！"
-            else
-                ERROR "wget 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
+        packages_apt_install curl
+        packages_apt_install wget
         ___install_docker
     elif [ "$1" == "yum" ]; then
-        if ! command -v curl; then
-            WARN "curl 未安装，脚本尝试自动安装..."
-            if yum install -y curl; then
-                INFO "curl 安装成功！"
-            else
-                ERROR "curl 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v wget; then
-            WARN "wget 未安装，脚本尝试自动安装..."
-            if yum install -y wget; then
-                INFO "wget 安装成功！"
-            else
-                ERROR "wget 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
+        packages_yum_install curl
+        packages_yum_install wget
         ___install_docker
     elif [ "$1" == "zypper" ]; then
-        if ! command -v curl; then
-            WARN "curl 未安装，脚本尝试自动安装..."
-            zypper refresh
-            if zypper install curl; then
-                INFO "curl 安装成功！"
-            else
-                ERROR "curl 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v wget; then
-            WARN "wget 未安装，脚本尝试自动安装..."
-            zypper refresh
-            if zypper install wget; then
-                INFO "wget 安装成功！"
-            else
-                ERROR "wget 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
+        packages_zypper_install curl
+        packages_zypper_install wget
         ___install_docker
     elif [ "$1" == "apk_alpine" ]; then
-        if ! command -v curl; then
-            WARN "curl 未安装，脚本尝试自动安装..."
-            if apk add curl; then
-                INFO "curl 安装成功！"
-            else
-                ERROR "curl 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v wget; then
-            WARN "wget 未安装，脚本尝试自动安装..."
-            if apk add wget; then
-                INFO "wget 安装成功！"
-            else
-                ERROR "wget 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v docker; then
-            WARN "docker 未安装，脚本尝试自动安装..."
-            if apk add docker; then
-                INFO "docker 安装成功！"
-            else
-                ERROR "docker 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
+        packages_apk_install curl
+        packages_apk_install wget
+        packages_apk_install docker
     elif [ "$1" == "pacman" ]; then
-        if ! command -v curl; then
-            WARN "curl 未安装，脚本尝试自动安装..."
-            if pacman -Sy --noconfirm curl; then
-                INFO "curl 安装成功！"
-            else
-                ERROR "curl 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v wget; then
-            WARN "wget 未安装，脚本尝试自动安装..."
-            if pacman -Sy --noconfirm wget; then
-                INFO "wget 安装成功！"
-            else
-                ERROR "wget 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
-        if ! command -v docker; then
-            WARN "docker 未安装，脚本尝试自动安装..."
-            if pacman -Sy --noconfirm docker; then
-                INFO "docker 安装成功！"
-            else
-                ERROR "docker 安装失败，请手动安装！"
-                exit 1
-            fi
-        fi
+        packages_pacman_install curl
+        packages_pacman_install wget
+        packages_pacman_install docker
     else
         if ! command -v curl; then
             ERROR "curl 未安装，请手动安装！"
@@ -4111,6 +4083,15 @@ function install_xiaoya_alist_tvbox() {
     read -erp "MEM_OPT:" MEM_OPT
     [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
 
+    INFO "是否使用内存优化版镜像 [Y/n]（默认 n 不使用）"
+    read -erp "Native:" choose_native
+    [[ -z "${choose_native}" ]] && choose_native="n"
+    if [[ ${choose_native} == [Yy] ]]; then
+        __choose_native="native"
+    else
+        __choose_native="latest"
+    fi
+
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         local RETURN_DATA
@@ -4151,7 +4132,7 @@ function install_xiaoya_alist_tvbox() {
             ${extra_parameters} \
             --restart=always \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
-            haroldli/xiaoya-tvbox:latest
+            haroldli/xiaoya-tvbox:${__choose_native}
     else
         docker run -itd \
             -p "${HT_PORT}":4567 \
@@ -4161,7 +4142,7 @@ function install_xiaoya_alist_tvbox() {
             -v "${CONFIG_DIR}:/data" \
             --restart=always \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" \
-            haroldli/xiaoya-tvbox:latest
+            haroldli/xiaoya-tvbox:${__choose_native}
     fi
 
     INFO "安装完成！"
@@ -4188,9 +4169,10 @@ function uninstall_xiaoya_alist_tvbox() {
         echo -en "即将开始卸载小雅Alist-TVBox${Blue} $i ${Font}\r"
         sleep 1
     done
+    IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)")"
     docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
     docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
-    docker rmi haroldli/xiaoya-tvbox:latest
+    docker rmi "${IMAGE_NAME}"
     if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
         INFO "清理配置文件..."
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
