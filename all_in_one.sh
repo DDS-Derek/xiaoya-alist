@@ -347,10 +347,6 @@ function get_os() {
 
 }
 
-function TODO() {
-    WARN "此功能未完成，请耐心等待开发者开发"
-}
-
 function show_disk_mount() {
 
     df -h | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | sort -nr -k 4
@@ -568,15 +564,12 @@ function install_xiaoya_alist() {
         mkdir -p "${CONFIG_DIR}/data"
     fi
 
-    if [ ! -f "${CONFIG_DIR}/mytoken.txt" ]; then
-        touch ${CONFIG_DIR}/mytoken.txt
-    fi
-    if [ ! -f "${CONFIG_DIR}/myopentoken.txt" ]; then
-        touch ${CONFIG_DIR}/myopentoken.txt
-    fi
-    if [ ! -f "${CONFIG_DIR}/temp_transfer_folder_id.txt" ]; then
-        touch ${CONFIG_DIR}/temp_transfer_folder_id.txt
-    fi
+    files=("mytoken.txt" "myopentoken.txt" "temp_transfer_folder_id.txt")
+    for file in "${files[@]}"; do
+        if [ ! -f "${CONFIG_DIR}/${file}" ]; then
+            touch "${CONFIG_DIR}/${file}"
+        fi
+    done
 
     mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
     mytokenstringsize=${#mytokenfilesize}
@@ -650,74 +643,29 @@ function install_xiaoya_alist() {
         read -erp "NET_MODE:" NET_MODE
     fi
     [[ -z "${NET_MODE}" ]] && NET_MODE="n"
+    if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
+        echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
+    fi
+    docker_command=("docker run" "-itd")
     if [[ ${NET_MODE} == [Yy] ]]; then
-        if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
-            echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
-        fi
-        if docker pull xiaoyaliu/alist:hostmode; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
-            proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
-            docker run -itd \
-                --env HTTP_PROXY="$proxy_url" \
-                --env HTTPS_PROXY="$proxy_url" \
-                --env no_proxy="*.aliyundrive.com" \
-                --network=host \
-                -v "${CONFIG_DIR}:/data" \
-                -v "${CONFIG_DIR}/data:/www/data" \
-                --restart=always \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
-                xiaoyaliu/alist:hostmode
-        else
-            docker run -itd \
-                --network=host \
-                -v "${CONFIG_DIR}:/data" \
-                -v "${CONFIG_DIR}/data:/www/data" \
-                --restart=always \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
-                xiaoyaliu/alist:hostmode
-        fi
+        docker_image="xiaoyaliu/alist:hostmode"
+        docker_command+=("--network=host")
+    else
+        docker_image="xiaoyaliu/alist:latest"
+        docker_command+=("-p 5678:80" "-p 2345:2345" "-p 2346:2346")
     fi
-    if [[ ${NET_MODE} == [Nn] ]]; then
-        if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
-            echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
-        fi
-        if docker pull xiaoyaliu/alist:latest; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
-            proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
-            docker run -itd \
-                -p 5678:80 \
-                -p 2345:2345 \
-                -p 2346:2346 \
-                --env HTTP_PROXY="$proxy_url" \
-                --env HTTPS_PROXY="$proxy_url" \
-                --env no_proxy="*.aliyundrive.com" \
-                -v "${CONFIG_DIR}:/data" \
-                -v "${CONFIG_DIR}/data:/www/data" \
-                --restart=always \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
-                xiaoyaliu/alist:latest
-        else
-            docker run -itd \
-                -p 5678:80 \
-                -p 2345:2345 \
-                -p 2346:2346 \
-                -v "${CONFIG_DIR}:/data" \
-                -v "${CONFIG_DIR}/data:/www/data" \
-                --restart=always \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" \
-                xiaoyaliu/alist:latest
-        fi
+    if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
+        proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
+        docker_command+=("--env HTTP_PROXY=$proxy_url" "--env HTTPS_PROXY=$proxy_url" "--env no_proxy=*.aliyundrive.com")
     fi
+    docker_command+=("-v ${CONFIG_DIR}:/data" "-v ${CONFIG_DIR}/data:/www/data" "--restart=always" "--name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" "$docker_image")
+    if docker pull "$docker_image"; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
+        exit 1
+    fi
+    eval "${docker_command[*]}"
 
     wait_xiaoya_start
 
@@ -1069,7 +1017,7 @@ function pull_run_glue() {
     if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
         local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest | cut -f2 -d:)
         remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-        if [ ! "$local_sha" == "$remote_sha" ]; then
+        if [ "$local_sha" != "$remote_sha" ]; then
             docker rmi xiaoyaliu/glue:latest
             if docker pull xiaoyaliu/glue:latest; then
                 INFO "镜像拉取成功！"
@@ -1117,7 +1065,7 @@ function pull_run_ddsderek_glue() {
     if docker inspect ddsderek/xiaoya-glue:latest > /dev/null 2>&1; then
         local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/xiaoya-glue:latest | cut -f2 -d:)
         remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/xiaoya-glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-        if [ ! "$local_sha" == "$remote_sha" ]; then
+        if [ "$local_sha" != "$remote_sha" ]; then
             docker rmi ddsderek/xiaoya-glue:latest
         fi
     fi
@@ -2338,82 +2286,50 @@ function install_emby_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if docker pull emby/embyserver:${IMAGE_VERSION}; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                --privileged=true \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                emby/embyserver:${IMAGE_VERSION}
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                --privileged=true \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                emby/embyserver:${IMAGE_VERSION}
-        fi
+        image_name="emby/embyserver"
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if docker pull emby/embyserver_arm64v8:${IMAGE_VERSION}; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                --privileged=true \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                emby/embyserver_arm64v8:${IMAGE_VERSION}
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                --privileged=true \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                emby/embyserver_arm64v8:${IMAGE_VERSION}
-        fi
+        image_name="emby/embyserver_arm64v8"
         ;;
     *)
         ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
         exit 1
         ;;
     esac
+    if docker pull "${image_name}:${IMAGE_VERSION}"; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
+        exit 1
+    fi
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            --privileged=true \
+            ${extra_parameters} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            "${image_name}:${IMAGE_VERSION}"
+    else
+        docker run -itd \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            --privileged=true \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            "${image_name}:${IMAGE_VERSION}"
+    fi
 
 }
 
@@ -2423,78 +2339,48 @@ function install_amilys_embyserver() {
     INFO "开始安装Emby容器....."
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if docker pull amilys/embyserver:${IMAGE_VERSION}; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver:${IMAGE_VERSION}
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver:${IMAGE_VERSION}
-        fi
+        image_name="amilys/embyserver"
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if docker pull amilys/embyserver_arm64v8:${IMAGE_VERSION}; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
-        if [ -n "${extra_parameters}" ]; then
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                ${extra_parameters} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver_arm64v8:${IMAGE_VERSION}
-        else
-            docker run -itd \
-                --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
-                -v "${MEDIA_DIR}/config:/config" \
-                -v "${MEDIA_DIR}/xiaoya:/media" \
-                -v ${NSSWITCH}:/etc/nsswitch.conf \
-                --add-host="xiaoya.host:$xiaoya_host" \
-                ${NET_MODE} \
-                -e UID=0 \
-                -e GID=0 \
-                --restart=always \
-                amilys/embyserver_arm64v8:${IMAGE_VERSION}
-        fi
+        image_name="amilys/embyserver_arm64v8"
         ;;
     *)
         ERROR "目前只支持amd64和arm64架构，你的架构是：$cpu_arch"
         exit 1
         ;;
     esac
+    if docker pull "${image_name}:${IMAGE_VERSION}"; then
+        INFO "镜像拉取成功！"
+    else
+        ERROR "镜像拉取失败！"
+        exit 1
+    fi
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            ${extra_parameters} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            "${image_name}:${IMAGE_VERSION}"
+    else
+        docker run -itd \
+            --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
+            -v "${MEDIA_DIR}/config:/config" \
+            -v "${MEDIA_DIR}/xiaoya:/media" \
+            -v ${NSSWITCH}:/etc/nsswitch.conf \
+            --add-host="xiaoya.host:$xiaoya_host" \
+            ${NET_MODE} \
+            -e UID=0 \
+            -e GID=0 \
+            --restart=always \
+            "${image_name}:${IMAGE_VERSION}"
+    fi
 
 }
 
