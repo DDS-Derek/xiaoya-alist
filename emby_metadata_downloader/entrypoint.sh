@@ -37,13 +37,7 @@ function mount_img() {
     if [ ! -d /volume_img ]; then
         mkdir /volume_img
     fi
-    while true; do
-        if mount /dev/loop7 /volume_img; then
-            INFO "img 镜像挂载成功！"
-            break
-        fi
-        sleep 30
-    done
+
     if [ -d /media ]; then
         if [ ! -d /media/电影/2023 ]; then
             if ! rm -rf /media; then
@@ -55,6 +49,15 @@ function mount_img() {
             exit 1
         fi
     fi
+
+    while true; do
+        if mount /dev/loop7 /volume_img; then
+            INFO "img 镜像挂载成功！"
+            break
+        fi
+        sleep 30
+    done
+
     ln -sf /volume_img/xiaoya /media
     INFO "/media 创建软链接成功！"
 
