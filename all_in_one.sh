@@ -3251,18 +3251,25 @@ function install_xiaoya_emd() {
     done
 
     extra_parameters=
-    local RETURN_DATA
-    RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
-    if [ "${RETURN_DATA}" == "None" ]; then
-        INFO "请输入运行参数（默认 --media /media ）"
-        WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
-        read -erp "Extra parameters:" extra_parameters
-        [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
-        data_crep "write" "install_xiaoya_emd"
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入运行参数（默认 --media /media ）"
+            WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
+            WARN "警告！！！ 默认请勿修改 /media 路径！！！"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
+            data_crep "write" "install_xiaoya_emd"
+        else
+            INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
     else
-        INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
-        read -erp "Extra parameters:" extra_parameters
-        [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        extra_parameters="--media /media"
+        data_crep "write" "install_xiaoya_emd"
     fi
     script_extra_parameters="${extra_parameters}"
 
