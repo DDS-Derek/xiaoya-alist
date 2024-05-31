@@ -321,15 +321,35 @@ function return_menu() {
 
 }
 
+function docker_pull() {
+
+    retries=0
+    max_retries=3
+
+    while [ $retries -lt $max_retries ]; do
+        if docker pull "${1}"; then
+            INFO "${1} 镜像拉取成功！"
+            break
+        else
+            WARN "${1} 镜像拉取失败，正在进行第 $((retries+1)) 次重试..."
+            retries=$((retries+1))
+        fi
+    done
+
+    if [ $retries -eq $max_retries ]; then
+        ERROR "镜像拉取失败，已达到最大重试次数！"
+        exit 1
+    else
+        return 0
+    fi
+
+}
+
 function container_update() {
 
     if ! docker inspect containrrr/watchtower:latest > /dev/null 2>&1; then
-        if docker pull containrrr/watchtower:latest; then
-            INFO "镜像拉取成功！"
+        if docker_pull "containrrr/watchtower:latest"; then
             REMOVE_WATCHTOWER_IMAGE=true
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
         fi
     fi
 
@@ -603,12 +623,7 @@ function install_xiaoya_alist() {
         docker_command+=("--env HTTP_PROXY=$proxy_url" "--env HTTPS_PROXY=$proxy_url" "--env no_proxy=*.aliyundrive.com")
     fi
     docker_command+=("-v ${CONFIG_DIR}:/data" "-v ${CONFIG_DIR}/data:/www/data" "--restart=always" "--name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" "$docker_image")
-    if docker pull "$docker_image"; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "$docker_image"
     eval "${docker_command[*]}"
 
     wait_xiaoya_start
@@ -963,20 +978,10 @@ function pull_run_glue() {
         remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
         if [ "$local_sha" != "$remote_sha" ]; then
             docker rmi xiaoyaliu/glue:latest
-            if docker pull xiaoyaliu/glue:latest; then
-                INFO "镜像拉取成功！"
-            else
-                ERROR "镜像拉取失败！"
-                exit 1
-            fi
+            docker_pull "xiaoyaliu/glue:latest"
         fi
     else
-        if docker pull xiaoyaliu/glue:latest; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
+        docker_pull "xiaoyaliu/glue:latest"
     fi
 
     if [ -n "${extra_parameters}" ]; then
@@ -1014,12 +1019,7 @@ function pull_run_ddsderek_glue() {
         fi
     fi
 
-    if docker pull ddsderek/xiaoya-glue:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "ddsderek/xiaoya-glue:latest"
 
     if [ -n "${extra_parameters}" ]; then
         docker run -it \
@@ -2152,12 +2152,7 @@ function install_emby_embyserver() {
         exit 1
         ;;
     esac
-    if docker pull "${image_name}:${IMAGE_VERSION}"; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2205,12 +2200,7 @@ function install_amilys_embyserver() {
         exit 1
         ;;
     esac
-    if docker pull "${image_name}:${IMAGE_VERSION}"; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2261,12 +2251,7 @@ function install_lovechen_embyserver() {
     INFO "数据库转换成功！"
     rm -rf ${MEDIA_DIR}/temp.sql
 
-    if docker pull lovechen/embyserver:4.7.14.0; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "lovechen/embyserver:4.7.14.0"
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2633,12 +2618,7 @@ function install_jellyfin_xiaoya_all_jellyfin() {
     INFO "您的架构是：$cpu_arch"
     case $cpu_arch in
     "x86_64" | *"amd64"*)
-        if docker pull nyanmisaka/jellyfin:240220-amd64-legacy; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
+        docker_pull "nyanmisaka/jellyfin:240220-amd64-legacy"
         docker run -d \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)" \
             -v ${NSSWITCH}:/etc/nsswitch.conf \
@@ -2656,12 +2636,7 @@ function install_jellyfin_xiaoya_all_jellyfin() {
             nyanmisaka/jellyfin:240220-amd64-legacy
         ;;
     "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        if docker pull nyanmisaka/jellyfin:240220-arm64; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
+        docker_pull "nyanmisaka/jellyfin:240220-arm64"
         docker run -d \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_jellyfin_name.txt)" \
             -v ${NSSWITCH}:/etc/nsswitch.conf \
@@ -2814,12 +2789,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
     else
         INFO '已经添加下面的记录到crontab定时任务容器'
         INFO "${CRON}"
-        if docker pull ddsderek/xiaoya-cron:latest; then
-            INFO "镜像拉取成功！"
-        else
-            ERROR "镜像拉取失败！"
-            exit 1
-        fi
+        docker_pull "ddsderek/xiaoya-cron:latest"
         CRON_PARAMETERS="--auto_update_all_pikpak=${auto_update_all_pikpak} \
 --auto_update_config=${auto_update_config} \
 --media_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt) \
@@ -2937,12 +2907,7 @@ function install_resilio() {
     if [ ! -d "${CONFIG_DIR}/downloads" ]; then
         mkdir -p "${CONFIG_DIR}/downloads"
     fi
-    if docker pull linuxserver/resilio-sync:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "linuxserver/resilio-sync:latest"
     if [ -n "${extra_parameters}" ]; then
         docker run -d \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)" \
@@ -3156,19 +3121,7 @@ function once_sync_emby_config() {
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
             # 先更新 xiaoya-cron，再运行立刻同步
-            if docker pull containrrr/watchtower:latest; then
-                INFO "镜像拉取成功！"
-            else
-                ERROR "镜像拉取失败！"
-                exit 1
-            fi
-            docker run --rm \
-                -v /var/run/docker.sock:/var/run/docker.sock \
-                containrrr/watchtower:latest \
-                --run-once \
-                --cleanup \
-                xiaoya-cron
-            docker rmi containrrr/watchtower:latest
+            container_update xiaoya-cron
             sleep 10
             COMMAND="docker exec -it xiaoya-cron bash /app/command.sh"
         else
@@ -3330,12 +3283,7 @@ function install_xiaoya_emd() {
     fi
     run_extra_parameters="${extra_parameters}"
 
-    if docker pull ddsderek/xiaoya-emd:${IMAGE_VERSION}; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "ddsderek/xiaoya-emd:${IMAGE_VERSION}"
 
     docker run -d \
         --name=xiaoya-emd \
@@ -3857,12 +3805,7 @@ function install_xiaoya_alist_tvbox() {
         INFO "备份数据路径：${CONFIG_DIR}/xiaoya_backup"
     fi
 
-    if docker pull haroldli/xiaoya-tvbox:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "haroldli/xiaoya-tvbox:latest"
 
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
@@ -3988,12 +3931,7 @@ function install_onelist() {
     read -erp "HT_PORT:" HT_PORT
     [[ -z "${HT_PORT}" ]] && HT_PORT="5245"
 
-    if docker pull msterzhang/onelist:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "msterzhang/onelist:latest"
 
     docker run -itd \
         -p "${HT_PORT}":5245 \
@@ -4111,12 +4049,7 @@ function install_portainer() {
     read -erp "TAG:" TAG
     [[ -z "${TAG}" ]] && TAG="latest"
 
-    if docker pull portainer/portainer-ce:${TAG}; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "portainer/portainer-ce:${TAG}"
 
     docker run -itd \
         -p "${HTTPS_PORT}":9443 \
@@ -4228,12 +4161,7 @@ function install_auto_symlink() {
     INFO "请输入挂载目录（可设置多个）（PS：-v /media:/media）"
     read -erp "Volumes:" volumes
 
-    if docker pull shenxianmq/auto_symlink:latest; then
-        INFO "镜像拉取成功！"
-    else
-        ERROR "镜像拉取失败！"
-        exit 1
-    fi
+    docker_pull "shenxianmq/auto_symlink:latest"
 
     if [ -n "${volumes}" ]; then
         docker run -d \
