@@ -331,8 +331,8 @@ function docker_pull() {
             INFO "${1} 镜像拉取成功！"
             break
         else
-            WARN "${1} 镜像拉取失败，正在进行第 $((retries+1)) 次重试..."
-            retries=$((retries+1))
+            WARN "${1} 镜像拉取失败，正在进行第 $((retries + 1)) 次重试..."
+            retries=$((retries + 1))
         fi
     done
 
