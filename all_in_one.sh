@@ -309,10 +309,16 @@ function judgment_container() {
 
 function return_menu() {
 
-    INFO "是否返回菜单继续配置 [Y/n]（默认 n 退出脚本）"
-    read -erp "RETURN_MENU:" __RETURN_MENU
-    [[ -z "${__RETURN_MENU}" ]] && __RETURN_MENU="n"
-    if [[ ${__RETURN_MENU} == [Yy] ]]; then
+    INFO "是否返回菜单继续配置 [Y/n]"
+    answer=""
+    t=60
+    while [[ -z "$answer" && $t -gt 0 ]]; do
+        printf "\r%2d 秒后将自动退出脚本：" $t
+        read -r -t 1 -n 1 answer
+        t=$((t - 1))
+    done
+    [[ -z "${answer}" ]] && answer="n"
+    if [[ ${answer} == [Yy] ]]; then
         clear
         "${@}"
     else
