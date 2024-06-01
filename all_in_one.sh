@@ -4305,6 +4305,41 @@ function main_casaos() {
 
 }
 
+function main_docker_compose() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Docker Compose 小雅及全家桶${Font}\n"
+    echo -e "${Sky_Blue}Docker Compose 安装方式由 https://github.com/monlor 更新维护，在此表示感谢！"
+    echo -e "具体详细介绍请看项目README：https://github.com/monlor/docker-xiaoya${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-2]:" num
+    case "$num" in
+    1)
+        clear
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/monlor/docker-xiaoya/main/install.sh)"
+        return_menu "main_docker_compose"
+        ;;
+    2)
+        clear
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/monlor/docker-xiaoya/main/uninstall.sh)"
+        return_menu "main_docker_compose"
+        ;;
+    0)
+        clear
+        main_return
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-2]'
+        main_docker_compose
+        ;;
+    esac
+
+}
+
 function init_container_name() {
 
     if [ ! -d ${DDSREM_CONFIG_DIR}/container_name ]; then
@@ -4622,11 +4657,12 @@ function main_return() {
 4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)
 5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")
 6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
-    echo -e "7、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
-    echo -e "8、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}"
-    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G${Font}"
+    echo -e "7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）"
+    echo -e "8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
+    echo -e "9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}"
+    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G,monlor${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-8]:" num
+    read -erp "请输入数字 [0-9]:" num
     case "$num" in
     1)
         clear
@@ -4654,9 +4690,13 @@ function main_return() {
         ;;
     7)
         clear
-        main_other_tools
+        main_docker_compose
         ;;
     8)
+        clear
+        main_other_tools
+        ;;
+    9)
         clear
         main_advanced_configuration
         ;;
@@ -4666,7 +4706,7 @@ function main_return() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-8]'
+        ERROR '请输入正确数字 [0-9]'
         main_return
         ;;
     esac
