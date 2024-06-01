@@ -4325,12 +4325,24 @@ function main_docker_compose() {
     case "$num" in
     1)
         clear
-        bash -c "$(curl -fsSL https://raw.githubusercontent.com/monlor/docker-xiaoya/main/install.sh)"
+        INFO "是否使用加速源 [Y/n]（默认 N）"
+        read -erp "USE_PROXY:" USE_PROXY
+        [[ -z "${USE_PROXY}" ]] && USE_PROXY="n"
+        if [[ ${USE_PROXY} == [Yy] ]]; then
+            export GH_PROXY=https://gh.monlor.com/ IMAGE_PROXY=ghcr.monlor.com
+        fi
+        bash -c "$(curl -fsSL ${GH_PROXY}https://raw.githubusercontent.com/monlor/docker-xiaoya/main/install.sh)"
         return_menu "main_docker_compose"
         ;;
     2)
         clear
-        bash -c "$(curl -fsSL https://raw.githubusercontent.com/monlor/docker-xiaoya/main/uninstall.sh)"
+        INFO "是否使用加速源 [Y/n]（默认 N）"
+        read -erp "USE_PROXY:" USE_PROXY
+        [[ -z "${USE_PROXY}" ]] && USE_PROXY="n"
+        if [[ ${USE_PROXY} == [Yy] ]]; then
+            export GH_PROXY=https://gh.monlor.com/ IMAGE_PROXY=ghcr.monlor.com
+        fi
+        bash -c "$(curl -fsSL ${GH_PROXY}https://raw.githubusercontent.com/monlor/docker-xiaoya/main/uninstall.sh)"
         return_menu "main_docker_compose"
         ;;
     0)
