@@ -322,6 +322,7 @@ function return_menu() {
         clear
         "${@}"
     else
+        echo -e "\n"
         exit 0
     fi
 
