@@ -4315,7 +4315,7 @@ function main_docker_compose() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}Docker Compose 小雅及全家桶${Font}\n"
-    echo -e "${Sky_Blue}Docker Compose 安装方式由 https://github.com/monlor 更新维护，在此表示感谢！"
+    echo -e "${Sky_Blue}Docker Compose 安装方式由 https://link.monlor.com/ 更新维护，在此表示感谢！"
     echo -e "具体详细介绍请看项目README：https://github.com/monlor/docker-xiaoya${Font}\n"
     echo -e "1、安装"
     echo -e "2、卸载"

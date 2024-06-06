@@ -231,6 +231,7 @@ Docker启动容器名称设置 -> 9 1
 - [Auto_Symlink](https://github.com/shenxianmq/Auto_Symlink)
 - [Portainer](https://github.com/portainer/portainer)
 - [AI老G](https://space.bilibili.com/252166818)
+- [monlor](https://link.monlor.com)
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
 
