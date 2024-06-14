@@ -4399,8 +4399,8 @@ function choose_image_mirror() {
             font="${Font}"
             s+=1
         fi
-        echo -e "$((i+1))、${color}${mirrors[$i]}${font}"
-        z=$((i+2))
+        echo -e "$((i + 1))、${color}${mirrors[$i]}${font}"
+        z=$((i + 2))
     done
     if [ "${s}" == "1" ]; then
         echo -e "${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"
@@ -4422,7 +4422,7 @@ function choose_image_mirror() {
         echo "${custom_url}" > ${DDSREM_CONFIG_DIR}/image_mirror_user.txt
     else
         for i in "${!mirrors[@]}"; do
-            if [[ "$((i+1))" == "${num}" ]]; then
+            if [[ "$((i + 1))" == "${num}" ]]; then
                 echo -e "${mirrors[$i]}" > ${DDSREM_CONFIG_DIR}/image_mirror.txt
                 break
             fi
