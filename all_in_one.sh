@@ -347,6 +347,7 @@ function docker_pull() {
 
     if [ $retries -eq $max_retries ]; then
         ERROR "镜像拉取失败，已达到最大重试次数！"
+        EROOR "请进入主菜单选择数字 ${Sky_Blue}9 6${Font} 进入 ${Sky_Blue}Docker镜像源选择${Font} 配置镜像源地址！"
         exit 1
     else
         docker tag "${IMAGE_MIRROR}/${1}" "${1}"
