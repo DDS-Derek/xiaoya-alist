@@ -333,8 +333,10 @@ function docker_pull() {
     retries=0
     max_retries=3
 
+    IMAGE_MIRROR=$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")
+
     while [ $retries -lt $max_retries ]; do
-        if docker pull "${1}"; then
+        if docker pull "${IMAGE_MIRROR}/${1}"; then
             INFO "${1} 镜像拉取成功！"
             break
         else
@@ -347,6 +349,8 @@ function docker_pull() {
         ERROR "镜像拉取失败，已达到最大重试次数！"
         exit 1
     else
+        docker tag "${IMAGE_MIRROR}/${1}" "${1}"
+        docker rmi "${IMAGE_MIRROR}/${1}"
         return 0
     fi
 
@@ -4375,6 +4379,81 @@ function main_docker_compose() {
 
 }
 
+function choose_image_mirror() {
+
+    local num
+    local mirrors=("docker.io" "registry-docker-hub-latest-9vqc.onrender.com" "docker.fxxk.dedyn.io")
+    local current_mirror
+    current_mirror="$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")"
+    declare -i s
+    local s=0
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Docker镜像源选择\n${Font}"
+    echo -e "${Sky_Blue}绿色字体代表当前选中的镜像源"
+    echo -e "选择镜像源后会自动检测是否可连接，如果预选镜像源都无法使用请自定义镜像源\n${Font}"
+    for i in "${!mirrors[@]}"; do
+        local color=
+        local font=
+        if [[ "${mirrors[$i]}" == "${current_mirror}" ]]; then
+            color="${Green}"
+            font="${Font}"
+            s+=1
+        fi
+        echo -e "$((i+1))、${color}${mirrors[$i]}${font}"
+        z=$((i+2))
+    done
+    if [ "${s}" == "1" ]; then
+        echo -e "${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"
+    else
+        echo -e "${z}、${Green}自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")${Font}"
+    fi
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-${z}]:" num
+    if [ "${num}" == "0" ]; then
+        clear
+        main_advanced_configuration
+    elif [ "${num}" == "${z}" ]; then
+        clear
+        INFO "请输入自定义源地址（当前自定义源地址为：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")，回车默认不修改）"
+        read -erp "custom_url:" custom_url
+        [[ -z "${custom_url}" ]] && custom_url=$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")
+        echo "${custom_url}" > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+        echo "${custom_url}" > ${DDSREM_CONFIG_DIR}/image_mirror_user.txt
+    else
+        for i in "${!mirrors[@]}"; do
+            if [[ "$((i+1))" == "${num}" ]]; then
+                echo -e "${mirrors[$i]}" > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+                break
+            fi
+        done
+    fi
+    clear
+    INFO "开始镜像源地址连通性测试..."
+    local retries=0
+    local max_retries=3
+    IMAGE_MIRROR=$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")
+    while [ $retries -lt $max_retries ]; do
+        if docker pull "${IMAGE_MIRROR}/library/hello-world:latest"; then
+            INFO "地址连通性测试正常！"
+            break
+        else
+            WARN "地址连通性测试失败，正在进行第 $((retries + 1)) 次重试..."
+            retries=$((retries + 1))
+        fi
+    done
+    if [ $retries -eq $max_retries ]; then
+        ERROR "地址连通性测试失败，已达到最大重试次数，请选择镜像源或者自定义镜像源！"
+    else
+        docker rmi "${IMAGE_MIRROR}/library/hello-world:latest"
+    fi
+    INFO "按任意键返回 Docker镜像源选择 菜单"
+    read -rs -n 1 -p ""
+    clear
+    choose_image_mirror
+
+}
+
 function init_container_name() {
 
     if [ ! -d ${DDSREM_CONFIG_DIR}/container_name ]; then
@@ -4579,9 +4658,10 @@ function main_advanced_configuration() {
     echo -e "3、重置脚本配置"
     echo -e "4、开启/关闭 磁盘容量检测                     当前状态：${_disk_capacity_detection}"
     echo -e "5、开启/关闭 小雅连通性检测                   当前状态：${_xiaoya_connectivity_detection}"
+    echo -e "6、Docker镜像源选择"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-5]:" num
+    read -erp "请输入数字 [0-6]:" num
     case "$num" in
     1)
         clear
@@ -4623,13 +4703,17 @@ function main_advanced_configuration() {
         clear
         main_advanced_configuration
         ;;
+    6)
+        clear
+        choose_image_mirror
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-5]'
+        ERROR '请输入正确数字 [0-6]'
         main_advanced_configuration
         ;;
     esac
@@ -4791,6 +4875,13 @@ function first_init() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt ]; then
         echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
+    fi
+
+    if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror.txt" ]; then
+        echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+    fi
+    if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror_user.txt" ]; then
+        touch ${DDSREM_CONFIG_DIR}/image_mirror_user.txt
     fi
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt ]; then
