@@ -3675,6 +3675,8 @@ function install_xiaoyahelper() {
         TG_CHOOSE="-tg"
     fi
 
+    docker_pull "library/alpine:3.18.2"
+
     XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
     if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
         return 0
@@ -4383,7 +4385,7 @@ function main_docker_compose() {
 function choose_image_mirror() {
 
     local num
-    local mirrors=("docker.io" "registry-docker-hub-latest-9vqc.onrender.com" "docker.fxxk.dedyn.io" "docker.chenby.cn")
+    local mirrors=("docker.io" "registry-docker-hub-latest-9vqc.onrender.com" "docker.fxxk.dedyn.io" "docker.chenby.cn" "dockerproxy.com")
     local current_mirror
     current_mirror="$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")"
     declare -i s
