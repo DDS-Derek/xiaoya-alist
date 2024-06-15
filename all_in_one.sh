@@ -4385,7 +4385,7 @@ function main_docker_compose() {
 function choose_image_mirror() {
 
     local num
-    local mirrors=("docker.io" "registry-docker-hub-latest-9vqc.onrender.com" "docker.fxxk.dedyn.io" "docker.chenby.cn" "dockerproxy.com")
+    local mirrors=("docker.io" "registry-docker-hub-latest-9vqc.onrender.com" "docker.fxxk.dedyn.io" "docker.chenby.cn" "dockerproxy.com" "hub.uuuadc.top")
     local current_mirror
     current_mirror="$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")"
     declare -i s
