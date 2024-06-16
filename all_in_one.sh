@@ -4397,8 +4397,10 @@ function choose_image_mirror() {
     echo -e "选择镜像源后会自动检测是否可连接，如果预选镜像源都无法使用请自定义镜像源\n${Font}"
     local status=()
     for i in "${!mirrors[@]}"; do
-        curl -s --head --request GET "${mirrors[$i]}" &> /dev/null &
+        local output
+        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}" &)
         status[$i]=$!
+        delays[$i]=$(printf "%.2f" $output)
     done
     for i in "${!mirrors[@]}"; do
         wait ${status[$i]}
@@ -4411,14 +4413,14 @@ function choose_image_mirror() {
             s+=1
         fi
         if [ $result -eq 0 ]; then
-            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Green}可用${Font})"
+            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Green}可用${Font} ${Sky_Blue}延迟: ${delays[$i]}秒${Font})"
         else
             echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Red}不可用${Font})"
         fi
         z=$((i + 2))
     done
-    if curl -s --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")" &> /dev/null; then
-        USER_TEST_STATUS="(${Green}可用${Font})"
+    if user_delay=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"); then
+        USER_TEST_STATUS="(${Green}可用${Font} ${Sky_Blue}延迟: ${user_delay}秒${Font})"
     else
         USER_TEST_STATUS="(${Red}不可用${Font})"
     fi
