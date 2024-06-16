@@ -3,6 +3,7 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC1091
 # shellcheck disable=SC2154
+# shellcheck disable=SC2004
 PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -4416,10 +4417,15 @@ function choose_image_mirror() {
         fi
         z=$((i + 2))
     done
-    if [ "${s}" == "1" ]; then
-        echo -e "${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"
+    if curl -s --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")" &> /dev/null; then
+        USER_TEST_STATUS="(${Green}可用${Font})"
     else
-        echo -e "${z}、${Green}自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")${Font}"
+        USER_TEST_STATUS="(${Red}不可用${Font})"
+    fi
+    if [ "${s}" == "1" ]; then
+        echo -e "${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt") ${USER_TEST_STATUS}"
+    else
+        echo -e "${z}、${Green}自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")${Font} ${USER_TEST_STATUS}"
     fi
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
