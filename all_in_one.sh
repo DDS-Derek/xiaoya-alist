@@ -4394,7 +4394,14 @@ function choose_image_mirror() {
     echo -e "${Blue}Docker镜像源选择\n${Font}"
     echo -e "${Sky_Blue}绿色字体代表当前选中的镜像源"
     echo -e "选择镜像源后会自动检测是否可连接，如果预选镜像源都无法使用请自定义镜像源\n${Font}"
+    local status=()
     for i in "${!mirrors[@]}"; do
+        curl -s --head --request GET "${mirrors[$i]}" &> /dev/null &
+        status[$i]=$!
+    done
+    for i in "${!mirrors[@]}"; do
+        wait ${status[$i]}
+        local result=$?
         local color=
         local font=
         if [[ "${mirrors[$i]}" == "${current_mirror}" ]]; then
@@ -4402,7 +4409,11 @@ function choose_image_mirror() {
             font="${Font}"
             s+=1
         fi
-        echo -e "$((i + 1))、${color}${mirrors[$i]}${font}"
+        if [ $result -eq 0 ]; then
+            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Green}可用${Font})"
+        else
+            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Red}不可用${Font})"
+        fi
         z=$((i + 2))
     done
     if [ "${s}" == "1" ]; then
