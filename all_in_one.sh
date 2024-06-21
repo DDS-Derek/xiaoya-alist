@@ -457,7 +457,7 @@ function wait_xiaoya_start() {
 
 }
 
-function check_quark_cookie () {
+function check_quark_cookie() {
 
     if [[ ! -f "${CONFIG_DIR}/quark_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/quark_cookie.txt" ]]; then
         return 1
