@@ -43,7 +43,7 @@ jobs:
 
       -
         name: Build Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./cron
           file: cron/Dockerfile
