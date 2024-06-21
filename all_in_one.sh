@@ -23,7 +23,7 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.6.4-2024_06_16_15_16"
+DATE_VERSION="v1.6.5-2024_06_21_22_40"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 
@@ -3414,6 +3414,8 @@ function main_xiaoya_emd() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅元数据定时爬虫${Font}\n"
+    echo -e "${Sky_Blue}小雅元数据定时爬虫由 https://github.com/Rik-F5 更新维护，在此表示感谢！"
+    echo -e "具体详细配置参数请看项目README：https://github.com/Rik-F5/xiaoya_db${Font}\n"
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
@@ -4863,7 +4865,7 @@ function main_return() {
     echo -e "7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）"
     echo -e "8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
     echo -e "9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}"
-    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G,monlor${Font}"
+    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G,monlor,Rik${Font}"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-9]:" num
     case "$num" in
