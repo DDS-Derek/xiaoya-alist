@@ -457,6 +457,38 @@ function wait_xiaoya_start() {
 
 }
 
+function check_quark_cookie () {
+
+    if [[ ! -f "${CONFIG_DIR}/quark_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/quark_cookie.txt" ]]; then
+        return 1
+    fi
+    local cookie user_agent url headers response status state_url sign_daily_reward sign_daily_reward_mb
+    cookie=$(head -n1 "${CONFIG_DIR}/quark_cookie.txt")
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
+    url="https://drive-pc.quark.cn/1/clouddrive/config?pr=ucpro&fr=pc&uc_param_str="
+    headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://pan.quark.cn"
+    response=$(curl -s -D - -H "$headers" "$url")
+    status=$(echo "$response" | grep -i status | cut -f2 -d: | cut -f1 -d,)
+    if [ "$status" == "401" ]; then
+        ERROR "无效夸克 Cookie"
+        return 1
+    else
+        state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
+        response=$(curl -s -H "$headers" "$state_url")
+        sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
+        sign_daily_reward_mb=$(echo "$sign_daily_reward 1024 1024" | awk '{printf "%.2f\n", $1 / ($2 * $3)}')
+        if [ $sign_daily_reward_mb ]; then
+            INFO "有效夸克 Cookie"
+            INFO "夸克签到获取 $sign_daily_reward_mb MB"
+            return 0
+        else
+            ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
+            return 1
+        fi
+    fi
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -606,6 +638,23 @@ function install_xiaoya_alist() {
             INFO "输入你的 PikPak 账号密码"
             read -erp "PikPak_Password:" PikPak_Password
             echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\"" > ${CONFIG_DIR}/pikpak.txt
+        fi
+    fi
+
+    if [ ! -f "${CONFIG_DIR}/quark_cookie.txt" ] || ! check_quark_cookie; then
+        INFO "是否配置 夸克 Cookie [Y/n]（默认 n 不配置）"
+        read -erp "Cookie:" choose_cookie
+        [[ -z "${choose_cookie}" ]] && choose_cookie="n"
+        if [[ ${choose_cookie} == [Yy] ]]; then
+            touch ${CONFIG_DIR}/quark_cookie.txt
+            while true; do
+                INFO "输入你的 夸克 Cookie"
+                read -erp "Cookie:" quark_cookie
+                echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
+                if check_quark_cookie; then
+                    break
+                fi
+            done
         fi
     fi
 
