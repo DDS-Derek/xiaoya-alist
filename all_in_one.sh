@@ -4494,7 +4494,7 @@ function choose_image_mirror() {
     read -erp "请输入数字 [0-${z}]:" num
     if [ "${num}" == "0" ]; then
         clear
-        main_advanced_configuration
+        "${1}"
     elif [ "${num}" == "${z}" ]; then
         clear
         INFO "请输入自定义源地址（当前自定义源地址为：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")，回车默认不修改）"
@@ -4532,7 +4532,7 @@ function choose_image_mirror() {
     INFO "按任意键返回 Docker镜像源选择 菜单"
     read -rs -n 1 -p ""
     clear
-    choose_image_mirror
+    choose_image_mirror "${1}"
 
 }
 
@@ -4787,7 +4787,7 @@ function main_advanced_configuration() {
         ;;
     6)
         clear
-        choose_image_mirror
+        choose_image_mirror "main_advanced_configuration"
         ;;
     0)
         clear
@@ -4851,7 +4851,9 @@ function main_other_tools() {
 function main_return() {
 
     cat /tmp/xiaoya_alist
-
+    if ! curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")" &> /dev/null; then
+        echo -e "${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}"
+    fi
     echo -e "1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")
 2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")
 3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")
@@ -4900,6 +4902,10 @@ function main_return() {
     9)
         clear
         main_advanced_configuration
+        ;;
+    96)
+        clear
+        choose_image_mirror "main_return"
         ;;
     0)
         clear
