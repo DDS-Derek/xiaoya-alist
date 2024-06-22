@@ -24,11 +24,19 @@ function update_app() {
 
     cd /app || exit
     echo "Update xiaoya_db script..."
+    if [ ! -s /tmp/requirements.txt.sha256sum ]; then
+        sha256sum requirements.txt > /tmp/requirements.txt.sha256sum
+    fi
     git remote set-url origin "${REPO_URL}"
     git fetch --all
     git reset --hard "origin/${BRANCH}"
-    pip install --upgrade pip
-    pip install -r /app/requirements.txt
+    hash_old=$(cat /tmp/requirements.txt.sha256sum)
+    hash_new=$(sha256sum /app/requirements.txt)
+    if [ "${hash_old}" != "${hash_new}" ]; then
+        pip install --upgrade pip
+        pip install -r /app/requirements.txt
+        sha256sum requirements.txt > /tmp/requirements.txt.sha256sum
+    fi
 
 }
 
@@ -80,6 +88,9 @@ if [ "$CYCLE" -lt "$TWELVE_HOURS" ]; then
     tail -f /dev/null
 else
     while true; do
+        INFO "开始更新代码！"
+        update_app
+        INFO "更新成功！"
         INFO "开始下载同步！"
         INFO "python3 solid.py $*"
         python3 solid.py $@
