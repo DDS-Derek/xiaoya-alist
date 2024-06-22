@@ -4459,7 +4459,10 @@ function auto_choose_image_mirror() {
 
     for i in "${!mirrors[@]}"; do
         local output
-        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"; echo $? > /tmp/curl_exit_status_${i} &)
+        output=$(
+            curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"
+            echo $? > /tmp/curl_exit_status_${i} &
+        )
         status[$i]=$!
         delays[$i]=$output
     done
@@ -4514,7 +4517,10 @@ function choose_image_mirror() {
     local status=()
     for i in "${!mirrors[@]}"; do
         local output
-        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"; echo $? > /tmp/curl_exit_status_${i} &)
+        output=$(
+            curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"
+            echo $? > /tmp/curl_exit_status_${i} &
+        )
         status[$i]=$!
         delays[$i]=$(printf "%.2f" $output)
     done
