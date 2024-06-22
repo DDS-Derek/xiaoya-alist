@@ -4919,7 +4919,7 @@ function main_return() {
     echo -ne "${INFO} 主界面加载中...${Font}\r"
     if ! curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")" &> /dev/null; then
         if auto_choose_image_mirror; then
-            out_tips="${Green}提示：以为您自动配置Docker镜像源地址为: $(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")${Font}\n"
+            out_tips="${Green}提示：已为您自动配置Docker镜像源地址为: $(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")${Font}\n"
         else
             out_tips="${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}\n"
         fi
