@@ -71,15 +71,9 @@ function mount_img() {
 
 }
 
-if [ "${RESTART_AUTO_UPDATE}" == "true" ]; then
-    update_app
-fi
-
 if [ "${IMG_VOLUME}" == "true" ]; then
     mount_img
 fi
-
-cd /app || exit
 
 TWELVE_HOURS=$((12 * 60 * 60))
 
@@ -88,9 +82,12 @@ if [ "$CYCLE" -lt "$TWELVE_HOURS" ]; then
     tail -f /dev/null
 else
     while true; do
-        INFO "开始更新代码！"
-        update_app
-        INFO "更新成功！"
+        if [ "${RESTART_AUTO_UPDATE}" == "true" ]; then
+            INFO "开始更新代码！"
+            update_app
+            INFO "更新成功！"
+        fi
+        cd /app || exit
         INFO "开始下载同步！"
         INFO "python3 solid.py $*"
         python3 solid.py $@
