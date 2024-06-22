@@ -192,6 +192,7 @@ function get_os() {
         OSNAME='macos'
         packages_need
         DDSREM_CONFIG_DIR=/etc/DDSRem
+        stty -icanon
     # 必须先判断的系统
     # 绿联NAS 基于 OpenWRT
     elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
