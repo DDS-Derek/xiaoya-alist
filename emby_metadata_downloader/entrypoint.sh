@@ -25,7 +25,7 @@ function update_app() {
     cd /app || exit
     echo "Update xiaoya_db script..."
     if [ ! -s /tmp/requirements.txt.sha256sum ]; then
-        sha256sum requirements.txt > /tmp/requirements.txt.sha256sum
+        sha256sum /app/requirements.txt > /tmp/requirements.txt.sha256sum
     fi
     git remote set-url origin "${REPO_URL}"
     git fetch --all
@@ -35,7 +35,7 @@ function update_app() {
     if [ "${hash_old}" != "${hash_new}" ]; then
         pip install --upgrade pip
         pip install -r /app/requirements.txt
-        sha256sum requirements.txt > /tmp/requirements.txt.sha256sum
+        sha256sum /app/requirements.txt > /tmp/requirements.txt.sha256sum
     fi
 
 }
