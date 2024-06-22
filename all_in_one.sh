@@ -337,6 +337,11 @@ function docker_pull() {
 
     IMAGE_MIRROR=$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")
 
+    if docker inspect "${1}" > /dev/null 2>&1; then
+        INFO "发现旧 ${1} 镜像，删除中..."
+        docker rmi "${1}" > /dev/null 2>&1
+    fi
+
     while [ $retries -lt $max_retries ]; do
         if docker pull "${IMAGE_MIRROR}/${1}"; then
             INFO "${1} 镜像拉取成功！"
