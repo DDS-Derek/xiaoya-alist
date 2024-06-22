@@ -352,8 +352,10 @@ function docker_pull() {
         ERROR "请进入主菜单选择数字 ${Sky_Blue}9 6${Font} 进入 ${Sky_Blue}Docker镜像源选择${Font} 配置镜像源地址！"
         exit 1
     else
-        docker tag "${IMAGE_MIRROR}/${1}" "${1}" > /dev/null 2>&1
-        docker rmi "${IMAGE_MIRROR}/${1}" > /dev/null 2>&1
+        if [ "${IMAGE_MIRROR}" != "docker.io" ]; then
+            docker tag "${IMAGE_MIRROR}/${1}" "${1}" > /dev/null 2>&1
+            docker rmi "${IMAGE_MIRROR}/${1}" > /dev/null 2>&1
+        fi
         return 0
     fi
 
