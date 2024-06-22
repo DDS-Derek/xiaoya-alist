@@ -46,6 +46,19 @@ function WARN() {
     echo -e "${WARN} ${1}"
 }
 
+mirrors=(
+    "docker.io"
+    "registry-docker-hub-latest-9vqc.onrender.com"
+    "docker.fxxk.dedyn.io"
+    "docker.chenby.cn"
+    "dockerproxy.com"
+    "hub.uuuadc.top"
+    "docker.jsdelivr.fyi"
+    "docker.registry.cyou"
+    "dockerhub.anzu.vip"
+    "docker.luyao.dynv6.net"
+)
+
 function root_need() {
     if [[ $EUID -ne 0 ]]; then
         ERROR '此脚本必须以 root 身份运行！'
@@ -4442,39 +4455,74 @@ function main_docker_compose() {
 
 }
 
+function auto_choose_image_mirror() {
+
+    for i in "${!mirrors[@]}"; do
+        local output
+        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"; echo $? > /tmp/curl_exit_status_${i} &)
+        status[$i]=$!
+        delays[$i]=$output
+    done
+    better_time=9999999999
+    for i in "${!mirrors[@]}"; do
+        local time_compare result
+        wait ${status[$i]}
+        result=$(cat /tmp/curl_exit_status_${i})
+        rm -f /tmp/curl_exit_status_${i}
+        if [ $result -eq 0 ]; then
+            if [ "${mirrors[$i]}" == "docker.io" ]; then
+                time_compare=$(awk -v n1="1" -v n2="$result" 'BEGIN {print (n1>n2)? "1":"0"}')
+                if [ $time_compare -eq 1 ]; then
+                    better_mirror=${mirrors[$i]}
+                    better_time=0
+                fi
+            else
+                time_compare=$(awk -v n1="$better_time" -v n2="$result" 'BEGIN {print (n1>n2)? "1":"0"}')
+                if [ $time_compare -eq 1 ]; then
+                    better_mirror=${mirrors[$i]}
+                    better_time=${delays[$i]}
+                fi
+            fi
+        fi
+    done
+    if [ -z "${better_mirror}" ]; then
+        return 1
+    else
+        echo -e "${better_mirror}" > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+        if docker pull "${better_mirror}/library/hello-world:latest" &> /dev/null; then
+            docker rmi "${better_mirror}/library/hello-world:latest" &> /dev/null
+            return 0
+        else
+            return 1
+        fi
+    fi
+
+}
+
 function choose_image_mirror() {
 
     local num
-    local mirrors=(
-        "docker.io"
-        "registry-docker-hub-latest-9vqc.onrender.com"
-        "docker.fxxk.dedyn.io"
-        "docker.chenby.cn"
-        "dockerproxy.com"
-        "hub.uuuadc.top"
-        "docker.jsdelivr.fyi"
-        "docker.registry.cyou"
-        "dockerhub.anzu.vip"
-        "docker.luyao.dynv6.net"
-    )
-    local current_mirror
+    local current_mirror interface
     current_mirror="$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")"
     declare -i s
     local s=0
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}Docker镜像源选择\n${Font}"
-    echo -e "${Sky_Blue}绿色字体代表当前选中的镜像源"
-    echo -e "选择镜像源后会自动检测是否可连接，如果预选镜像源都无法使用请自定义镜像源\n${Font}"
+    echo -ne "${INFO} 界面加载中...${Font}\r"
+    interface="${Sky_Blue}绿色字体代表当前选中的镜像源"
+    interface="${interface}\n选择镜像源后会自动检测是否可连接，如果预选镜像源都无法使用请自定义镜像源${Font}\n"
     local status=()
     for i in "${!mirrors[@]}"; do
         local output
-        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}" &)
+        output=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"; echo $? > /tmp/curl_exit_status_${i} &)
         status[$i]=$!
         delays[$i]=$(printf "%.2f" $output)
     done
     for i in "${!mirrors[@]}"; do
         wait ${status[$i]}
-        local result=$?
+        local result
+        result=$(cat /tmp/curl_exit_status_${i})
+        rm -f /tmp/curl_exit_status_${i}
         local color=
         local font=
         if [[ "${mirrors[$i]}" == "${current_mirror}" ]]; then
@@ -4483,9 +4531,9 @@ function choose_image_mirror() {
             s+=1
         fi
         if [ $result -eq 0 ]; then
-            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Green}可用${Font} ${Sky_Blue}延迟: ${delays[$i]}秒${Font})"
+            interface="${interface}\n$((i + 1))、${color}${mirrors[$i]}${font} (${Green}可用${Font} ${Sky_Blue}延迟: ${delays[$i]}秒${Font})"
         else
-            echo -e "$((i + 1))、${color}${mirrors[$i]}${font} (${Red}不可用${Font})"
+            interface="${interface}\n$((i + 1))、${color}${mirrors[$i]}${font} (${Red}不可用${Font})"
         fi
         z=$((i + 2))
     done
@@ -4495,11 +4543,11 @@ function choose_image_mirror() {
         USER_TEST_STATUS="(${Red}不可用${Font})"
     fi
     if [ "${s}" == "1" ]; then
-        echo -e "${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt") ${USER_TEST_STATUS}"
+        interface="${interface}\n${z}、自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt") ${USER_TEST_STATUS}"
     else
-        echo -e "${z}、${Green}自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")${Font} ${USER_TEST_STATUS}"
+        interface="${interface}\n${z}、${Green}自定义源：$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")${Font} ${USER_TEST_STATUS}"
     fi
-    echo -e "0、返回上级"
+    echo -e "${interface}\n0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-${z}]:" num
     if [ "${num}" == "0" ]; then
@@ -4860,21 +4908,27 @@ function main_other_tools() {
 
 function main_return() {
 
+    local out_tips
     cat /tmp/xiaoya_alist
+    echo -ne "${INFO} 主界面加载中...${Font}\r"
     if ! curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")" &> /dev/null; then
-        echo -e "${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}"
+        if auto_choose_image_mirror; then
+            out_tips="${Green}提示：以为您自动配置Docker镜像源地址为: $(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")${Font}\n"
+        else
+            out_tips="${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}\n"
+        fi
     fi
-    echo -e "1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")
+    echo -e "${out_tips}1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")
 2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")
 3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")
 4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)
 5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")
-6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")"
-    echo -e "7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）"
-    echo -e "8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}"
-    echo -e "9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}"
-    echo -e "0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G,monlor,Rik${Font}"
-    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")
+7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）
+8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}
+9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}
+0、退出脚本 | Thanks: ${Sky_Blue}heiheigui,xiaoyaLiu,Harold,AI老G,monlor,Rik${Font}
+——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-9]:" num
     case "$num" in
     1)
@@ -4931,6 +4985,10 @@ function main_return() {
 
 function first_init() {
 
+    clear
+
+    INFO "初始化中，请稍等...."
+
     root_need
 
     get_os
@@ -4976,7 +5034,9 @@ function first_init() {
     fi
 
     if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror.txt" ]; then
-        echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+        if ! auto_choose_image_mirror; then
+            echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+        fi
     fi
     if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror_user.txt" ]; then
         touch ${DDSREM_CONFIG_DIR}/image_mirror_user.txt
