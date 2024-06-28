@@ -786,108 +786,6 @@ function judgment_xiaoya_alist_sync_data_status() {
 
 }
 
-function install_xiaoya_alist_sync_data() {
-
-    if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
-        get_config_dir
-    else
-        CONFIG_DIR="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"
-    fi
-
-    while true; do
-        INFO "请输入您希望的同步间隔"
-        read -erp "请输入以小时为单位的同步间隔时间（默认：5）：" sync_interval
-        [[ -z "${sync_interval}" ]] && sync_interval="5"
-        if [[ "$sync_interval" -gt 0 && "$sync_interval" -le 23 ]]; then
-            break
-        else
-            ERROR "输入错误，请重新输入。同步间隔时间必须为1到23之间的正整数。"
-        fi
-    done
-
-    bash -c "$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)" -s "${CONFIG_DIR}"
-
-    # 组合定时任务命令
-    CRON="0 */${sync_interval} * * *   bash -c \"\$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)\" -s \
-${CONFIG_DIR} >> \
-${CONFIG_DIR}/data/cron.log 2>&1"
-    if command -v crontab > /dev/null 2>&1; then
-        crontab -l | grep -v xiaoya_data_downloader > /tmp/cronjob.tmp
-        echo -e "${CRON}" >> /tmp/cronjob.tmp
-        crontab /tmp/cronjob.tmp
-        INFO '已经添加下面的记录到crontab定时任务'
-        INFO "${CRON}"
-        rm -rf /tmp/cronjob.tmp
-    elif [ -f /etc/synoinfo.conf ]; then
-        # 群晖单独支持
-        cp /etc/crontab /etc/crontab.bak
-        INFO "已创建/etc/crontab.bak备份文件"
-        sed -i '/xiaoya_data_downloader/d' /etc/crontab
-        echo -e "${CRON}" >> /etc/crontab
-        INFO '已经添加下面的记录到crontab定时任务'
-        INFO "${CRON}"
-    fi
-
-    local net_mode
-    net_mode="$(docker inspect --format='{{range $m, $conf := .NetworkSettings.Networks}}{{$m}}{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
-    if [ "$net_mode"x = "bridge"x ]; then
-        echo "http://127.0.0.1:81/data" > "${CONFIG_DIR}"/download_url.txt
-    elif [ "$net_mode"x = "host"x ]; then
-        echo "http://127.0.0.1:5233/data" > "${CONFIG_DIR}"/download_url.txt
-    else
-        WARN "程序自动编辑download_url.txt失败，请自行编辑 ${CONFIG_DIR}/download_url.txt 文件！"
-    fi
-
-    if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
-        if docker inspect xiaoyaliu/alist:latest > /dev/null 2>&1; then
-            local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/alist:latest | cut -f2 -d:)
-            remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-            INFO "remote_sha: ${remote_sha}"
-            INFO "local_sha: ${local_sha}"
-            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
-                INFO "程序将更新小雅容器！"
-                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
-                docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                docker rmi "${IMAGE_NAME}"
-                SET_NET_MODE=false
-                NET_MODE=n
-                install_xiaoya_alist
-            else
-                INFO "跳过小雅容器更新"
-                INFO "重启小雅容器使配置生效！"
-                docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                wait_xiaoya_start
-            fi
-        fi
-    elif docker inspect xiaoyaliu/alist:hostmode > /dev/null 2>&1; then
-        if docker inspect xiaoyaliu/alist:hostmode > /dev/null 2>&1; then
-            local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/alist:hostmode | cut -f2 -d:)
-            remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/xiaoyaliu/alist/tags/hostmode" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-            INFO "remote_sha: ${remote_sha}"
-            INFO "local_sha: ${local_sha}"
-            if [ ! "${local_sha}" == "${remote_sha}" ] && [ -n "${remote_sha}" ] && [ -n "${local_sha}" ]; then
-                INFO "程序将更新小雅容器！"
-                IMAGE_NAME="$(docker inspect --format='{{.Config.Image}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")"
-                docker stop "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                docker rm "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                docker rmi "${IMAGE_NAME}"
-                SET_NET_MODE=false
-                NET_MODE=y
-                install_xiaoya_alist
-            else
-                INFO "跳过小雅容器更新"
-                INFO "重启小雅容器使配置生效！"
-                docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-                wait_xiaoya_start
-            fi
-        fi
-    fi
-
-    INFO "设置完成！"
-
-}
-
 function uninstall_xiaoya_alist_sync_data() {
 
     if command -v crontab > /dev/null 2>&1; then
@@ -908,7 +806,7 @@ function main_xiaoya_alist() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
-    echo -e "4、创建/删除 定时同步更新数据                  当前状态：$(judgment_xiaoya_alist_sync_data_status)"
+    echo -e "4、创建/删除 定时同步更新数据（${Red}功能已弃用，只提供删除${Font}）  当前状态：$(judgment_xiaoya_alist_sync_data_status)"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-4]:" num
@@ -942,7 +840,7 @@ function main_xiaoya_alist() {
                 clear
                 INFO "已删除"
             else
-                install_xiaoya_alist_sync_data
+                INFO "功能已弃用，目前只提供删除！"
             fi
         elif [ -f /etc/synoinfo.conf ]; then
             if grep 'xiaoya_data_downloader' /etc/crontab > /dev/null 2>&1; then
@@ -954,12 +852,10 @@ function main_xiaoya_alist() {
                 clear
                 INFO "已删除"
             else
-                install_xiaoya_alist_sync_data
+                INFO "功能已弃用，目前只提供删除！"
             fi
         else
-            WARN "目前你的系统不支持脚本自动设置定时任务，请手动将以下命令添加到定时任务，并修改 xiaoya配置文件目录 ！"
-            WARN "bash -c \"\$(curl --insecure -fsSL https://ddsrem.com/xiaoya/xiaoya_data_downloader.sh)\" -s xiaoya配置文件目录"
-            exit 0
+            INFO "功能已弃用，目前只提供删除！"
         fi
         return_menu "main_xiaoya_alist"
         ;;

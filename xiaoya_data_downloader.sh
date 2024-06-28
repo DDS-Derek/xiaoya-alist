@@ -32,6 +32,12 @@ function ERROR() {
     echo -e "${Time} ${ERROR} ${1}"
 }
 
+# 弃用此脚本
+if [ -n "$(date)" ]; then
+    ERROR "此脚本已弃用！"
+    exit 0
+fi
+
 files=(tvbox.zip update.zip index.zip)
 base_urls=(
     "https://gitlab.com/xiaoyaliu/data/-/raw/main/"
