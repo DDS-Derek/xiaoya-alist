@@ -563,6 +563,7 @@ function get_config_dir() {
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
     fi
     if [ -d "${CONFIG_DIR}" ]; then
+        INFO "读取配置目录中..."
         # 将所有小雅配置文件修正成 linux 格式
         find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
         # 设置权限
@@ -1023,45 +1024,6 @@ function pull_run_glue() {
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
-            "${@}"
-    fi
-
-}
-
-function pull_run_ddsderek_glue() {
-
-    if docker inspect ddsderek/xiaoya-glue:latest > /dev/null 2>&1; then
-        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/xiaoya-glue:latest | cut -f2 -d:)
-        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/xiaoya-glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
-        if [ "$local_sha" != "$remote_sha" ]; then
-            docker rmi ddsderek/xiaoya-glue:latest
-        fi
-    fi
-
-    docker_pull "ddsderek/xiaoya-glue:latest"
-
-    if [ -n "${extra_parameters}" ]; then
-        docker run -it \
-            --security-opt seccomp=unconfined \
-            --rm \
-            --net=host \
-            -v "${MEDIA_DIR}:/media" \
-            -v "${CONFIG_DIR}:/etc/xiaoya" \
-            ${extra_parameters} \
-            -e LANG=C.UTF-8 \
-            -e TZ=Asia/Shanghai \
-            ddsderek/xiaoya-glue:latest \
-            "${@}"
-    else
-        docker run -it \
-            --security-opt seccomp=unconfined \
-            --rm \
-            --net=host \
-            -v "${MEDIA_DIR}:/media" \
-            -v "${CONFIG_DIR}:/etc/xiaoya" \
-            -e LANG=C.UTF-8 \
-            -e TZ=Asia/Shanghai \
-            ddsderek/xiaoya-glue:latest \
             "${@}"
     fi
 
@@ -2708,18 +2670,6 @@ function install_jellyfin_xiaoya_all_jellyfin() {
 
 }
 
-function docker_address_xiaoya_all_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    pull_run_ddsderek_glue "/docker_address.sh"
-
-    INFO "替换DOCKER_ADDRESS完成！"
-
-}
-
 function install_xiaoya_notify_cron() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt ]; then
@@ -3521,7 +3471,7 @@ function main_xiaoya_all_emby() {
         ;;
     4)
         clear
-        docker_address_xiaoya_all_emby
+        WARN "此功能已弃用！"
         return_menu "main_xiaoya_all_emby"
         ;;
     5)
