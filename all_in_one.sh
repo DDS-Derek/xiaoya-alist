@@ -318,30 +318,30 @@ function judgment_container() {
         local container_status
         container_status=$(docker inspect --format='{{.State.Status}}' "${1}")
         case "${container_status}" in
-            "created")
-                echo -e "${Blue}已创建${Font}"
-                ;;
-            "running")
-                echo -e "${Green}运行中${Font}"
-                ;;
-            "paused")
-                echo -e "${Blue}已暂停${Font}"
-                ;;
-            "restarting")
-                echo -e "${Blue}重启中${Font}"
-                ;;
-            "removing")
-                echo -e "${Blue}删除中${Font}"
-                ;;
-            "exited")
-                echo -e "${Yellow}已停止${Font}"
-                ;;
-            "dead")
-                echo -e "${Red}不可用${Font}"
-                ;;
-            *)
-                echo -e "${Red}未知状态${Font}"
-                ;;
+        "created")
+            echo -e "${Blue}已创建${Font}"
+            ;;
+        "running")
+            echo -e "${Green}运行中${Font}"
+            ;;
+        "paused")
+            echo -e "${Blue}已暂停${Font}"
+            ;;
+        "restarting")
+            echo -e "${Blue}重启中${Font}"
+            ;;
+        "removing")
+            echo -e "${Blue}删除中${Font}"
+            ;;
+        "exited")
+            echo -e "${Yellow}已停止${Font}"
+            ;;
+        "dead")
+            echo -e "${Red}不可用${Font}"
+            ;;
+        *)
+            echo -e "${Red}未知状态${Font}"
+            ;;
         esac
     else
         echo -e "${Red}未安装${Font}"
