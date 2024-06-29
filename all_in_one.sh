@@ -315,7 +315,34 @@ function show_disk_mount() {
 function judgment_container() {
 
     if docker container inspect "${1}" > /dev/null 2>&1; then
-        echo -e "${Green}已安装${Font}"
+        local container_status
+        container_status=$(docker inspect --format='{{.State.Status}}' "${1}")
+        case "${container_status}" in
+            "created")
+                echo -e "${Blue}已创建${Font}"
+                ;;
+            "running")
+                echo -e "${Green}运行中${Font}"
+                ;;
+            "paused")
+                echo -e "${Blue}已暂停${Font}"
+                ;;
+            "restarting")
+                echo -e "${Blue}重启中${Font}"
+                ;;
+            "removing")
+                echo -e "${Blue}删除中${Font}"
+                ;;
+            "exited")
+                echo -e "${Yellow}已停止${Font}"
+                ;;
+            "dead")
+                echo -e "${Red}不可用${Font}"
+                ;;
+            *)
+                echo -e "${Red}未知状态${Font}"
+                ;;
+        esac
     else
         echo -e "${Red}未安装${Font}"
     fi
@@ -3427,11 +3454,11 @@ function main_xiaoya_all_emby() {
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
-    echo -e "5、安装/更新/卸载 Resilio-Sync                当前安装状态：$(judgment_container "${xiaoya_resilio_name}")"
+    echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、立即同步小雅Emby config目录"
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
-    echo -e "9、安装/更新/卸载 小雅元数据定时爬虫          当前安装状态：$(judgment_container xiaoya-emd)"
+    echo -e "9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)"
     echo -e "10、卸载Emby全家桶"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -4753,8 +4780,8 @@ function main_other_tools() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}其他工具${Font}\n"
-    echo -e "1、安装/更新/卸载 Portainer                   当前安装状态：$(judgment_container "${portainer_name}")"
-    echo -e "2、安装/更新/卸载 Auto_Symlink                当前安装状态：$(judgment_container "${auto_symlink_name}")"
+    echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
+    echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
     echo -e "3、查看系统磁盘挂载"
     echo -e "4、安装/卸载 CasaOS"
     echo -e "0、返回上级"
@@ -4807,12 +4834,12 @@ function main_return() {
             out_tips="${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}\n"
         fi
     fi
-    echo -e "${out_tips}1、安装/更新/卸载 小雅Alist                   当前安装状态：$(judgment_container "${xiaoya_alist_name}")
-2、安装/卸载 小雅Emby全家桶                   当前安装状态：$(judgment_container "${xiaoya_emby_name}")
-3、安装/卸载 小雅Jellyfin全家桶               当前安装状态：$(judgment_container "${xiaoya_jellyfin_name}")
-4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前安装状态：$(judgment_container xiaoyakeeper)
-5、安装/更新/卸载 小雅Alist-TVBox             当前安装状态：$(judgment_container "${xiaoya_tvbox_name}")
-6、安装/更新/卸载 Onelist                     当前安装状态：$(judgment_container "${xiaoya_onelist_name}")
+    echo -e "${out_tips}1、安装/更新/卸载 小雅Alist                   当前状态：$(judgment_container "${xiaoya_alist_name}")
+2、安装/卸载 小雅Emby全家桶                   当前状态：$(judgment_container "${xiaoya_emby_name}")
+3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")
+4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)
+5、安装/更新/卸载 小雅Alist-TVBox             当前状态：$(judgment_container "${xiaoya_tvbox_name}")
+6、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")
 7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）
 8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}
 9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}
