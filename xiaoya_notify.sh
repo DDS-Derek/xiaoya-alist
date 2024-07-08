@@ -41,18 +41,18 @@ function WARN() {
 function container_update() {
 
     local run_image remove_image IMAGE_MIRROR pull_image
-    if docker inspect assaflavie/runlike:latest > /dev/null 2>&1; then
-        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' assaflavie/runlike:latest | cut -f2 -d:)
-        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/assaflavie/runlike/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+    if docker inspect ddsderek/runlike:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/runlike:latest | cut -f2 -d:)
+        remote_sha=$(curl -s "https://hub.docker.com/v2/repositories/ddsderek/runlike/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
         if [ "$local_sha" != "$remote_sha" ]; then
-            docker rmi assaflavie/runlike:latest
-            docker_pull "assaflavie/runlike:latest"
+            docker rmi ddsderek/runlike:latest
+            docker_pull "ddsderek/runlike:latest"
         fi
     else
-        docker_pull "assaflavie/runlike:latest"
+        docker_pull "ddsderek/runlike:latest"
     fi
     INFO "获取 ${1} 容器信息中..."
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp assaflavie/runlike "${@}" > "/tmp/container_update_${*}"
+    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp ddsderek/runlike "${@}" > "/tmp/container_update_${*}"
     run_image=$(docker container inspect -f '{{.Config.Image}}' "${@}")
     remove_image=$(docker images -q ${run_image})
     local retries=0
