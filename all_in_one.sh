@@ -57,6 +57,7 @@ mirrors=(
     "docker.registry.cyou"
     "dockerhub.anzu.vip"
     "docker.luyao.dynv6.net"
+    "freeno.xyz"
 )
 
 function root_need() {
@@ -4370,7 +4371,7 @@ function auto_choose_image_mirror() {
     for i in "${!mirrors[@]}"; do
         local output
         output=$(
-            curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"
+            curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "${mirrors[$i]}"
             echo $? > /tmp/curl_exit_status_${i} &
         )
         status[$i]=$!
@@ -4428,7 +4429,7 @@ function choose_image_mirror() {
     for i in "${!mirrors[@]}"; do
         local output
         output=$(
-            curl -s -o /dev/null -w '%{time_total}' --head --request GET "${mirrors[$i]}"
+            curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "${mirrors[$i]}"
             echo $? > /tmp/curl_exit_status_${i} &
         )
         status[$i]=$!
@@ -4453,7 +4454,7 @@ function choose_image_mirror() {
         fi
         z=$((i + 2))
     done
-    if user_delay=$(curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"); then
+    if user_delay=$(curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror_user.txt")"); then
         USER_TEST_STATUS="(${Green}可用${Font} ${Sky_Blue}延迟: ${user_delay}秒${Font})"
     else
         USER_TEST_STATUS="(${Red}不可用${Font})"
@@ -4827,7 +4828,7 @@ function main_return() {
     local out_tips
     cat /tmp/xiaoya_alist
     echo -ne "${INFO} 主界面加载中...${Font}\r"
-    if ! curl -s -o /dev/null -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")" &> /dev/null; then
+    if ! curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")" &> /dev/null; then
         if auto_choose_image_mirror; then
             out_tips="${Green}提示：已为您自动配置Docker镜像源地址为: $(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")${Font}\n"
         else
