@@ -740,8 +740,11 @@ EOF
         DDSREM_CONFIG_DIR=/etc/DDSRem
         stty -icanon
     # 必须先判断的系统
-    # 绿联NAS 基于 OpenWRT
+    # 绿联旧版UGOS 基于 OpenWRT
     elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    # 绿联UGOS Pro 基于 Debian
+    elif grep -Eqi "Debian" /etc/os-release && grep -Eqi "UGOSPRO" /etc/issue; then
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # OpenMediaVault 基于 Debian
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then

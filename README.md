@@ -190,7 +190,8 @@ Docker镜像源选择 -> 9 6
 |    Synology     |    ✅    |           ✅           |
 |  TrueNAS CORE   |    ✅    |           ✅           |
 |  TrueNAS SCALE  |    ✅    |           ✅           |
-|     UGREEN      |    ✅    |           ✅           |
+|      UGOS       |    ✅    |           ✅           |
+|     UGOS Pro    |    ✅    |           ✅           |
 |   LibreELEC     |    ❌    |           ❌           |
 
 ## 免责声明
