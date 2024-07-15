@@ -796,6 +796,9 @@ EOF
     fi
 
     INFO "脚本配置文件路径：${DDSREM_CONFIG_DIR}"
+    if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror.txt" ]; then
+        echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
+    fi
 
     test_xiaoya_status
 
