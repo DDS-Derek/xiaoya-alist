@@ -779,11 +779,12 @@ function install_xiaoya_alist() {
     fi
     docker_command+=("-v ${CONFIG_DIR}:/data" "-v ${CONFIG_DIR}/data:/www/data" "--restart=always" "--name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" "$docker_image")
     docker_pull "$docker_image"
-    eval "${docker_command[*]}"
-
-    wait_xiaoya_start
-
-    INFO "安装完成！"
+    if eval "${docker_command[*]}"; then
+        wait_xiaoya_start
+        INFO "安装完成！"
+    else
+        ERROR "安装失败！"
+    fi
 
 }
 
