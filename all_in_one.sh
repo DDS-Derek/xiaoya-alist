@@ -4941,7 +4941,7 @@ function first_init() {
     fi
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
-        if [ "$OSNAME" = "ugreen" ]; then
+        if [ "$OSNAME" = "ugos" ] || [ "$OSNAME" = "ugos pro" ]; then
             echo 'wget' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
         else
             echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
