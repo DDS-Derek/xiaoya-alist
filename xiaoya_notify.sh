@@ -734,6 +734,64 @@ EOF
     INFO "Resilio 容器名称：${RESILIO_NAME}"
     INFO "小雅容器名称：${XIAOYA_NAME}"
 
+    _os=$(uname -s)
+    _os_all=$(uname -a)
+    if [ "${_os}" == "Darwin" ]; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+        stty -icanon
+    # 必须先判断的系统
+    # 绿联NAS 基于 OpenWRT
+    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    # OpenMediaVault 基于 Debian
+    elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    # FreeNAS（TrueNAS CORE）基于 FreeBSD
+    elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    # TrueNAS SCALE 基于 Debian
+    elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif [ -f /etc/synoinfo.conf ]; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif [ -f /etc/openwrt_release ]; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "QNAP" /etc/issue; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif [ -f /etc/unraid-version ]; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/storage/DDSRem
+        ERROR "LibreELEC 系统目前不支持！"
+        exit 1
+    elif grep -Eqi "openSUSE" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "FreeBSD" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Arch Linux" /etc/issue || grep -Eqi "Arch Linux" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    else
+        DDSREM_CONFIG_DIR=/etc/DDSRem
+    fi
+
     test_xiaoya_status
 
     # all.mp4 和 pikpak.mp4
