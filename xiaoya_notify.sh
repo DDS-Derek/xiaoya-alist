@@ -792,6 +792,8 @@ EOF
         DDSREM_CONFIG_DIR=/etc/DDSRem
     fi
 
+    INFO "脚本配置文件路径：${DDSREM_CONFIG_DIR}"
+
     test_xiaoya_status
 
     # all.mp4 和 pikpak.mp4
