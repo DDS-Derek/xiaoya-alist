@@ -313,8 +313,7 @@ function update_media() {
 
     extra_parameters="--workdir=/media/temp"
 
-    _os_all=$(uname -a)
-    if echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+    if [ "$OSNAME" = "ugos" ] || [ "$OSNAME" = "ugos pro" ]; then
         INFO "wget 下载模式"
         pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"
     else
@@ -502,8 +501,7 @@ function sync_emby_config() {
     test_xiaoya_status
 
     extra_parameters="--workdir=/media/temp"
-    _os_all=$(uname -a)
-    if echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+    if [ "$OSNAME" = "ugos" ] || [ "$OSNAME" = "ugos pro" ]; then
         INFO "绿联NAS使用 wget 下载"
         pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"
     else
@@ -737,61 +735,85 @@ EOF
     _os=$(uname -s)
     _os_all=$(uname -a)
     if [ "${_os}" == "Darwin" ]; then
+        OSNAME='macos'
         DDSREM_CONFIG_DIR=/etc/DDSRem
         stty -icanon
     # 必须先判断的系统
     # 绿联旧版UGOS 基于 OpenWRT
     elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+        OSNAME='ugos'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # 绿联UGOS Pro 基于 Debian
     elif grep -Eqi "Debian" /etc/os-release && grep -Eqi "UGOSPRO" /etc/issue; then
+        OSNAME='ugos pro'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # OpenMediaVault 基于 Debian
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
+        OSNAME='openmediavault'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # FreeNAS（TrueNAS CORE）基于 FreeBSD
     elif echo -e "${_os_all}" | grep -Eqi "FreeBSD" | grep -Eqi "TRUENAS"; then
+        OSNAME='truenas core'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # TrueNAS SCALE 基于 Debian
     elif grep -Eqi "Debian" /etc/issue && [ -f /etc/version ]; then
+        OSNAME='truenas scale'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/synoinfo.conf ]; then
+        OSNAME='synology'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/openwrt_release ]; then
+        OSNAME='openwrt'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "QNAP" /etc/issue; then
+        OSNAME='qnap'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/unraid-version ]; then
+        OSNAME='unraid'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
+        OSNAME='libreelec'
         DDSREM_CONFIG_DIR=/storage/DDSRem
         ERROR "LibreELEC 系统目前不支持！"
         exit 1
     elif grep -Eqi "openSUSE" /etc/*-release; then
+        OSNAME='opensuse'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "FreeBSD" /etc/*-release; then
+        OSNAME='freebsd'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
+        OSNAME='euler'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+        OSNAME='centos'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+        OSNAME='fedora'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+        OSNAME='rocky'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+        OSNAME='almalinux'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Arch Linux" /etc/issue || grep -Eqi "Arch Linux" /etc/*-release; then
+        OSNAME='archlinux'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+        OSNAME='amazon'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
+        OSNAME='debian'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
+        OSNAME='ubuntu'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif grep -Eqi "Alpine" /etc/issue || grep -Eq "Alpine" /etc/*-release; then
+        OSNAME='alpine'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     else
+        OSNAME='unknow'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     fi
 
