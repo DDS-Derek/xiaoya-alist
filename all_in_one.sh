@@ -312,6 +312,16 @@ function get_os() {
 
 }
 
+function sedsh() {
+
+    if [[ "${OSNAME}" = "macos" ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+
+}
+
 function show_disk_mount() {
 
     df -h | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | sort -nr -k 4
@@ -598,7 +608,11 @@ function get_config_dir() {
     if [ -d "${CONFIG_DIR}" ]; then
         INFO "读取配置目录中..."
         # 将所有小雅配置文件修正成 linux 格式
-        find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
+        if [[ "${OSNAME}" = "macos" ]]; then
+            find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i '' "s/\r$//g" {} \;
+        else
+            find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
+        fi
         # 设置权限
         chmod -R 777 ${CONFIG_DIR}
     fi
@@ -866,11 +880,11 @@ function uninstall_xiaoya_alist_sync_data() {
 
     if command -v crontab > /dev/null 2>&1; then
         crontab -l > /tmp/cronjob.tmp
-        sed -i '/xiaoya_data_downloader/d' /tmp/cronjob.tmp
+        sedsh '/xiaoya_data_downloader/d' /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
         rm -f /tmp/cronjob.tmp
     elif [ -f /etc/synoinfo.conf ]; then
-        sed -i '/xiaoya_data_downloader/d' /etc/crontab
+        sedsh '/xiaoya_data_downloader/d' /etc/crontab
     fi
 
 }
@@ -960,7 +974,11 @@ function get_docker0_url() {
         INFO "docker0 的 IP 地址是：$docker0"
     else
         WARN "无法获取 docker0 的 IP 地址！"
-        docker0=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        if [[ "${OSNAME}" = "macos" ]]; then
+            docker0=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            docker0=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
         INFO "尝试使用本地IP：${docker0}"
     fi
 
@@ -2403,12 +2421,12 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
     else
         if [ "$MODE" == "host" ]; then
             if grep -q "^${docker0}.*xiaoya\.host" ${HOSTS_FILE_PATH}; then
-                sed -i '/xiaoya.host/d' ${HOSTS_FILE_PATH}
+                sedsh '/xiaoya.host/d' ${HOSTS_FILE_PATH}
                 echo -e "127.0.0.1\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
             fi
         elif [ "$MODE" == "bridge" ]; then
             if grep -q "^127\.0\.0\.1.*xiaoya\.host" ${HOSTS_FILE_PATH}; then
-                sed -i '/xiaoya.host/d' ${HOSTS_FILE_PATH}
+                sedsh '/xiaoya.host/d' ${HOSTS_FILE_PATH}
                 echo -e "$docker0\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
             fi
         fi
@@ -2432,7 +2450,7 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
     #     [[ -z "${FIX_HOST_ERROR}" ]] && FIX_HOST_ERROR="y"
     #     if [[ ${FIX_HOST_ERROR} == [Yy] ]]; then
     #         INFO "开始自动纠错..."
-    #         sed -i '/xiaoya\.host/d' /etc/hosts
+    #         sedsh '/xiaoya\.host/d' /etc/hosts
     #         get_xiaoya_hosts
     #     else
     #         exit 1
@@ -2447,7 +2465,7 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
         [[ -z "${FIX_HOST_ERROR}" ]] && FIX_HOST_ERROR="y"
         if [[ ${FIX_HOST_ERROR} == [Yy] ]]; then
             INFO "开始自动纠错..."
-            sed -i '/xiaoya\.host/d' /etc/hosts
+            sedsh '/xiaoya\.host/d' /etc/hosts
             get_xiaoya_hosts
         else
             exit 1
@@ -2799,7 +2817,7 @@ $(cat ${DDSREM_CONFIG_DIR}/resilio_config_dir.txt)/cron.log 2>&1"
         # 群晖单独支持
         cp /etc/crontab /etc/crontab.bak
         INFO "已创建/etc/crontab.bak备份文件"
-        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
+        sedsh '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
         echo -e "${CRON}" >> /etc/crontab
         INFO '已经添加下面的记录到crontab定时任务'
         INFO "${CRON}"
@@ -2962,7 +2980,7 @@ function install_resilio() {
         start_time=$(date +%s)
         while true; do
             if [ -f "${CONFIG_DIR}/sync.conf" ]; then
-                sed -i "/\"listening_port\"/c\    \"listening_port\": ${SYNC_PORT}," ${CONFIG_DIR}/sync.conf
+                sedsh "/\"listening_port\"/c\    \"listening_port\": ${SYNC_PORT}," ${CONFIG_DIR}/sync.conf
                 docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_resilio_name.txt)"
                 break
             fi
@@ -3011,11 +3029,11 @@ function uninstall_xiaoya_notify_cron() {
     # 清理定时同步任务
     if command -v crontab > /dev/null 2>&1; then
         crontab -l > /tmp/cronjob.tmp
-        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /tmp/cronjob.tmp
+        sedsh '/sync_emby_config/d; /xiaoya_notify/d' /tmp/cronjob.tmp
         crontab /tmp/cronjob.tmp
         rm -f /tmp/cronjob.tmp
     elif [ -f /etc/synoinfo.conf ]; then
-        sed -i '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
+        sedsh '/sync_emby_config/d; /xiaoya_notify/d' /etc/crontab
     else
         if docker container inspect xiaoya-cron > /dev/null 2>&1; then
             docker stop xiaoya-cron
