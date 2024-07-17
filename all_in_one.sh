@@ -3865,6 +3865,7 @@ function install_xiaoya_alist_tvbox() {
     fi
 
     INFO "安装完成！"
+    INFO "浏览器访问 小雅Alist-TVBox 服务：${Sky_Blue}http://ip:${HT_PORT}${Font}, 默认用户密码: ${Sky_Blue}admin/admin${Font}"
 
 }
 
