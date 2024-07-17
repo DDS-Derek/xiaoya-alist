@@ -740,7 +740,7 @@ EOF
         stty -icanon
     # 必须先判断的系统
     # 绿联旧版UGOS 基于 OpenWRT
-    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+    elif [ -f /etc/openwrt_version ] && echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
         OSNAME='ugos'
         DDSREM_CONFIG_DIR=/etc/DDSRem
     # 绿联UGOS Pro 基于 Debian

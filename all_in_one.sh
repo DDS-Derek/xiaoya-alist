@@ -209,7 +209,7 @@ function get_os() {
         stty -icanon
     # 必须先判断的系统
     # 绿联旧版UGOS 基于 OpenWRT
-    elif echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
+    elif [ -f /etc/openwrt_version ] && echo -e "${_os_all}" | grep -Eqi "UGREEN"; then
         OSNAME='ugos'
         packages_need
         DDSREM_CONFIG_DIR=/etc/DDSRem
