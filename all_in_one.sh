@@ -782,6 +782,10 @@ function install_xiaoya_alist() {
     if eval "${docker_command[*]}"; then
         wait_xiaoya_start
         INFO "安装完成！"
+        INFO "服务已成功启动，您可以根据使用需求尝试访问以下的地址："
+        INFO "alist: ${Sky_Blue}http://ip:5678${Font}"
+        INFO "webdav: ${Sky_Blue}http://ip:5678/dav${Font}, 默认用户密码: ${Sky_Blue}guest/guest_Api789${Font}"
+        INFO "tvbox: ${Sky_Blue}http://ip:5678/tvbox/my_ext.json${Font}"
     else
         ERROR "安装失败！"
     fi
@@ -3490,6 +3494,7 @@ function main_xiaoya_all_emby() {
             fi
         fi
         INFO "Emby 全家桶安装完成！ "
+        INFO "浏览器访问 Emby 服务：${Sky_Blue}http://ip:2345${Font}, 默认用户密码: ${Sky_Blue}xiaoya/1234${Font}"
         return_menu "main_xiaoya_all_emby"
         ;;
     2)
