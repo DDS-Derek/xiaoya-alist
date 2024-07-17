@@ -817,6 +817,7 @@ EOF
         DDSREM_CONFIG_DIR=/etc/DDSRem
     fi
 
+    INFO "OS: ${_os},${OSNAME}"
     INFO "脚本配置文件路径：${DDSREM_CONFIG_DIR}"
     if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror.txt" ]; then
         echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
