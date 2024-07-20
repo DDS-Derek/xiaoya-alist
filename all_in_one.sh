@@ -4853,6 +4853,38 @@ function main_other_tools() {
 
 }
 
+function love_aliyun_and_fuck() {
+
+    local config_dir local_ip
+    INFO "AliyunPan ありがとう、あなたのせいで世界は爆発する"
+    docker_pull xiaoyaliu/glue:python
+    config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+    if [ -n "${config_dir}" ]; then
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        docker run -i --rm \
+            -v "$config_dir:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            xiaoyaliu/glue:python \
+            /alitoken2.py
+        INFO "开始更新小雅容器..."
+        container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        INFO "操作全部完成！"
+    else
+        ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
+        exit 1
+    fi
+
+}
+
 function main_return() {
 
     local out_tips
@@ -4917,6 +4949,11 @@ function main_return() {
     96)
         clear
         choose_image_mirror "main_return"
+        ;;
+    fuckaliyun)
+        clear
+        love_aliyun_and_fuck
+        return_menu "main_return"
         ;;
     0)
         clear
