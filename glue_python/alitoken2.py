@@ -1,7 +1,12 @@
+#!/usr/local/bin/python3
+
 from flask import Flask, jsonify, render_template, request
 import requests
 import time
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -40,8 +45,10 @@ def get_tokens():
     refresh_token = token_data['refresh_token']
     with open("/data/myopentoken.txt", "w") as file:
         file.write(refresh_token)
+    logging.info('myopentoken.txt 文件更新成功！')
     with open("/data/open_tv_token_url.txt", "w") as file:
         file.write("https://alitv.sakurapy.de/token")
+    logging.info('open_tv_token_url.txt 文件更新成功！')
     return jsonify({'status': 'completed'})
 
 @app.route('/shutdown_server', methods=['GET'])

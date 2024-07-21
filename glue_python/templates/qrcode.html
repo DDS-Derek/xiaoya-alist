@@ -46,7 +46,7 @@
         type: 'post',
         success: function(res) {
             if (res.status === 'completed') {
-                alert('任务完成!');
+                alert('扫码完成，请返回命令行查看后续操作！');
                 $.ajax({
                     url: '/shutdown_server',
                     type: 'get',
