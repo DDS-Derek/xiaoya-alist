@@ -4857,7 +4857,7 @@ function love_aliyun_and_fuck() {
 
     local config_dir local_ip
     INFO "AliyunPan ありがとう、あなたのせいで世界は爆発する"
-    docker_pull xiaoyaliu/glue:python
+    docker_pull ddsderek/xiaoya-glue:python
     config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
     if [ -n "${config_dir}" ]; then
         if [[ "${OSNAME}" = "macos" ]]; then
@@ -4873,7 +4873,7 @@ function love_aliyun_and_fuck() {
             -v "$config_dir:/data" \
             -e LANG=C.UTF-8 \
             --net=host \
-            xiaoyaliu/glue:python \
+            ddsderek/xiaoya-glue:python \
             /alitoken2.py
         INFO "开始更新小雅容器..."
         container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
