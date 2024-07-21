@@ -3483,7 +3483,7 @@ function main_xiaoya_all_emby() {
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Emby（可选择版本）"
     echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
-    echo -e "5、安装/更新/卸载 Resilio-Sync                当前状态：$(judgment_container "${xiaoya_resilio_name}")"
+    echo -e "5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")"
     echo -e "6、立即同步小雅Emby config目录"
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
