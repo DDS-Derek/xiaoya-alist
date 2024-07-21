@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>扫码登录</title>
+<script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='qrcode.min.js') }}"></script>
+</head>
+<body>
+<div id="qrcode"></div>
+
+<script>
+	$.ajax({
+		url: '/get_qrcode',
+		type: 'get',
+		success: function(data){
+			var sid = data.sid;
+			var qr_link = data.qr_link;
+			new QRCode(document.getElementById("qrcode"), {text: qr_link, width: 128, height: 128});
+			var poll = function(){
+				$.ajax({
+					url: '/check_qrcode/' + sid,
+					type: 'get',
+					success: function(res) {
+						if (res.auth_code) {
+							getTokens(res.auth_code);
+						} else {
+							setTimeout(poll, 3000);
+						}
+					},
+					error: function() {
+						console.error('Error occurred checking Qrcode');
+					}
+				});
+			}
+			setTimeout(poll, 3000);
+		},
+		error: function(){
+			console.error('Error occurred getting Qrcode');
+		}
+	});
+	function getTokens(code) {
+    $.ajax({
+        url: '/get_tokens',
+        data: JSON.stringify({auth_code: code}),
+        contentType: 'application/json',
+        type: 'post',
+        success: function(res) {
+            if (res.status === 'completed') {
+                alert('任务完成!');
+                $.ajax({
+                    url: '/shutdown_server',
+                    type: 'get',
+                    complete: function() {
+                        window.close();
+                    }
+                });
+            }
+        },
+        error: function() {
+            console.error('Error occurred getting tokens');
+        }
+    });
+}
+</script>
+
+</body>
+</html>
