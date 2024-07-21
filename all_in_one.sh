@@ -4874,7 +4874,7 @@ function love_aliyun_and_fuck() {
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /alitoken2.py
+            python3 /alitoken2.py
         INFO "开始更新小雅容器..."
         container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
         INFO "操作全部完成！"
