@@ -573,19 +573,19 @@ function check_quark_cookie() {
     if [ "$status" == "401" ]; then
         ERROR "无效夸克 Cookie"
         return 1
-    else
+    elif [ "$status" == "200" ]; then
+        INFO "有效夸克 Cookie"
         state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
         response=$(curl -s -H "$headers" "$state_url")
         sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
-        sign_daily_reward_mb=$(echo "$sign_daily_reward 1024 1024" | awk '{printf "%.2f\n", $1 / ($2 * $3)}')
-        if [ $sign_daily_reward_mb ]; then
-            INFO "有效夸克 Cookie"
+        if [ -n "${sign_daily_reward}" ]; then
+            sign_daily_reward_mb=$(echo "$sign_daily_reward 1024 1024" | awk '{printf "%.2f\n", $1 / ($2 * $3)}')
             INFO "夸克签到获取 $sign_daily_reward_mb MB"
-            return 0
-        else
-            ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
-            return 1
         fi
+        return 0
+    else
+        ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
+        return 1
     fi
 
 }
