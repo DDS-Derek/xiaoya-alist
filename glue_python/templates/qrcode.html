@@ -2,8 +2,25 @@
 <html>
 <head>
 <title>扫码登录</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='qrcode.min.js') }}"></script>
+<style>
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#qrcode {
+    padding: 1em;
+    background-color: #fff;
+    display: inline-block;
+}
+</style>
 </head>
 <body>
 <div id="qrcode"></div>
