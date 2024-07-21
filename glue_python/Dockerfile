@@ -1,3 +1,3 @@
 FROM xiaoyaliu/glue:python
 
-COPY . /
+COPY --chmod=755 . /
