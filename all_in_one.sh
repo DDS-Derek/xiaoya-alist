@@ -822,8 +822,8 @@ function install_xiaoya_alist() {
         if [[ ${choose_115_cookie} == [Yy] ]]; then
             touch ${CONFIG_DIR}/115_cookie.txt
             INFO "输入你的 115 Cookie"
-            read -erp "Cookie:" 115_cookie
-            echo -e "${115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
+            read -erp "Cookie:" set_115_cookie
+            echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
         fi
     fi
 
