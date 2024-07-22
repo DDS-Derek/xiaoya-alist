@@ -590,6 +590,40 @@ function check_quark_cookie() {
 
 }
 
+function check_uc_cookie() {
+
+    if [[ ! -f "${CONFIG_DIR}/uc_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/uc_cookie.txt" ]]; then
+        return 1
+    fi
+    local cookie user_agent url headers response status referer set_cookie
+    cookie=$(head -n1 "${CONFIG_DIR}/uc_cookie.txt")
+    referer="https://drive.uc.cn"
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
+    url="https://pc-api.uc.cn/1/clouddrive/file/sort?pr=UCBrowser&fr=pc&pdir_fid=0&_page=1&_size=50&_fetch_total=1&_fetch_sub_dirs=0&_sort=file_type:asc,updated_at:desc"
+    headers="Cookie: $cookie; User-Agent: $user_agent; Referer: $referer"
+    response=$(curl -s -D - -H "$headers" "$url")
+    set_cookie=$(echo "$response" | grep -i "^Set-Cookie:" | sed 's/Set-Cookie: //')
+    status=$(echo "$response" | grep -i status | cut -f2 -d: | cut -f1 -d,)
+    if [ "$status" == "401" ]; then
+        ERROR "无效 UC Cookie"
+        return 1
+    elif [ -n "${set_cookie}" ]; then
+        local new_puus new_cookie
+        new_puus=$(echo "$set_cookie" | cut -f2 -d: | cut -f1 -d\;)
+        new_cookie=${cookie//__puus=[^;]*/$new_puus}
+        INFO "$new_cookie" > /data/uc_cookie.txt
+        INFO "有效 UC Cookie 并更新"
+        return 0
+    elif [ -z "${set_cookie}" ] && [ "${status}" == "200" ]; then
+        INFO "有效 UC Cookie"
+        return 0
+    else
+        ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
+        return 1
+    fi
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -749,15 +783,32 @@ function install_xiaoya_alist() {
 
     if [ ! -f "${CONFIG_DIR}/quark_cookie.txt" ] || ! check_quark_cookie; then
         INFO "是否配置 夸克 Cookie [Y/n]（默认 n 不配置）"
-        read -erp "Cookie:" choose_cookie
-        [[ -z "${choose_cookie}" ]] && choose_cookie="n"
-        if [[ ${choose_cookie} == [Yy] ]]; then
+        read -erp "Cookie:" choose_quark_cookie
+        [[ -z "${choose_quark_cookie}" ]] && choose_quark_cookie="n"
+        if [[ ${choose_quark_cookie} == [Yy] ]]; then
             touch ${CONFIG_DIR}/quark_cookie.txt
             while true; do
                 INFO "输入你的 夸克 Cookie"
                 read -erp "Cookie:" quark_cookie
                 echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
                 if check_quark_cookie; then
+                    break
+                fi
+            done
+        fi
+    fi
+
+    if [ ! -f "${CONFIG_DIR}/uc_cookie.txt" ] || ! check_uc_cookie; then
+        INFO "是否配置 UC Cookie [Y/n]（默认 n 不配置）"
+        read -erp "Cookie:" choose_uc_cookie
+        [[ -z "${choose_uc_cookie}" ]] && choose_uc_cookie="n"
+        if [[ ${choose_uc_cookie} == [Yy] ]]; then
+            touch ${CONFIG_DIR}/uc_cookie.txt
+            while true; do
+                INFO "输入你的 UC Cookie"
+                read -erp "Cookie:" uc_cookie
+                echo -e "${uc_cookie}" > ${CONFIG_DIR}/uc_cookie.txt
+                if check_uc_cookie; then
                     break
                 fi
             done
