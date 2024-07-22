@@ -3781,9 +3781,9 @@ function once_xiaoyahelper() {
     else
         XIAOYAHELPER_URL="https://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
         if bash -c "$(curl --insecure -fsSL ${XIAOYAHELPER_URL} | tail -n +2)" -s 1 ${TG_CHOOSE}; then
-            INFO "安装完成！"
+            INFO "运行完成！"
         else
-            ERROR "安装失败！"
+            ERROR "运行失败！"
             exit 1
         fi
     fi
