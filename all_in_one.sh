@@ -815,6 +815,18 @@ function install_xiaoya_alist() {
         fi
     fi
 
+    if [ ! -f "${CONFIG_DIR}/115_cookie.txt" ]; then
+        INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
+        read -erp "Cookie:" choose_115_cookie
+        [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
+        if [[ ${choose_115_cookie} == [Yy] ]]; then
+            touch ${CONFIG_DIR}/115_cookie.txt
+            INFO "输入你的 115 Cookie"
+            read -erp "Cookie:" 115_cookie
+            echo -e "${115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
+        fi
+    fi
+
     if command -v ifconfig > /dev/null 2>&1; then
         localip=$(ifconfig -a | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1)
     else
