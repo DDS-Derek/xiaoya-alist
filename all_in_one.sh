@@ -2625,13 +2625,13 @@ function install_emby_xiaoya_all_emby() {
         if [ -n "${version}" ]; then
             IMAGE_VERSION="${version}"
         else
-            IMAGE_VERSION=4.8.0.56
+            IMAGE_VERSION=4.8.8.0
         fi
 
         if [ "${image}" == "emby" ]; then
             install_emby_embyserver
         else
-            # 因为amilys embyserver arm64镜像没有4.8.0.56这个版本号，所以这边规定只能使用latest
+            # 因为amilys embyserver arm64镜像没有4.8.8.0这个版本号，所以这边规定只能使用latest
             cpu_arch=$(uname -m)
             case $cpu_arch in
             "x86_64" | *"amd64"*)
@@ -2684,12 +2684,12 @@ function install_emby_xiaoya_all_emby() {
                     break
                 fi
             fi
-            INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
+            INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest ]（默认 1）"
             read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
             case ${CHOOSE_IMAGE_VERSION} in
             1)
-                IMAGE_VERSION=4.8.0.56
+                IMAGE_VERSION=4.8.8.0
                 break
                 ;;
             2)
