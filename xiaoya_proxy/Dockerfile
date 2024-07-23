@@ -9,10 +9,10 @@ RUN apk add --no-cache \
        dumb-init \
        tzdata \
        bash && \
-    && rm -rf /var/cache/apk/* /tmp/*
+    rm -rf /var/cache/apk/* /tmp/*
 
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
-COPY --chmod=755 xiaoya_proxy/target/xiaoya_proxy-*.jar /xiaoya_proxy.jar
+COPY --chmod=755 target/xiaoya_proxy-*.jar /xiaoya_proxy.jar
 
 EXPOSE 9988
 

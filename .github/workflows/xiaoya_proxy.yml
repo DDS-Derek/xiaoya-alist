@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@master
 
       - 
-        name: Build nginxWebUI.jar
+        name: Build xiaoya_proxy.jar
         id: prepare
         run: |
           cd xiaoya_proxy
