@@ -87,7 +87,7 @@ public class XiaoyaProxyHandler {
         String referer = null;
         int blockCounter = 0;
         OkHttpClient downloadClient = null;
-        OkHttpClient defaultClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).build();
+        OkHttpClient defaultClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).hostnameVerifier((hostname, session) -> true).sslSocketFactory(new MySSLCompat(), MySSLCompat.TM).build();
 
         private HttpDownloader(Map<String, String> params) {
             
