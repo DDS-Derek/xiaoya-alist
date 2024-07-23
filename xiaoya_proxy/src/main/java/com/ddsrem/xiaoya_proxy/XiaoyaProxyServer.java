@@ -22,7 +22,14 @@ public class XiaoyaProxyServer extends NanoHTTPD {
     public Response serve(IHTTPSession session) {
         try {
             Map<String, String> params = session.getParms();
-            params.putAll(session.getHeaders());
+            Map<String, String> headers = session.getHeaders();
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (!params.containsKey(key)) {
+                    params.put(key, value);
+                }
+            }
             Object[] rs = XiaoyaProxyHandler.proxy(params);
             return rs[0] instanceof Response ? (Response) rs[0] : newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
