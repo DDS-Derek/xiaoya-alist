@@ -155,7 +155,7 @@ public class XiaoyaProxyHandler {
             }
             Request request = requestBuilder.build();
             //不支持断点续传，单线程下载
-            if(!this.supportRange) {
+            if(!this.supportRange || threadNum == 0) {
                 Logger.log(connId + "[createDownloadTask]：单线程模式下载，配置线程数：" + threadNum);
                 Callable<InputStream> callable = () -> {
                     return downloadTask(url, headers, "", 0);
