@@ -1,0 +1,74 @@
+name: xiaoya proxy
+
+on:
+    workflow_dispatch:
+    push:
+      branches:
+        - master
+      paths:
+        - "xiaoya_proxy/**"
+        - ".github/workflows/xiaoya_proxy.yml"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+
+      - 
+        name: Build nginxWebUI.jar
+        id: prepare
+        run: |
+          cd xiaoya_proxy
+          mvn clean package
+
+      - 
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-proxy
+          tags: |
+            type=raw,value=latest
+
+      - 
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - 
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - 
+        name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - 
+        name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./xiaoya_proxy
+          file: xiaoya_proxy/Dockerfile
+          platforms: |
+            linux/amd64
+            linux/arm64/v8
+            linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - 
+        name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-proxy
+          short-description: 小雅Alist的相关周边
+          readme-filepath: ./README.md
