@@ -611,11 +611,32 @@ function check_uc_cookie() {
         local new_puus new_cookie
         new_puus=$(echo "$set_cookie" | cut -f2 -d: | cut -f1 -d\;)
         new_cookie=${cookie//__puus=[^;]*/$new_puus}
-        INFO "$new_cookie" > /data/uc_cookie.txt
+        echo "$new_cookie" > ${CONFIG_DIR}/uc_cookie.txt
         INFO "有效 UC Cookie 并更新"
         return 0
     elif [ -z "${set_cookie}" ] && [ "${status}" == "200" ]; then
         INFO "有效 UC Cookie"
+        return 0
+    else
+        ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
+        return 1
+    fi
+
+}
+
+function check_115_cookie() {
+
+    if [[ ! -f "${CONFIG_DIR}/115_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/115_cookie.txt" ]]; then
+        return 1
+    fi
+    local cookie user_agent url headers response
+    cookie=$(head -n1 "${CONFIG_DIR}/115_cookie.txt")
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
+    url="https://passportapi.115.com/app/1.0/web/1.0/check/sso"
+    headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://appversion.115.com/1/web/1.0/api/chrome"
+    response=$(curl -s -D - -H "$headers" "$url")
+    if echo -e "${response}" | grep -q "user_id"; then
+        INFO "有效 115 Cookie"
         return 0
     else
         ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
@@ -815,15 +836,20 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/115_cookie.txt" ]; then
+    if [ ! -f "${CONFIG_DIR}/115_cookie.txt" ] || ! check_115_cookie; then
         INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
         read -erp "Cookie:" choose_115_cookie
         [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
         if [[ ${choose_115_cookie} == [Yy] ]]; then
             touch ${CONFIG_DIR}/115_cookie.txt
-            INFO "输入你的 115 Cookie"
-            read -erp "Cookie:" set_115_cookie
-            echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
+            while true; do
+                INFO "输入你的 115 Cookie"
+                read -erp "Cookie:" set_115_cookie
+                echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
+                if check_115_cookie; then
+                    break
+                fi
+            done
         fi
     fi
 
