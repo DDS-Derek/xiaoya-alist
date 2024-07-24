@@ -62,6 +62,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha, scope=${{ github.workflow }}_xiaoya_proxy
+          cache-to: type=gha, scope=${{ github.workflow }}_xiaoya_proxy
 
       - 
         name: Docker Hub Description
