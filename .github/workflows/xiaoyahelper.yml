@@ -1,0 +1,60 @@
+name: xiaoyahelper
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "xiaoyahelper/**"
+      - ".github/workflows/xiaoyahelper.yml"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/xiaoyahelper
+          tags: |
+            type=raw,value=latest
+
+      - name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set Up Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./xiaoyahelper
+          file: xiaoyahelper/Dockerfile
+          platforms: |
+            linux/amd64,linux/arm64/v8,linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ github.workflow }}_xiaoyahelper
+          cache-to: type=gha,scope=${{ github.workflow }}_xiaoyahelper
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/xiaoyahelper
+          short-description: 小雅Alist的相关周边
+          readme-filepath: ./xiaoyahelper/README.md
