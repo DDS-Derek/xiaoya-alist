@@ -20,9 +20,11 @@ jobs:
 
       - 
         name: Build xiaoya_proxy.jar
-        id: prepare
+        id: build_jar
         run: |
           cd xiaoya_proxy
+          version=$(cat pom.xml | grep -A1 xiaoya_proxy | grep version | perl -pe "s|.*((\d+\.?){3,}).*|\1|")
+          echo "XIAOYA_PROXY_VERSION=${version}" >> $GITHUB_ENV
           mvn clean package
 
       - 
@@ -33,6 +35,7 @@ jobs:
           images: ${{ secrets.DOCKER_USERNAME }}/xiaoya-proxy
           tags: |
             type=raw,value=latest
+            type=raw,value=${{ env.XIAOYA_PROXY_VERSION }}
 
       - 
         name: Set Up QEMU
@@ -73,4 +76,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-proxy
           short-description: 小雅Alist的相关周边
-          readme-filepath: ./README.md
+          readme-filepath: ./xiaoya_proxy/README.md
