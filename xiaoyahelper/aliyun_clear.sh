@@ -2,8 +2,8 @@
 
 ver="202404270924"
 
-upgrade_url="http://xiaoyahelper.zengge99.eu.org/aliyun_clear.sh"
-upgrade_url_backup="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
+upgrade_url="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
+upgrade_url_backup="http://xiaoyahelper.zngle.cf/aliyun_clear.sh"
 tg_push_api_url="https://xiaoyapush.ddsrem.com"
 
 hash_function() {
@@ -727,10 +727,9 @@ install_keeper() {
     if para -b; then
         network=""
     fi
-    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
-    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
+    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d ddsderek/xiaoyakeeper:latest sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi"
     docker exec xiaoyakeeper touch /docker-entrypoint.sh
-    docker exec xiaoyakeeper mkdir /etc/xiaoya
+    docker exec xiaoyakeeper sh -c "mkdir /etc/xiaoya > /dev/null 2>&1"
     #docker cp $XIAOYA_ROOT/aliyun_clear.sh xiaoyakeeper:/etc/xiaoya/aliyun_clear.sh
     echo "$newsh" | docker exec -i xiaoyakeeper sh -c 'cp /dev/stdin /etc/xiaoya/aliyun_clear.sh'
 
