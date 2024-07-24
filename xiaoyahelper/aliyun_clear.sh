@@ -727,7 +727,8 @@ install_keeper() {
     if para -b; then
         network=""
     fi
-    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d ddsderek/xiaoyakeeper:latest sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi"
+    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
+    docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d dockerproxy.com/library/alpine:3.18.2 sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi" &>/dev/null
     docker exec xiaoyakeeper touch /docker-entrypoint.sh
     docker exec xiaoyakeeper mkdir /etc/xiaoya
     #docker cp $XIAOYA_ROOT/aliyun_clear.sh xiaoyakeeper:/etc/xiaoya/aliyun_clear.sh
