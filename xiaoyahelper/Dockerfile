@@ -10,7 +10,7 @@ RUN apk add --no-cache \
        cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
        echo "Asia/Shanghai" >/etc/timezone
 
-COPY xiaoyahelper/aliyun_clear.sh /etc/xiaoya/aliyun_clear.sh
+COPY aliyun_clear.sh /etc/xiaoya/aliyun_clear.sh
 
 RUN chmod 755 /etc/xiaoya/aliyun_clear.sh
 
