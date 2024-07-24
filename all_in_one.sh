@@ -664,12 +664,12 @@ function get_config_dir() {
         INFO "读取配置目录中..."
         # 将所有小雅配置文件修正成 linux 格式
         if [[ "${OSNAME}" = "macos" ]]; then
-            find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i '' "s/\r$//g" {} \;
+            find ${CONFIG_DIR} -maxdepth 1 -type f -name "*.txt" -exec sed -i '' "s/\r$//g" {} \;
         else
-            find ${CONFIG_DIR} -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
+            find ${CONFIG_DIR} -maxdepth 1 -type f -name "*.txt" -exec sed -i "s/\r$//g" {} \;
         fi
         # 设置权限
-        chmod -R 777 ${CONFIG_DIR}
+        find ${CONFIG_DIR} -maxdepth 1 -type f -exec chmod 777 {} \;
     fi
 
 }
