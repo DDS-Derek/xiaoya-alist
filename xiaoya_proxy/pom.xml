@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ddsrem</groupId>
     <artifactId>xiaoya_proxy</artifactId>
-    <version>0.1</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Xiaoya Proxy</name>
-    <description>Xiaoya Alist Proxy.</description>
+    <description>Xiaoya Alist Proxy</description>
     <!-- 依赖 -->
     <dependencies>
         <dependency>
@@ -40,6 +40,14 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                </excludes>
+                            </filter>
+                            </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.ddsrem.xiaoya_proxy.XiaoyaProxyRun</mainClass>
