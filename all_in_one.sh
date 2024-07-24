@@ -3777,7 +3777,7 @@ function install_xiaoyahelper() {
         TG_CHOOSE="-tg"
     fi
 
-    docker_pull "library/alpine:3.18.2"
+    docker_pull "ddsderek/xiaoyakeeper:latest"
 
     XIAOYAHELPER_URL="https://xiaoyahelper.ddsrem.com/aliyun_clear.sh"
     if xiaoyahelper_install_check "${XIAOYAHELPER_URL}"; then
@@ -3827,7 +3827,9 @@ function uninstall_xiaoyahelper() {
     done
     docker stop xiaoyakeeper
     docker rm xiaoyakeeper
-    docker rmi dockerproxy.com/library/alpine:3.18.2
+    docker rmi dockerproxy.com/library/alpine:3.18.2 > /dev/null 2>&1
+    docker rmi alpine:3.18.2 > /dev/null 2>&1
+    docker rmi ddsderek/xiaoyakeeper:latest
 
     if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
         INFO "清理配置文件..."
