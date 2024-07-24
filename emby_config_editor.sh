@@ -100,12 +100,12 @@ function set_image() {
 
 function set_version() {
 
-    if [ "${version}" == "4.8.8.0" ]; then
+    if [ "${version}" == "4.8.0.56" ]; then
         new_version=latest
     elif [ "${version}" == "latest" ]; then
-        new_version=4.8.8.0
+        new_version=4.8.0.56
     else
-        new_version=4.8.8.0
+        new_version=4.8.0.56
     fi
 
     sed -i "s/version=.*/version=${new_version}/" "${config_dir}/emby_config.txt"
@@ -241,7 +241,7 @@ if [ ! -s "${config_dir}/emby_config.txt" ]; then
         echo "image=emby"
         echo "media_dir="
         echo "resilio=no"
-        echo "version=4.8.8.0"
+        echo "version=4.8.0.56"
     } >> "${config_dir}/emby_config.txt"
 else
     source "${config_dir}/emby_config.txt"
@@ -261,7 +261,7 @@ else
         echo "resilio=no" >> "${config_dir}/emby_config.txt"
     fi
     if [ -z "${version}" ]; then
-        echo "version=4.8.8.0" >> "${config_dir}/emby_config.txt"
+        echo "version=4.8.0.56" >> "${config_dir}/emby_config.txt"
     fi
 fi
 

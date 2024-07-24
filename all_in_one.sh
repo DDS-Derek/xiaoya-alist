@@ -2383,7 +2383,7 @@ function install_lovechen_embyserver() {
     INFO "数据库转换成功！"
     rm -rf ${MEDIA_DIR}/temp.sql
 
-    docker_pull "lovechen/embyserver:4.7.14.0"
+    docker_pull "lovechen/embyserver:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2397,7 +2397,7 @@ function install_lovechen_embyserver() {
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
-            lovechen/embyserver:4.7.14.0
+            lovechen/embyserver:${IMAGE_VERSION}
     else
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
@@ -2410,7 +2410,7 @@ function install_lovechen_embyserver() {
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
-            lovechen/embyserver:4.7.14.0
+            lovechen/embyserver:${IMAGE_VERSION}
     fi
 
 }
@@ -2625,20 +2625,20 @@ function install_emby_xiaoya_all_emby() {
         if [ -n "${version}" ]; then
             IMAGE_VERSION="${version}"
         else
-            IMAGE_VERSION=4.8.8.0
+            IMAGE_VERSION=4.8.0.56
         fi
 
         if [ "${image}" == "emby" ]; then
             install_emby_embyserver
         else
-            # 因为amilys embyserver arm64镜像没有4.8.8.0这个版本号，所以这边规定只能使用latest
+            # 因为amilys embyserver arm64镜像没有4.8.0.56这个版本号，所以这边规定只能使用latest
             cpu_arch=$(uname -m)
             case $cpu_arch in
             "x86_64" | *"amd64"*)
                 install_amilys_embyserver
                 ;;
             "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-                WARN "amilys/embyserver_arm64v8镜像无法指定版本号，忽略镜像版本号设置，默认拉取latest镜像！"
+                WARN "amilys/embyserver_arm64v8 镜像无法指定版本号，忽略镜像版本号设置，默认拉取latest镜像！"
                 IMAGE_VERSION=latest
                 install_amilys_embyserver
                 ;;
@@ -2679,17 +2679,22 @@ function install_emby_xiaoya_all_emby() {
             if [ "${CHOOSE_EMBY}" == "amilys_embyserver" ]; then
                 cpu_arch=$(uname -m)
                 if [[ $cpu_arch == "aarch64" || $cpu_arch == *"arm64"* || $cpu_arch == *"armv8"* || $cpu_arch == *"arm/v8"* ]]; then
-                    WARN "amilys/embyserver_arm64v8镜像无法指定版本号，默认拉取latest镜像！"
+                    WARN "amilys/embyserver_arm64v8 镜像无法指定版本号，默认拉取 latest 镜像！"
                     IMAGE_VERSION=latest
                     break
                 fi
             fi
-            INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest ]（默认 1）"
+            if [ "${CHOOSE_EMBY}" == "install_lovechen_embyserver" ]; then
+                WARN "lovechen/embyserver 镜像无法指定版本号，默认拉取 4.7.14.0 镜像！"
+                IMAGE_VERSION=4.7.14.0
+                break
+            fi
+            INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
             read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
             case ${CHOOSE_IMAGE_VERSION} in
             1)
-                IMAGE_VERSION=4.8.8.0
+                IMAGE_VERSION=4.8.0.56
                 break
                 ;;
             2)
