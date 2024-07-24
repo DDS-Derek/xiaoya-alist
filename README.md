@@ -144,9 +144,12 @@ Docker镜像源选择 -> 9 6
 
 ## 相关地址
 
-[https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
-
-小雅官方 [Telegram](https://t.me/xiaoyaliu00) 交流群
+- [https://github.com/DDS-Derek/xiaoya-alist](https://github.com/DDS-Derek/xiaoya-alist)
+- [https://hub.docker.com/r/ddsderek/xiaoya-emd](https://hub.docker.com/r/ddsderek/xiaoya-emd)
+- [https://hub.docker.com/r/ddsderek/xiaoya-proxy](https://hub.docker.com/r/ddsderek/xiaoya-proxy)
+- [https://hub.docker.com/r/ddsderek/xiaoya-cron](https://hub.docker.com/r/ddsderek/xiaoya-cron)
+- [https://hub.docker.com/r/ddsderek/xiaoya-glue](https://hub.docker.com/r/ddsderek/xiaoya-glue)
+- 小雅官方 [Telegram](https://t.me/xiaoyaliu00) 交流群
 
 ## 通用兼容性测试报告
 
