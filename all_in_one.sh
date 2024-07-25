@@ -635,8 +635,7 @@ function check_115_cookie() {
     url="https://my.115.com/?ct=ajax&ac=nav"
     headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://appversion.115.com/1/web/1.0/api/chrome"
     response=$(curl -s -D - -H "$headers" "$url")
-    vip=${response//*vip\":\"/}
-    vip=${vip%%,*}
+    vip=$(echo -e "$response" | grep -o '"vip":[^,]*' | sed 's/"vip"://')
     if echo -e "${response}" | grep -q "user_id"; then
         if [ $vip == "0" ]; then
             INFO "尊敬的白嫖用户，您的 115 Cookie 有效"
