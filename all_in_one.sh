@@ -629,14 +629,19 @@ function check_115_cookie() {
     if [[ ! -f "${CONFIG_DIR}/115_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/115_cookie.txt" ]]; then
         return 1
     fi
-    local cookie user_agent url headers response
+    local cookie user_agent url headers response vip
     cookie=$(head -n1 "${CONFIG_DIR}/115_cookie.txt")
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
-    url="https://passportapi.115.com/app/1.0/web/1.0/check/sso"
+    url="https://my.115.com/?ct=ajax&ac=nav"
     headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://appversion.115.com/1/web/1.0/api/chrome"
     response=$(curl -s -D - -H "$headers" "$url")
+    vip=$(echo "$response" | sed 's/.*vip\"\:\([[:digit:]]\).*/\1/' )
     if echo -e "${response}" | grep -q "user_id"; then
-        INFO "有效 115 Cookie"
+        if [ $vip == "0" ]; then
+            INFO "尊敬的白嫖用户，您的 115 Cookie 有效"
+        else
+            INFO "尊敬的VIP用户，您的 115 Cookie 有效"
+        fi
         return 0
     else
         ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
