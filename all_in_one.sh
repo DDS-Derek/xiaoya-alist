@@ -58,6 +58,7 @@ mirrors=(
     "dockerhub.anzu.vip"
     "docker.luyao.dynv6.net"
     "freeno.xyz"
+    "docker.1panel.live"
 )
 
 function root_need() {
