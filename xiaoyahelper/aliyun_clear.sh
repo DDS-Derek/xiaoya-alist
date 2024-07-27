@@ -155,17 +155,6 @@ if [ ! "$latest_ver"x = x ] && [ ! "$ver"x = "$latest_ver"x ]; then
     fi
 fi
 
-docker_mirror() {
-    mirrors="$(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh | awk '/mirrors=\(/,/\)/' | sed -n 's/^[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' | grep -v "docker\.io" | grep -v "dockerproxy\.com" | grep -v "docker\.jsdelivr\.fyi")"
-    output="$(
-        for line in $mirrors; do
-            curl -s -o /dev/null -m 4 -w '%{time_total} '$line'\n' --head --request GET "$line" &
-        done
-        wait
-    )"
-    echo "$output" | sort -n | head -n1 | awk '{print $2}'
-}
-
 get_Header() {
     response=$(curl --connect-timeout 5 -m 5 -s -H "Content-Type: application/json" \
         -d '{"grant_type":"refresh_token", "refresh_token":"'$refresh_token'"}' \
@@ -611,6 +600,28 @@ copy_tvbox_files() {
 copy_tvbox_files'
 }
 
+docker_pull() {
+    mirrors="$(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh | awk '/mirrors=\(/,/\)/' | sed -n 's/^[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' | grep -v "docker\.io")"
+    mirrors="$(
+        for line in $mirrors; do
+            curl -s -o /dev/null -m 4 -w '%{time_total} '$line'\n' --head --request GET "$line" &
+        done
+        wait
+    )"
+    mirrors="$(echo "$mirrors" | sort -n | awk '{print $2}')"
+    for mirror in $mirrors; do
+        echo "尝试使用镜像源拉取：$mirror/$1"
+        docker tag "$1" "$mirror/$para_i" > /dev/null 2>&1
+        docker pull "$mirror/$1"
+        res=$?
+        docker tag "$mirror/$1" "$1" > /dev/null 2>&1
+        docker rmi "$mirror/$1" > /dev/null 2>&1
+        if [ $res -eq 0 ]; then
+            break
+        fi
+    done
+}
+
 update_xiaoya() {
     sleep 60
     para_v="$(docker inspect --format='{{range $v,$conf := .Mounts}}-v {{$conf.Source}}:{{$conf.Destination}} {{$conf.Type}}~{{end}}' $XIAOYA_NAME | tr '~' '\n' | grep bind | sed 's/bind//g' | grep -Eo "\-v .*:.*" | tr '\n' ' ')"
@@ -626,12 +637,7 @@ update_xiaoya() {
     para_i="$(get_docker_info $XIAOYA_NAME | awk '{print $2}'):$tag"
     para_e="$(docker inspect --format='{{range $p, $conf := .Config.Env}}~{{$conf}}{{end}}' $XIAOYA_NAME 2>/dev/null | sed '/^$/d' | tr '~' '\n' | sed '/^$/d' | awk '{printf("-e \"%s\"\n",$0)}' | tr '\n' ' ')"
     #docker pull "$para_i" 2>&1
-    mirror="$(docker_mirror)"
-    echo "当前使用镜像源是：$mirror"
-    docker tag "$para_i" "$mirror/$para_i" > /dev/null 2>&1
-    docker pull "$mirror/$para_i"
-    docker tag "$mirror/$para_i" "$para_i" > /dev/null 2>&1
-    docker rmi "$mirror/$para_i" > /dev/null 2>&1
+    docker_pull "$para_i"
     cur_image=$(get_docker_info $XIAOYA_NAME | awk '{print $3}')
     latest_image=$(docker images --no-trunc | tail -n +2 | tr ':' ' ' | awk '{printf("%s:%s %s\n",$1,$2,$4)}' | grep "$para_i" | awk '{print $2}')
 
@@ -941,3 +947,4 @@ case "$run_mode" in
 esac
 
 exec 6>&- >/dev/null 2>&1
+
