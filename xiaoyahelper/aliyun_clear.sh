@@ -750,6 +750,7 @@ install_keeper() {
     if para -b; then
         network=""
     fi
+    docker_pull "ddsderek/xiaoyakeeper:latest"
     docker run --name xiaoyakeeper --restart=always $network --privileged -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" -d ddsderek/xiaoyakeeper:latest sh -c "if [ -f /etc/xiaoya/aliyun_clear.sh ];then sh /etc/xiaoya/aliyun_clear.sh $1;else sleep 60;fi"
     docker exec xiaoyakeeper touch /docker-entrypoint.sh
     docker exec xiaoyakeeper sh -c "mkdir /etc/xiaoya > /dev/null 2>&1"
