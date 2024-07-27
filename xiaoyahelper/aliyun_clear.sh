@@ -156,7 +156,7 @@ if [ ! "$latest_ver"x = x ] && [ ! "$ver"x = "$latest_ver"x ]; then
 fi
 
 docker_mirror() {
-    mirrors="$(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh | awk '/mirrors=\(/,/\)/' | sed -n 's/^[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' | grep -v "docker\.io" | grep -v "dockerproxy\.com")"
+    mirrors="$(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh | awk '/mirrors=\(/,/\)/' | sed -n 's/^[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' | grep -v "docker\.io" | grep -v "dockerproxy\.com" | grep -v "docker\.jsdelivr\.fyi")"
     output="$(
         for line in $mirrors; do
             curl -s -o /dev/null -m 4 -w '%{time_total} '$line'\n' --head --request GET "$line" &
@@ -627,6 +627,7 @@ update_xiaoya() {
     para_e="$(docker inspect --format='{{range $p, $conf := .Config.Env}}~{{$conf}}{{end}}' $XIAOYA_NAME 2>/dev/null | sed '/^$/d' | tr '~' '\n' | sed '/^$/d' | awk '{printf("-e \"%s\"\n",$0)}' | tr '\n' ' ')"
     #docker pull "$para_i" 2>&1
     mirror="$(docker_mirror)"
+    echo "当前使用镜像源是：$mirror"
     docker tag "$para_i" "$mirror/$para_i" > /dev/null 2>&1
     docker pull "$mirror/$para_i"
     docker tag "$mirror/$para_i" "$para_i" > /dev/null 2>&1
