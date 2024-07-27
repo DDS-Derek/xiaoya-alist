@@ -947,4 +947,3 @@ case "$run_mode" in
 esac
 
 exec 6>&- >/dev/null 2>&1
-
