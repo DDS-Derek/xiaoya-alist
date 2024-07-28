@@ -1250,6 +1250,9 @@ function unzip_xiaoya_emby() {
     if [ "${1}" == "config.mp4" ]; then
         extra_parameters="--workdir=/media"
 
+        if [ -d "${MEDIA_DIR}/config" ]; then
+            rm -rf ${MEDIA_DIR}/config
+        fi
         mkdir -p "${MEDIA_DIR}"/config
 
         config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
