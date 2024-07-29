@@ -18,6 +18,14 @@ jobs:
         name: Checkout
         uses: actions/checkout@master
 
+      -
+        name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'maven'
+          cache-dependency-path: 'xiaoya_proxy/pom.xml'
       - 
         name: Build xiaoya_proxy.jar
         id: build_jar
