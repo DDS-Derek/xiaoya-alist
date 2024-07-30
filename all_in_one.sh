@@ -564,7 +564,7 @@ function check_quark_cookie() {
     if [[ ! -f "${CONFIG_DIR}/quark_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/quark_cookie.txt" ]]; then
         return 1
     fi
-    local cookie user_agent url headers response status state_url sign_daily_reward sign_daily_reward_mb
+    local cookie user_agent url headers response status state_url sign_daily_reward sign_daily_reward_mb url2 response2 member member_type vip_88
     cookie=$(head -n1 "${CONFIG_DIR}/quark_cookie.txt")
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
     url="https://drive-pc.quark.cn/1/clouddrive/config?pr=ucpro&fr=pc&uc_param_str="
@@ -575,7 +575,22 @@ function check_quark_cookie() {
         ERROR "无效夸克 Cookie"
         return 1
     elif [ "$status" == "200" ]; then
-        INFO "有效夸克 Cookie"
+        url2="https://drive-pc.quark.cn/1/clouddrive/member?pr=ucpro&fr=pc&uc_param_str=&fetch_subscribe=true&_ch=home&fetch_identity=true"
+        response2=$(curl -s -H "$headers" "$url2")
+        member=$(echo $response2 | grep -o '"member_type":"[^"]*"' | sed 's/"member_type":"\(.*\)"/\1/')
+        if [ $member == 'EXP_SVIP' ] || [ $member == 'SVIP' ]; then
+            vip_88=$(echo $response2 | grep -o '"vip88_new":[t|f]' | cut -f2 -d:)
+            if [ $vip_88 == 't' ]; then
+                member_type="88VIP会员"
+            else
+                member_type="SVIP会员"
+            fi
+        elif [ $member == 'NORMAL' ]; then
+            member_type="普通用户"
+        else
+            member_type="${member//\"/}会员"
+        fi
+        INFO "有效夸克 Cookie，欢迎你${member_type}"
         state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
         response=$(curl -s -H "$headers" "$state_url")
         sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
