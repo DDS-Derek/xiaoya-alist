@@ -3655,7 +3655,21 @@ function main_xiaoya_all_emby() {
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}小雅Emby全家桶${Font}\n"
     echo -e "${Red}注意：2024年3月16日后Emby config同步定时任务更换为同步定时更新任务${Font}"
-    echo -e "${Red}用户需先执行一遍 菜单27 删除旧任务，再执行一遍 菜单27 创建新任务${Font}\n"
+    echo -e "${Red}用户需先执行一遍 菜单27 删除旧任务，再执行一遍 菜单27 创建新任务${Font}"
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        local container_status
+        container_status=$(docker inspect --format='{{.State.Status}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")
+        case "${container_status}" in
+        "running")
+            echo -e "\n"
+            ;;
+        *)
+            echo -e "\n${Red}警告：您的小雅容器未正常启动，请先检查小雅容器后再安装全家桶${Font}\n"
+            ;;
+        esac
+    else
+        echo -e "${Red}\n警告：您未安装小雅容器，请先安装小雅容器后再安装全家桶${Font}\n"
+    fi
     echo -e "1、一键安装Emby全家桶"
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Emby（可选择版本）"
@@ -3791,7 +3805,21 @@ function main_xiaoya_all_jellyfin() {
     echo -e "${Sky_Blue}Jellyfin 全家桶元数据由 AI老G 更新维护，在此表示感谢！"
     echo -e "Jellyfin 全家桶安装前提条件："
     echo -e "1. 硬盘140G以上（如果无需完整安装则 60G 以上即可）"
-    echo -e "2. 内存3.5G以上空余空间${Font}\n"
+    echo -e "2. 内存3.5G以上空余空间${Font}"
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        local container_status
+        container_status=$(docker inspect --format='{{.State.Status}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")
+        case "${container_status}" in
+        "running")
+            echo -e "\n"
+            ;;
+        *)
+            echo -e "\n${Red}警告：您的小雅容器未正常启动，请先检查小雅容器后再安装全家桶${Font}\n"
+            ;;
+        esac
+    else
+        echo -e "${Red}\n警告：您未安装小雅容器，请先安装小雅容器后再安装全家桶${Font}\n"
+    fi
     echo -e "1、一键安装Jellyfin全家桶"
     echo -e "2、下载/解压 元数据"
     echo -e "3、安装Jellyfin"
