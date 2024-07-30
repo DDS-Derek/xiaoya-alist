@@ -2667,7 +2667,11 @@ function install_emby_xiaoya_all_emby() {
             exit 1
         fi
     else
-        ERROR "Emby config 出错，请重新下载解压！"
+        if [ ! -f "${MEDIA_DIR}/temp/config.mp4" ]; then
+            ERROR "config.mp4 不存在，请下载此文件并解压！"
+        else
+            ERROR "Emby config 出错，请重新下载解压！"
+        fi
         exit 1
     fi
 
