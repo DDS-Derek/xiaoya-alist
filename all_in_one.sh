@@ -3949,14 +3949,27 @@ function install_xiaoya_alist_tvbox() {
     read -erp "MEM_OPT:" MEM_OPT
     [[ -z "${MEM_OPT}" ]] && MEM_OPT="-Xmx512M"
 
-    INFO "是否使用内存优化版镜像 [Y/n]（默认 n 不使用）"
-    read -erp "Native:" choose_native
-    [[ -z "${choose_native}" ]] && choose_native="n"
-    if [[ ${choose_native} == [Yy] ]]; then
-        __choose_native="native"
-    else
+    cpu_arch=$(uname -m)
+    INFO "您的CPU架构：${cpu_arch}"
+    case $cpu_arch in
+    "x86_64" | *"amd64"*)
+        INFO "是否使用内存优化版镜像 [Y/n]（默认 n 不使用）"
+        read -erp "Native:" choose_native
+        [[ -z "${choose_native}" ]] && choose_native="n"
+        if [[ ${choose_native} == [Yy] ]]; then
+            __choose_native="native"
+        else
+            __choose_native="latest"
+        fi
+        ;;
+    "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         __choose_native="latest"
-    fi
+        ;;
+    *)
+        ERROR "Xiaoya-TVBox 目前只支持 amd64 和 arm64 架构，你的架构是：$cpu_arch"
+        exit 1
+        ;;
+    esac
 
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
