@@ -2584,8 +2584,25 @@ function get_xiaoya_hosts() { # 调用这个函数必须设置 $MODE 此变量
         if [[ "$response" == "302" || "$response" == "200" ]]; then
             INFO "hosts 文件设置正确，本机可以正常访问小雅容器！"
         else
-            ERROR "hosts 文件设置错误，本机无法正常访问小雅容器！"
-            exit 1
+            if [[ "${OSNAME}" = "macos" ]]; then
+                localip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+            else
+                if command -v ifconfig > /dev/null 2>&1; then
+                    localip=$(ifconfig -a | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1)
+                else
+                    localip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+                fi
+            fi
+            INFO "尝试使用本机IP：${localip}"
+            response="$(curl -s -o /dev/null -w '%{http_code}' http://${localip}:5678)"
+            if [[ "$response" == "302" || "$response" == "200" ]]; then
+                sedsh '/xiaoya.host/d' ${HOSTS_FILE_PATH}
+                echo -e "$localip\txiaoya.host\n" >> ${HOSTS_FILE_PATH}
+                INFO "hosts 文件设置成功，本机可以正常访问小雅容器！"
+            else
+                ERROR "hosts 文件设置错误，本机无法正常访问小雅容器！"
+                exit 1
+            fi
         fi
     fi
 
