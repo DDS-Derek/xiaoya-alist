@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<html lang="en">
+  <style>
+    body {
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+    }
+  </style>
+  <head>
+    <meta charset="utf-8">
+    <title>115 Cookie</title>
+  </head>
+  <body>
+    <h1>请打开115网盘扫描此二维码，并在确认登入后返回命令行查看后续操作！</h1>
+    <img src="data:image/png;base64,{{ qrcode_image_b64_str }}" />
+  </body>
+</html>
