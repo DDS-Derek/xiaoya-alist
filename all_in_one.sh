@@ -2802,7 +2802,7 @@ function install_emby_xiaoya_all_emby() {
                     IMAGE_VERSION=4.8.8.0
                     break
                     ;;
-                4)
+                3)
                     IMAGE_VERSION=latest
                     break
                     ;;
