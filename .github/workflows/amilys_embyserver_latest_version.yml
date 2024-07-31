@@ -14,9 +14,9 @@ jobs:
       -
         name: Get Version
         run: |
-            docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:4.8.0.56 /system/EmbyServer.deps.json /data
+            docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:latest /system/EmbyServer.deps.json /data
             LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
-            sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|"" all_in_one.sh
+            sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
             rm -rf ${PWD}/emby
 
       - 
