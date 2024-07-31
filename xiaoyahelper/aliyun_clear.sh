@@ -601,6 +601,7 @@ copy_tvbox_files'
 }
 
 docker_pull() {
+    repo_tag="$1"
     mirrors="$(curl --insecure -fsSL https://ddsrem.com/xiaoya/all_in_one.sh | awk '/mirrors=\(/,/\)/' | sed -n 's/^[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' | grep -v "docker\.io")"
     mirrors="$(
         for line in $mirrors; do
@@ -609,17 +610,25 @@ docker_pull() {
         wait
     )"
     mirrors="$(echo "$mirrors" | sort -n | awk '{print $2}')"
+    repo="$(echo "$repo_tag" | awk -F: '{print $1}')"
+    tag="$(echo "$repo_tag" | awk -F: '{print $2}')"
+    old_image_id="$(docker images | grep "$repo" | grep "$tag" | grep -Eo "[0-9a-f]{6,128}")"
     for mirror in $mirrors; do
-        echo "尝试使用镜像源拉取：$mirror/$1"
-        docker tag "$1" "$mirror/$para_i" > /dev/null 2>&1
-        docker pull "$mirror/$1"
+        echo "尝试使用镜像源拉取：$mirror/$repo_tag"
+        docker tag "$repo_tag" "$mirror/$para_i" > /dev/null 2>&1
+        docker rmi "$repo_tag" > /dev/null 2>&1
+        docker pull "$mirror/$repo_tag"
         res=$?
-        docker tag "$mirror/$1" "$1" > /dev/null 2>&1
-        docker rmi "$mirror/$1" > /dev/null 2>&1
+        docker tag "$mirror/$repo_tag" "$repo_tag" > /dev/null 2>&1
+        docker rmi "$mirror/$repo_tag" > /dev/null 2>&1
         if [ $res -eq 0 ]; then
             break
         fi
     done
+    new_image_id="$(docker images | grep "$repo" | grep "$tag" | grep -Eo "[0-9a-f]{6,128}")"
+    if [ "$new_image_id"x != "$old_image_id"x ];then
+        docker tag "$old_image_id" "$repo:none" > /dev/null 2>&1
+    fi
 }
 
 update_xiaoya() {
