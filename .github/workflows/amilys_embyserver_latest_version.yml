@@ -17,12 +17,12 @@ jobs:
             docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:latest /system/EmbyServer.deps.json /data
             LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
             sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
-            rm -rf ${PWD}/emby
 
       - 
         uses: stefanzweifel/git-auto-commit-action@be823a7e51f116fecebc222b8307716921375992
         with:
             commit_message: 'chore: update amilys embyserver latest version'
             branch: master
+            file_pattern: 'all_in_one.sh'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
