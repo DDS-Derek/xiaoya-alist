@@ -26,6 +26,8 @@ export PATH
 DATE_VERSION="v1.6.8-2024_07_21_16_14"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
+amilys_embyserver_latest_version=
+# ——————————————————————————————————————————————————————————————————————————————————
 
 Sky_Blue="\e[36m"
 Blue="\033[34m"
@@ -2765,29 +2767,50 @@ function install_emby_xiaoya_all_emby() {
                     WARN "amilys/embyserver_arm64v8 镜像无法指定版本号，默认拉取 latest 镜像！"
                     IMAGE_VERSION=latest
                     break
+                else
+                    INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest（${amilys_embyserver_latest_version}） ]（默认 1）"
+                    read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+                    [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+                    case ${CHOOSE_IMAGE_VERSION} in
+                    1)
+                        IMAGE_VERSION=4.8.0.56
+                        break
+                        ;;
+                    2)
+                        IMAGE_VERSION=latest
+                        break
+                        ;;
+                    *)
+                        ERROR "输入无效，请重新选择"
+                        ;;
+                    esac
                 fi
-            fi
-            if [ "${CHOOSE_EMBY}" == "install_lovechen_embyserver" ]; then
+            elif [ "${CHOOSE_EMBY}" == "install_lovechen_embyserver" ]; then
                 WARN "lovechen/embyserver 镜像无法指定版本号，默认拉取 4.7.14.0 镜像！"
                 IMAGE_VERSION=4.7.14.0
                 break
+            elif [ "${CHOOSE_EMBY}" == "emby_embyserver" ]; then
+                INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；4.8.8.0 | 3；latest ]（默认 1）"
+                read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+                [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+                case ${CHOOSE_IMAGE_VERSION} in
+                1)
+                    IMAGE_VERSION=4.8.0.56
+                    break
+                    ;;
+                2)
+                    IMAGE_VERSION=4.8.8.0
+                    break
+                    ;;
+                4)
+                    IMAGE_VERSION=latest
+                    break
+                    ;;
+                *)
+                    ERROR "输入无效，请重新选择"
+                    ;;
+                esac
             fi
-            INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest ]（默认 1）"
-            read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
-            [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
-            case ${CHOOSE_IMAGE_VERSION} in
-            1)
-                IMAGE_VERSION=4.8.0.56
-                break
-                ;;
-            2)
-                IMAGE_VERSION=latest
-                break
-                ;;
-            *)
-                ERROR "输入无效，请重新选择"
-                ;;
-            esac
         done
 
         case ${CHOOSE_EMBY} in
