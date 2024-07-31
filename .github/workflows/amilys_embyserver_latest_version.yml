@@ -2,6 +2,13 @@ name: amilys embyserver latest version
 
 on:
     workflow_dispatch:
+    schedule:
+        - cron: '0 3 */3 * *'
+    push:
+        branches:
+            - master
+        paths:
+            - ".github/workflows/amilys_embyserver_latest_version.yml"
 
 jobs:
   get:
