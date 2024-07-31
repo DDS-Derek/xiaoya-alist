@@ -702,6 +702,33 @@ function qrcode_aliyunpan_tvtoken() {
 
 }
 
+function qrcode_115_cookie() { # get_config_dir
+
+    INFO "115 Cookie 扫码获取"
+    local local_ip
+    INFO "拉取镜像中..."
+    docker_pull ddsderek/xiaoya-glue:python > /dev/null
+    if [[ "${OSNAME}" = "macos" ]]; then
+        local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+    else
+        local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+    fi
+    if [ -z "${local_ip}" ]; then
+        local_ip="小雅服务器IP"
+    fi
+    INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+    docker run -i --rm \
+        -v "${CONFIG_DIR}:/data" \
+        -e LANG=C.UTF-8 \
+        --net=host \
+        ddsderek/xiaoya-glue:python \
+        /115cookie/115cookie.py
+    INFO "清理镜像中..."
+    docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
+    INFO "操作全部完成！"
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -899,14 +926,18 @@ function install_xiaoya_alist() {
         [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
         if [[ ${choose_115_cookie} == [Yy] ]]; then
             touch ${CONFIG_DIR}/115_cookie.txt
-            while true; do
-                INFO "输入你的 115 Cookie"
-                read -erp "Cookie:" set_115_cookie
-                echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
-                if check_115_cookie; then
-                    break
-                fi
-            done
+            qrcode_115_cookie
+            if ! check_115_cookie; then
+                WARN "扫码获取115 Cookie 失败，请手动获取！"
+                while true; do
+                    INFO "输入你的 115 Cookie"
+                    read -erp "Cookie:" set_115_cookie
+                    echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
+                    if check_115_cookie; then
+                        break
+                    fi
+                done
+            fi
         fi
     fi
 
