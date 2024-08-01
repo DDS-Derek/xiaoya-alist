@@ -168,6 +168,7 @@ Docker镜像源选择 -> 9 6
 | 小雅元数据爬虫（xiaoya-emd） |        ✅         |         ✅         |        ✅        |
 | 小雅Cron容器（xiaoya-cron）  |        ✅         |         ✅         |        ✅        |
 | 小雅代理容器（xiaoya-proxy）  |        ✅         |         ✅         |        ✅        |
+| 115清理助手（xiaoya-115cleaner）  |        ✅         |         ✅         |        ✅        |
 
 |    系统名称     | main.sh | emby_config_editor.sh |
 | :-------------: | :-----: | :-------------------: |
