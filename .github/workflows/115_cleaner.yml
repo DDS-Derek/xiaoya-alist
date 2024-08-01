@@ -1,0 +1,26 @@
+name: xiaoya 115 cleaner
+
+on:
+    workflow_dispatch:
+    push:
+      branches:
+        - master
+      paths:
+        - "115_cleaner/**"
+        - ".github/workflows/115_cleaner.yml"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - 
+        name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-115cleaner
+          short-description: 小雅Alist的相关周边
+          readme-filepath: ./115_cleaner/README.md
