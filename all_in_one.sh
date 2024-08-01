@@ -563,11 +563,11 @@ function wait_xiaoya_start() {
 
 function check_quark_cookie() {
 
-    if [[ ! -f "${CONFIG_DIR}/quark_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/quark_cookie.txt" ]]; then
+    if [[ ! -f "${1}/quark_cookie.txt" ]] && [[ ! -s "${1}/quark_cookie.txt" ]]; then
         return 1
     fi
     local cookie user_agent url headers response status state_url sign_daily_reward sign_daily_reward_mb url2 response2 member member_type vip_88
-    cookie=$(head -n1 "${CONFIG_DIR}/quark_cookie.txt")
+    cookie=$(head -n1 "${1}/quark_cookie.txt")
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
     url="https://drive-pc.quark.cn/1/clouddrive/config?pr=ucpro&fr=pc&uc_param_str="
     headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://pan.quark.cn"
@@ -610,11 +610,11 @@ function check_quark_cookie() {
 
 function check_uc_cookie() {
 
-    if [[ ! -f "${CONFIG_DIR}/uc_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/uc_cookie.txt" ]]; then
+    if [[ ! -f "${1}/uc_cookie.txt" ]] && [[ ! -s "${1}/uc_cookie.txt" ]]; then
         return 1
     fi
     local cookie user_agent url headers response status referer set_cookie
-    cookie=$(head -n1 "${CONFIG_DIR}/uc_cookie.txt")
+    cookie=$(head -n1 "${1}/uc_cookie.txt")
     referer="https://drive.uc.cn"
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
     url="https://pc-api.uc.cn/1/clouddrive/file/sort?pr=UCBrowser&fr=pc&pdir_fid=0&_page=1&_size=50&_fetch_total=1&_fetch_sub_dirs=0&_sort=file_type:asc,updated_at:desc"
@@ -629,7 +629,7 @@ function check_uc_cookie() {
         local new_puus new_cookie
         new_puus=$(echo "$set_cookie" | cut -f2 -d: | cut -f1 -d\;)
         new_cookie=${cookie//__puus=[^;]*/$new_puus}
-        echo "$new_cookie" > ${CONFIG_DIR}/uc_cookie.txt
+        echo "$new_cookie" > ${1}/uc_cookie.txt
         INFO "有效 UC Cookie 并更新"
         return 0
     elif [ -z "${set_cookie}" ] && [ "${status}" == "200" ]; then
@@ -644,11 +644,11 @@ function check_uc_cookie() {
 
 function check_115_cookie() {
 
-    if [[ ! -f "${CONFIG_DIR}/115_cookie.txt" ]] && [[ ! -s "${CONFIG_DIR}/115_cookie.txt" ]]; then
+    if [[ ! -f "${1}/115_cookie.txt" ]] && [[ ! -s "${1}/115_cookie.txt" ]]; then
         return 1
     fi
     local cookie user_agent url headers response vip
-    cookie=$(head -n1 "${CONFIG_DIR}/115_cookie.txt")
+    cookie=$(head -n1 "${1}/115_cookie.txt")
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
     url="https://my.115.com/?ct=ajax&ac=nav"
     headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://appversion.115.com/1/web/1.0/api/chrome"
@@ -702,7 +702,7 @@ function qrcode_aliyunpan_tvtoken() {
 
 }
 
-function qrcode_115_cookie() { # get_config_dir
+function qrcode_115_cookie() {
 
     INFO "115 Cookie 扫码获取"
     local local_ip
@@ -718,7 +718,7 @@ function qrcode_115_cookie() { # get_config_dir
     fi
     INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
     docker run -i --rm \
-        -v "${CONFIG_DIR}:/data" \
+        -v "${1}:/data" \
         -e LANG=C.UTF-8 \
         --net=host \
         ddsderek/xiaoya-glue:python \
@@ -726,6 +726,31 @@ function qrcode_115_cookie() { # get_config_dir
     INFO "清理镜像中..."
     docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
     INFO "操作全部完成！"
+
+}
+
+function settings_115_cookie() {
+
+    if [ ! -f "${1}/115_cookie.txt" ] || ! check_115_cookie "${1}"; then
+        INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
+        read -erp "Cookie:" choose_115_cookie
+        [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
+        if [[ ${choose_115_cookie} == [Yy] ]]; then
+            touch ${1}/115_cookie.txt
+            qrcode_115_cookie "${1}"
+            if ! check_115_cookie "${1}"; then
+                WARN "扫码获取115 Cookie 失败，请手动获取！"
+                while true; do
+                    INFO "输入你的 115 Cookie"
+                    read -erp "Cookie:" set_115_cookie
+                    echo -e "${set_115_cookie}" > ${1}/115_cookie.txt
+                    if check_115_cookie "${1}"; then
+                        break
+                    fi
+                done
+            fi
+        fi
+    fi
 
 }
 
@@ -886,7 +911,7 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/quark_cookie.txt" ] || ! check_quark_cookie; then
+    if [ ! -f "${CONFIG_DIR}/quark_cookie.txt" ] || ! check_quark_cookie "${CONFIG_DIR}"; then
         INFO "是否配置 夸克 Cookie [Y/n]（默认 n 不配置）"
         read -erp "Cookie:" choose_quark_cookie
         [[ -z "${choose_quark_cookie}" ]] && choose_quark_cookie="n"
@@ -896,14 +921,14 @@ function install_xiaoya_alist() {
                 INFO "输入你的 夸克 Cookie"
                 read -erp "Cookie:" quark_cookie
                 echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
-                if check_quark_cookie; then
+                if check_quark_cookie "${CONFIG_DIR}"; then
                     break
                 fi
             done
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/uc_cookie.txt" ] || ! check_uc_cookie; then
+    if [ ! -f "${CONFIG_DIR}/uc_cookie.txt" ] || ! check_uc_cookie "${CONFIG_DIR}"; then
         INFO "是否配置 UC Cookie [Y/n]（默认 n 不配置）"
         read -erp "Cookie:" choose_uc_cookie
         [[ -z "${choose_uc_cookie}" ]] && choose_uc_cookie="n"
@@ -913,33 +938,14 @@ function install_xiaoya_alist() {
                 INFO "输入你的 UC Cookie"
                 read -erp "Cookie:" uc_cookie
                 echo -e "${uc_cookie}" > ${CONFIG_DIR}/uc_cookie.txt
-                if check_uc_cookie; then
+                if check_uc_cookie "${CONFIG_DIR}"; then
                     break
                 fi
             done
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/115_cookie.txt" ] || ! check_115_cookie; then
-        INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
-        read -erp "Cookie:" choose_115_cookie
-        [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
-        if [[ ${choose_115_cookie} == [Yy] ]]; then
-            touch ${CONFIG_DIR}/115_cookie.txt
-            qrcode_115_cookie
-            if ! check_115_cookie; then
-                WARN "扫码获取115 Cookie 失败，请手动获取！"
-                while true; do
-                    INFO "输入你的 115 Cookie"
-                    read -erp "Cookie:" set_115_cookie
-                    echo -e "${set_115_cookie}" > ${CONFIG_DIR}/115_cookie.txt
-                    if check_115_cookie; then
-                        break
-                    fi
-                done
-            fi
-        fi
-    fi
+    settings_115_cookie "${CONFIG_DIR}"
 
     if [[ "${OSNAME}" = "macos" ]]; then
         localip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
@@ -4129,7 +4135,7 @@ function install_xiaoya_alist_tvbox() {
         INFO "备份数据路径：${CONFIG_DIR}/xiaoya_backup"
     fi
 
-    docker_pull "haroldli/xiaoya-tvbox:latest"
+    docker_pull "haroldli/xiaoya-tvbox:${__choose_native}"
 
     if [ -n "${extra_parameters}" ]; then
         docker run -itd \
@@ -4238,6 +4244,134 @@ function main_xiaoya_alist_tvbox() {
 
 }
 
+function install_xiaoya_115_cleaner() {
+
+    local config_dir
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+    fi
+    if [ -z "${config_dir}" ]; then
+        get_config_dir
+        config_dir=${CONFIG_DIR}
+    fi
+
+    settings_115_cookie "${config_dir}"
+
+    if [ ! -f "${config_dir}/115_key.txt" ]; then
+        touch ${config_dir}/115_key.txt
+        INFO "输入你的 115 回收站密码"
+        INFO "注意：此选项为必填项，如果您关闭了回收站密码请手动开启并输入！"
+        read -erp "Key:" password_key
+        echo -e "${password_key}" > ${config_dir}/115_key.txt
+    fi
+
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_115_cleaner")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入其他参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+            data_crep "w" "install_xiaoya_115_cleaner"
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
+    fi
+
+    docker_pull "ddsderek/xiaoya-115cleaner:latest"
+
+    docker run -d \
+        --name=xiaoya-115cleaner \
+        -v "${config_dir}:/data" \
+        --net=host \
+        -e TZ=Asia/Shanghai \
+        ${extra_parameters} \
+        --restart=always \
+        ddsderek/xiaoya-115cleaner:latest
+
+    INFO "安装完成！"
+
+}
+
+function update_xiaoya_115_cleaner() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新115清理助手${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    container_update xiaoya-115cleaner
+
+}
+
+function uninstall_xiaoya_115_cleaner() {
+
+    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载115清理助手${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop xiaoya-115cleaner
+    docker rm xiaoya-115cleaner
+    docker rmi ddsderek/xiaoya-115cleaner:latest
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            for file in "${OLD_CONFIG_DIR}/115_cleaner_only_recyclebin.txt" "${OLD_CONFIG_DIR}/115_cleaner_all_recyclebin.txt" "${OLD_CONFIG_DIR}/115_key.txt"; do
+                if [ -f "$file" ]; then
+                    rm -f "$file"
+                fi
+            done
+        fi
+    fi
+    INFO "115清理助手卸载成功！"
+
+}
+
+function main_xiaoya_115_cleaner() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}115 清理助手${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-3]:" num
+    case "$num" in
+    1)
+        clear
+        install_xiaoya_115_cleaner
+        return_menu "main_xiaoya_115_cleaner"
+        ;;
+    2)
+        clear
+        update_xiaoya_115_cleaner
+        return_menu "main_xiaoya_115_cleaner"
+        ;;
+    3)
+        clear
+        uninstall_xiaoya_115_cleaner
+        return_menu "main_xiaoya_115_cleaner"
+        ;;
+    0)
+        clear
+        main_return
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-3]'
+        main_xiaoya_115_cleaner
+        ;;
+    esac
+
+}
+
 function install_onelist() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/onelist_config_dir.txt ]; then
@@ -4337,7 +4471,7 @@ function main_onelist() {
         ;;
     0)
         clear
-        main_return
+        main_other_tools
         ;;
     *)
         clear
@@ -5087,11 +5221,12 @@ function main_other_tools() {
     echo -e "${Blue}其他工具${Font}\n"
     echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
-    echo -e "3、查看系统磁盘挂载"
-    echo -e "4、安装/卸载 CasaOS"
+    echo -e "3、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
+    echo -e "4、查看系统磁盘挂载"
+    echo -e "5、安装/卸载 CasaOS"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-4]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         clear
@@ -5103,6 +5238,10 @@ function main_other_tools() {
         ;;
     3)
         clear
+        main_onelist
+        ;;
+    4)
+        clear
         INFO "系统磁盘挂载情况:"
         show_disk_mount
         INFO "按任意键返回菜单"
@@ -5110,7 +5249,7 @@ function main_other_tools() {
         clear
         main_other_tools
         ;;
-    4)
+    5)
         clear
         main_casaos
         ;;
@@ -5120,7 +5259,7 @@ function main_other_tools() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-4]'
+        ERROR '请输入正确数字 [0-5]'
         main_other_tools
         ;;
     esac
@@ -5144,7 +5283,7 @@ function main_return() {
 3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")
 4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)
 5、安装/更新/卸载 小雅Alist-TVBox（非原版）   当前状态：$(judgment_container "${xiaoya_tvbox_name}")
-6、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")
+6、安装/更新/卸载 115清理助手                 当前状态：$(judgment_container xiaoya-115cleaner)
 7、Docker Compose 安装/卸载 小雅及全家桶（实验性功能）
 8、其他工具 | Script info: ${DATE_VERSION} OS: ${_os},${OSNAME},${is64bit}
 9、高级配置 | Docker version: ${Blue}${DOCKER_VERSION}${Font} ${IP_CITY}
@@ -5174,7 +5313,7 @@ function main_return() {
         ;;
     6)
         clear
-        main_onelist
+        main_xiaoya_115_cleaner
         ;;
     7)
         clear
