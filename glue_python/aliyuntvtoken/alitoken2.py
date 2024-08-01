@@ -5,10 +5,24 @@ import requests
 import time
 import os
 import logging
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+import base64
+import json
 
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+
+def decrypt_AES256_CBC_PKCS7(ciphertext, key, iv):
+    key = key[:32]
+    key = key.ljust(32, "\0")
+    decoded_ciphertext = base64.b64decode(ciphertext)
+    iv = bytes.fromhex(iv)
+    cipher = AES.new(key.encode('utf8'), AES.MODE_CBC, iv=iv)
+    decrypted_data = cipher.decrypt(decoded_ciphertext)
+    unpadded_data = unpad(decrypted_data, AES.block_size)
+    return unpadded_data.decode('utf8')
 
 @app.route('/')
 def main_page():
@@ -39,10 +53,15 @@ def check_qrcode(sid):
 @app.route('/get_tokens', methods=['POST'])
 def get_tokens():
     code = request.json.get('auth_code')
-    token_data = requests.post('http://api.extscreen.com/aliyundrive/token', data={
+    token_data = requests.post('http://api.extscreen.com/aliyundrive/v2/token', data={
         'code': code,
     }).json()['data']
-    refresh_token = token_data['refresh_token']
+    ciphertext = token_data['ciphertext']
+    iv = token_data['iv']
+    key = "^(i/x>>5(ebyhumz*i1wkpk^orIs^Na."
+    token_data = decrypt_AES256_CBC_PKCS7(ciphertext, key, iv)
+    parsed_json = json.loads(token_data)
+    refresh_token = parsed_json['refresh_token']
     with open("/data/myopentoken.txt", "w") as file:
         file.write(refresh_token)
     logging.info('myopentoken.txt 文件更新成功！')
