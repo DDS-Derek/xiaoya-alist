@@ -66,7 +66,7 @@ def get_tokens():
         file.write(refresh_token)
     logging.info('myopentoken.txt 文件更新成功！')
     with open("/data/open_tv_token_url.txt", "w") as file:
-        file.write("https://alitv.sakurapy.de/token")
+        file.write("https://www.voicehub.top/api/v1/oauth/alipan/token")
     logging.info('open_tv_token_url.txt 文件更新成功！')
     return jsonify({'status': 'completed'})
 
