@@ -90,6 +90,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 立即 同步小雅Emby的config目录 -> 2 6
 单独 创建/删除 同步定时更新任务 -> 2 7
 图形化编辑 emby_config.txt -> 2 8
+一键升级Emby容器（可选择镜像版本） -> 2 10
 ————————————————————————————Jellyfin手动全家桶配置——————————————————————————————————
 单独 下载并解压 全部元数据 -> 3 2 1
 单独 解压 全部元数据 -> 3 2 2
@@ -113,7 +114,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 更新 小雅元数据定时爬虫 -> 2 9 2
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 1 3
-卸载 Emby全家桶 -> 2 10
+卸载 Emby全家桶 -> 2 11
 卸载 卸载Jellyfin全家桶 -> 3 4
 卸载 Resilio-Sync（单独） -> 2 5 3
 卸载 小雅助手（xiaoyahelper）-> 4 3

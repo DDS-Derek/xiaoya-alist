@@ -481,8 +481,8 @@ function container_update() {
             docker rmi "${remove_image}" > /dev/null 2>&1
         fi
         if [ "${IMAGE_MIRROR}" != "docker.io" ]; then
-            docker tag "${IMAGE_MIRROR}/${1}" "${1}" > /dev/null 2>&1
-            docker rmi "${IMAGE_MIRROR}/${1}" > /dev/null 2>&1
+            docker tag "${IMAGE_MIRROR}/${run_image}" "${run_image}" > /dev/null 2>&1
+            docker rmi "${IMAGE_MIRROR}/${run_image}" > /dev/null 2>&1
         fi
         if bash "/tmp/container_update_${*}"; then
             rm -f "/tmp/container_update_${*}"
@@ -2880,6 +2880,134 @@ function install_emby_xiaoya_all_emby() {
 
 }
 
+function oneclick_upgrade_emby() {
+
+    local emby_name
+    emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+    if docker inspect ddsderek/runlike:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' ddsderek/runlike:latest 2> /dev/null | cut -f2 -d:)
+        remote_sha=$(curl -s -m 10 "https://hub.docker.com/v2/repositories/ddsderek/runlike/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ "$local_sha" != "$remote_sha" ]; then
+            docker rmi ddsderek/runlike:latest
+            docker_pull "ddsderek/runlike:latest"
+        fi
+    else
+        docker_pull "ddsderek/runlike:latest"
+    fi
+    INFO "获取 ${emby_name} 容器信息中..."
+    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp ddsderek/runlike "${emby_name}" > "/tmp/container_update_${emby_name}"
+    old_image=$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")
+    old_image_name="$(echo "${old_image}" | cut -d':' -f1)"
+    while true; do
+        if [ "${old_image_name}" == "amilys/embyserver" ] || [ "${old_image_name}" == "amilys/embyserver_arm64v8" ]; then
+            cpu_arch=$(uname -m)
+            if [[ $cpu_arch == "aarch64" || $cpu_arch == *"arm64"* || $cpu_arch == *"armv8"* || $cpu_arch == *"arm/v8"* ]]; then
+                WARN "amilys/embyserver_arm64v8 镜像无法指定版本号，默认重新拉取 latest 镜像更新容器！"
+                IMAGE_VERSION=latest
+                break
+            else
+                INFO "请选择 Emby 镜像版本 [ 1；latest（${amilys_embyserver_latest_version}）| 2；beta（此版本请勿轻易尝试）]（默认 1）"
+                read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+                [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+                case ${CHOOSE_IMAGE_VERSION} in
+                1)
+                    IMAGE_VERSION=latest
+                    break
+                    ;;
+                2)
+                    IMAGE_VERSION=beta
+                    break
+                    ;;
+                *)
+                    ERROR "输入无效，请重新选择"
+                    ;;
+                esac
+            fi
+        elif [ "${old_image_name}" == "lovechen/embyserver" ]; then
+            WARN "lovechen/embyserver 镜像无法更新！"
+            exit 0
+        elif [ "${old_image_name}" == "emby/embyserver" ] || [ "${old_image_name}" == "emby/embyserver_arm64v8" ]; then
+            INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest | 3；beta（此版本请勿轻易尝试） ]（默认 1）"
+            read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
+            [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
+            case ${CHOOSE_IMAGE_VERSION} in
+            1)
+                IMAGE_VERSION=4.8.8.0
+                break
+                ;;
+            2)
+                IMAGE_VERSION=latest
+                break
+                ;;
+            3)
+                IMAGE_VERSION=beta
+                break
+                ;;
+            *)
+                ERROR "输入无效，请重新选择"
+                ;;
+            esac
+        fi
+    done
+    run_image="$(echo "${old_image}" | cut -d':' -f1):${IMAGE_VERSION}"
+    remove_image=$(docker images -q ${old_image})
+    sedsh "s|${old_image}|${run_image}|g" "/tmp/container_update_${emby_name}"
+    INFO "${old_image} ${old_image_name} ${run_image} ${remove_image}"
+    local retries=0
+    local max_retries=3
+    IMAGE_MIRROR=$(cat "${DDSREM_CONFIG_DIR}/image_mirror.txt")
+    while [ $retries -lt $max_retries ]; do
+        if docker pull "${IMAGE_MIRROR}/${run_image}"; then
+            INFO "${emby_name} 镜像拉取成功！"
+            break
+        else
+            WARN "${emby_name} 镜像拉取失败，正在进行第 $((retries + 1)) 次重试..."
+            retries=$((retries + 1))
+        fi
+    done
+    if [ $retries -eq $max_retries ]; then
+        ERROR "镜像拉取失败，已达到最大重试次数！"
+        exit 1
+    else
+        if [ "${IMAGE_MIRROR}" != "docker.io" ]; then
+            pull_image=$(docker images -q "${IMAGE_MIRROR}/${run_image}")
+        else
+            pull_image=$(docker images -q "${run_image}")
+        fi
+        if ! docker stop "${emby_name}" > /dev/null 2>&1; then
+            if ! docker kill "${emby_name}" > /dev/null 2>&1; then
+                docker rmi "${IMAGE_MIRROR}/${run_image}"
+                ERROR "更新失败，停止 ${emby_name} 容器失败！"
+                exit 1
+            fi
+        fi
+        INFO "停止 ${emby_name} 容器成功！"
+        if ! docker rm --force "${emby_name}" > /dev/null 2>&1; then
+            ERROR "更新失败，删除 ${emby_name} 容器失败！"
+            exit 1
+        fi
+        INFO "删除 ${emby_name} 容器成功！"
+        if [ "${pull_image}" != "${remove_image}" ]; then
+            INFO "删除 ${remove_image} 镜像中..."
+            docker rmi "${remove_image}" > /dev/null 2>&1
+        fi
+        if [ "${IMAGE_MIRROR}" != "docker.io" ]; then
+            docker tag "${IMAGE_MIRROR}/${run_image}" "${run_image}" > /dev/null 2>&1
+            docker rmi "${IMAGE_MIRROR}/${run_image}" > /dev/null 2>&1
+        fi
+        if bash "/tmp/container_update_${emby_name}"; then
+            rm -f "/tmp/container_update_${emby_name}"
+            wait_emby_start
+            INFO "${emby_name} 更新成功"
+            return 0
+        else
+            ERROR "更新失败，创建 ${emby_name} 容器失败！"
+            exit 1
+        fi
+    fi
+
+}
+
 function install_jellyfin_xiaoya_all_jellyfin() {
 
     get_docker0_url
@@ -3739,10 +3867,11 @@ function main_xiaoya_all_emby() {
     echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
     echo -e "8、图形化编辑 emby_config.txt"
     echo -e "9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)"
-    echo -e "10、卸载Emby全家桶"
+    echo -e "10、一键升级Emby容器（可选择镜像版本）"
+    echo -e "11、卸载Emby全家桶"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-10]:" num
+    read -erp "请输入数字 [0-11]:" num
     case "$num" in
     1)
         clear
@@ -3843,6 +3972,11 @@ function main_xiaoya_all_emby() {
         ;;
     10)
         clear
+        oneclick_upgrade_emby
+        return_menu "main_xiaoya_all_emby"
+        ;;
+    11)
+        clear
         uninstall_xiaoya_all_emby
         ;;
     0)
@@ -3851,7 +3985,7 @@ function main_xiaoya_all_emby() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-10]'
+        ERROR '请输入正确数字 [0-11]'
         main_xiaoya_all_emby
         ;;
     esac
