@@ -552,8 +552,8 @@ function wait_xiaoya_start() {
                 break
             fi
         fi
-        if [ "$elapsed_time" -gt 300 ]; then
-            WARN "小雅alist 未正常启动超时 5 分钟！"
+        if [ "$elapsed_time" -gt 600 ]; then
+            WARN "小雅alist 未正常启动超时 10 分钟！"
             break
         fi
         sleep 3
