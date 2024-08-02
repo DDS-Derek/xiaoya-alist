@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import threading
 import time
 import os
@@ -13,8 +13,11 @@ from json import loads
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 
+
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
+last_status = 0
+
 
 AppEnum = Enum("AppEnum", {
     "web": 1, 
@@ -32,6 +35,7 @@ AppEnum = Enum("AppEnum", {
     "alipaymini": 23, 
 })
 
+
 def get_enum_name(val, cls):
     if isinstance(val, cls):
         return val.name
@@ -42,6 +46,7 @@ def get_enum_name(val, cls):
         pass
     return cls(val).name
 
+
 def get_qrcode_token():
     """获取登录二维码，扫码可用
     GET https://qrcodeapi.115.com/api/1.0/web/1.0/token/
@@ -49,6 +54,7 @@ def get_qrcode_token():
     """
     api = "https://qrcodeapi.115.com/api/1.0/web/1.0/token/"
     return loads(urlopen(api).read())
+
 
 def get_qrcode_status(payload):
     """获取二维码的状态（未扫描、已扫描、已登录、已取消、已过期等）
@@ -61,6 +67,7 @@ def get_qrcode_status(payload):
     """
     api = "https://qrcodeapi.115.com/get/status/?" + urlencode(payload)
     return loads(urlopen(api).read())
+
 
 def post_qrcode_result(uid, app="web"):
     """获取扫码登录的结果，并且绑定设备，包含 cookie
@@ -120,12 +127,33 @@ def post_qrcode_result(uid, app="web"):
     api = "https://passportapi.115.com/app/1.0/%s/1.0/login/qrcode/" % app
     return loads(urlopen(Request(api, data=urlencode(payload).encode("utf-8"), method="POST")).read())
 
+
 def get_qrcode(uid):
     """获取二维码图片（注意不是链接）
     :return: 一个文件对象，可以读取
     """
     url = "https://qrcodeapi.115.com/api/1.0/mac/1.0/qrcode?uid=%s" % uid
     return urlopen(url)
+
+
+def poll_qrcode_status(qrcode_token):
+    global last_status
+    while True:
+        time.sleep(1)
+        resp = get_qrcode_status(qrcode_token)
+        status = resp["data"].get("status")
+        if status == 2:
+            resp = post_qrcode_result(qrcode_token["uid"], "alipaymini")
+            cookie_data = resp['data']['cookie']
+            cookie_str = "; ".join("%s=%s" % t for t in cookie_data.items())
+            with open('/data/115_cookie.txt', 'w') as f:
+                f.write(cookie_str)
+            logging.info('扫码成功, cookie 已写入文件！')
+            last_status = 1
+        elif status in [-1, -2]:
+            logging.error('扫码失败')
+            last_status = 2
+
 
 @app.route('/')
 def index():
@@ -139,22 +167,20 @@ def index():
     threading.Thread(target=poll_qrcode_status, args=(qrcode_token,)).start()
     return render_template('index.html', qrcode_image_b64_str=qrcode_image_b64_str)
 
-def poll_qrcode_status(qrcode_token):
-    while True:
-        time.sleep(1)
-        resp = get_qrcode_status(qrcode_token)
-        status = resp["data"].get("status")
-        if status == 2:
-            resp = post_qrcode_result(qrcode_token["uid"], "alipaymini")
-            cookie_data = resp['data']['cookie']
-            cookie_str = "; ".join("%s=%s" % t for t in cookie_data.items())
-            with open('/data/115_cookie.txt', 'w') as f:
-                f.write(cookie_str)
-            logging.info('扫码成功, cookie 已写入文件！')
-            os._exit(0)
-        elif status in [-1, -2]:
-            logging.error('扫码失败')
-            os._exit(1)
+
+@app.route('/status')
+def status():
+    if last_status == 1:
+        return jsonify({'status': 'success'})
+    elif last_status == 2:
+        return jsonify({'status': 'failure'})
+    else:
+        return jsonify({'status': 'unknown'})
+
+
+@app.route('/shutdown_server', methods=['GET'])
+def shutdown():
+    os._exit(0)
 
 
 if __name__ == '__main__':
