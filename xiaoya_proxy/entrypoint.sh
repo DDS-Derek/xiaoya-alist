@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec dumb-init java -jar -Xmx64m /xiaoya_proxy.jar
+exec dumb-init java -jar /xiaoya_proxy.jar
