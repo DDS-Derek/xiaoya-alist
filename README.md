@@ -73,8 +73,9 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 安装 Jellyfin全家桶（一键） -> 3 1
 安装 Resilio-Sync（单独） -> 2 5 1
 安装 Auto_Symlink -> 8 2 1
-安装 CasaOS -> 8 5 1
+安装 CasaOS -> 8 6 1
 安装 小雅元数据定时爬虫 -> 2 9 1
+安装 Xiaoya Proxy -> 8 4 1
 ——————————————————————————————Emby手动全家桶配置————————————————————————————————————
 单独 下载并解压 全部元数据 -> 2 2 1
 单独 解压 全部元数据 -> 2 2 2
@@ -112,6 +113,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 更新 Portainer -> 8 1 2
 更新 Auto_Symlink -> 8 2 2
 更新 小雅元数据定时爬虫 -> 2 9 2
+更新 Xiaoya Proxy -> 8 4 2
 ———————————————————————————————————————卸载———————————————————————————————————————
 卸载 小雅Alist -> 1 3
 卸载 Emby全家桶 -> 2 11
@@ -123,13 +125,14 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 卸载 Onelist -> 8 3 3
 卸载 Portainer -> 8 1 3
 卸载 Auto_Symlink -> 8 2 3
-卸载 CasaOS -> 8 5 2
+卸载 CasaOS -> 8 6 2
 卸载 小雅元数据定时爬虫 -> 2 9 3
+卸载 Xiaoya Proxy -> 8 4 3
 ————————————————————————————————Docker Compose—————————————————————————————————————
 安装 小雅及全家桶 -> 7 1
 卸载 小雅及全家桶 -> 7 2
 ——————————————————————————————————————系统工具——————————————————————————————————————
-查看系统磁盘挂载 -> 8 4
+查看系统磁盘挂载 -> 8 5
 ———————————————————————————————————————其他———————————————————————————————————————
 一次性运行 小雅助手（xiaoyahelper）-> 4 2
 创建/删除 定时同步更新数据（小雅alist启动时拉取的数据）-> 1 4

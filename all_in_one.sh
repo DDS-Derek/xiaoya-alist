@@ -4616,6 +4616,120 @@ function main_onelist() {
 
 }
 
+function install_xiaoya_proxy() {
+
+    local config_dir
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+    else
+        ERROR "请先安装小雅容器后再使用 Xiaoya Proxy！"
+        exit 1
+    fi
+    if [ -z "${config_dir}" ]; then
+        get_config_dir
+        config_dir=${CONFIG_DIR}
+    fi
+    INFO "小雅配置文件目录：${config_dir}"
+    docker_pull "ddsderek/xiaoya-proxy:latest"
+    docker run -d \
+        --name=xiaoya-proxy \
+        --restart=always \
+        --net=host \
+        -e TZ=Asia/Shanghai \
+        ddsderek/xiaoya-proxy:latest
+    if [[ "${OSNAME}" = "macos" ]]; then
+        local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+    else
+        local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+    fi
+    if [ -z "${local_ip}" ]; then
+        WARN "请手动配置 ${config_dir}/xiaoya_proxy.txt 文件，内容为 http://小雅服务器IP:9988"
+    else
+        INFO "本机IP：${local_ip}"
+        echo "http://${local_ip}:9988" > ${config_dir}/xiaoya_proxy.txt
+        INFO "xiaoya_proxy.txt 配置完成！"
+    fi
+    docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+    wait_xiaoya_start
+    INFO "安装完成！"
+
+}
+
+function update_xiaoya_proxy() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新 Xiaoya Proxy${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    container_update xiaoya-proxy
+
+}
+
+function uninstall_xiaoya_proxy() {
+
+    INFO "是否${Red}删除配置文件${Font} [Y/n]（默认 Y 删除）"
+    read -erp "Clean config:" CLEAN_CONFIG
+    [[ -z "${CLEAN_CONFIG}" ]] && CLEAN_CONFIG="y"
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载 Xiaoya Proxy${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop xiaoya-proxy
+    docker rm xiaoya-proxy
+    docker rmi ddsderek/xiaoya-proxy:latest
+    if [[ ${CLEAN_CONFIG} == [Yy] ]]; then
+        INFO "清理配置文件..."
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            if [ -f "${OLD_CONFIG_DIR}/xiaoya_proxy.txt" ]; then
+                rm -f "${OLD_CONFIG_DIR}/xiaoya_proxy.txt"
+            fi
+        fi
+    fi
+    INFO "Xiaoya Proxy 卸载成功！"
+
+}
+
+function main_xiaoya_proxy() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}Xiaoya Proxy${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-3]:" num
+    case "$num" in
+    1)
+        clear
+        install_xiaoya_proxy
+        return_menu "main_xiaoya_proxy"
+        ;;
+    2)
+        clear
+        update_xiaoya_proxy
+        return_menu "main_xiaoya_proxy"
+        ;;
+    3)
+        clear
+        uninstall_xiaoya_proxy
+        return_menu "main_xiaoya_proxy"
+        ;;
+    0)
+        clear
+        main_other_tools
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-3]'
+        main_xiaoya_proxy
+        ;;
+    esac
+
+}
+
 function install_portainer() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/portainer_config_dir.txt ]; then
@@ -5356,11 +5470,12 @@ function main_other_tools() {
     echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
     echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
     echo -e "3、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
-    echo -e "4、查看系统磁盘挂载"
-    echo -e "5、安装/卸载 CasaOS"
+    echo -e "4、安装/更新/卸载 Xiaoya Proxy                当前状态：$(judgment_container xiaoya-proxy)"
+    echo -e "5、查看系统磁盘挂载"
+    echo -e "6、安装/卸载 CasaOS"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-5]:" num
+    read -erp "请输入数字 [0-6]:" num
     case "$num" in
     1)
         clear
@@ -5376,6 +5491,10 @@ function main_other_tools() {
         ;;
     4)
         clear
+        main_xiaoya_proxy
+        ;;
+    5)
+        clear
         INFO "系统磁盘挂载情况:"
         show_disk_mount
         INFO "按任意键返回菜单"
@@ -5383,7 +5502,7 @@ function main_other_tools() {
         clear
         main_other_tools
         ;;
-    5)
+    6)
         clear
         main_casaos
         ;;
@@ -5393,7 +5512,7 @@ function main_other_tools() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-5]'
+        ERROR '请输入正确数字 [0-6]'
         main_other_tools
         ;;
     esac
