@@ -649,9 +649,9 @@ function check_115_cookie() {
     fi
     local cookie user_agent url headers response vip
     cookie=$(head -n1 "${1}/115_cookie.txt")
-    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
+    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
     url="https://my.115.com/?ct=ajax&ac=nav"
-    headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://appversion.115.com/1/web/1.0/api/chrome"
+    headers="Cookie: $cookie; User-Agent: $user_agent; Referer: https://115.com/"
     response=$(curl -s -D - -H "$headers" "$url")
     vip=$(echo -e "$response" | grep -o '"vip":[^,]*' | sed 's/"vip"://')
     if echo -e "${response}" | grep -q "user_id"; then
