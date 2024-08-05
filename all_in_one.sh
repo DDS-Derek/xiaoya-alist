@@ -831,6 +831,7 @@ function data_crep() { # container_run_extra_parameters
         else
             echo "${extra_parameters}" > ${DIR}/${DATA}.txt
         fi
+        cat ${DIR}/${DATA}.txt | head -n1
     else
         return 1
     fi
@@ -2801,7 +2802,7 @@ function install_emby_xiaoya_all_emby() {
                 read -erp "Extra parameters:" extra_parameters
                 [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
             fi
-            data_crep "write" "install_xiaoya_emby"
+            extra_parameters=$(data_crep "write" "install_xiaoya_emby")
         fi
 
         get_nsswitch_conf_path
@@ -3166,7 +3167,7 @@ function install_xiaoya_notify_cron() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
-        data_crep "w" "install_xiaoya_notify_cron"
+        extra_parameters=$(data_crep "w" "install_xiaoya_notify_cron")
     fi
 
     # 组合定时任务命令
@@ -3284,7 +3285,7 @@ function install_resilio() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
-        data_crep "w" "install_xiaoya_resilio"
+        extra_parameters=$(data_crep "w" "install_xiaoya_resilio")
     fi
 
     INFO "是否自动配置系统 inotify watches & instances 的数值 [Y/n]（默认 Y）"
@@ -3677,12 +3678,10 @@ function install_xiaoya_emd() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
-        data_crep "write" "install_xiaoya_emd"
     else
         extra_parameters="--media /media"
-        data_crep "write" "install_xiaoya_emd"
     fi
-    script_extra_parameters="${extra_parameters}"
+    script_extra_parameters="$(data_crep "write" "install_xiaoya_emd")"
 
     extra_parameters=
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
@@ -3697,9 +3696,8 @@ function install_xiaoya_emd() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA_2}
         fi
-        data_crep "w" "install_xiaoya_emd_2"
+        run_extra_parameters=$(data_crep "w" "install_xiaoya_emd_2")
     fi
-    run_extra_parameters="${extra_parameters}"
 
     docker_pull "ddsderek/xiaoya-emd:${IMAGE_VERSION}"
 
@@ -4267,7 +4265,7 @@ function install_xiaoya_alist_tvbox() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
-        data_crep "w" "install_xiaoya_alist_tvbox"
+        extra_parameters=$(data_crep "w" "install_xiaoya_alist_tvbox")
     fi
 
     if ls ${CONFIG_DIR}/*.txt 1> /dev/null 2>&1; then
@@ -4428,7 +4426,7 @@ function install_xiaoya_115_cleaner() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
-        data_crep "w" "install_xiaoya_115_cleaner"
+        extra_parameters=$(data_crep "w" "install_xiaoya_115_cleaner")
     fi
 
     docker_pull "ddsderek/xiaoya-115cleaner:latest"
