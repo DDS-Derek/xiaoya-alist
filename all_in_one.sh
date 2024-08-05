@@ -2792,12 +2792,12 @@ function install_emby_xiaoya_all_emby() {
                 INFO "请输入其他参数（默认 --device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all ）"
                 read -erp "Extra parameters:" extra_parameters
                 [[ -z "${extra_parameters}" ]] && extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
-                data_crep "write" "install_xiaoya_emby"
             else
                 INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
                 read -erp "Extra parameters:" extra_parameters
                 [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
             fi
+            data_crep "write" "install_xiaoya_emby"
         fi
 
         get_nsswitch_conf_path
@@ -3157,12 +3157,12 @@ function install_xiaoya_notify_cron() {
         if [ "${RETURN_DATA}" == "None" ]; then
             INFO "请输入其他参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_notify_cron"
         else
             INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
+        data_crep "w" "install_xiaoya_notify_cron"
     fi
 
     # 组合定时任务命令
@@ -3275,12 +3275,12 @@ function install_resilio() {
         if [ "${RETURN_DATA}" == "None" ]; then
             INFO "请输入其他参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_resilio"
         else
             INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
+        data_crep "w" "install_xiaoya_resilio"
     fi
 
     INFO "是否自动配置系统 inotify watches & instances 的数值 [Y/n]（默认 Y）"
@@ -3666,7 +3666,6 @@ function install_xiaoya_emd() {
             WARN "警告！！！ 默认请勿修改 /media 路径！！！"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
-            data_crep "write" "install_xiaoya_emd"
         else
             INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
@@ -3674,6 +3673,7 @@ function install_xiaoya_emd() {
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
+        data_crep "write" "install_xiaoya_emd"
     else
         extra_parameters="--media /media"
         data_crep "write" "install_xiaoya_emd"
@@ -3688,12 +3688,12 @@ function install_xiaoya_emd() {
         if [ "${RETURN_DATA_2}" == "None" ]; then
             INFO "请输入运行容器额外参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_emd_2"
         else
             INFO "已读取您上次设置的运行容器额外参数：${RETURN_DATA_2} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA_2}
         fi
+        data_crep "w" "install_xiaoya_emd_2"
     fi
     run_extra_parameters="${extra_parameters}"
 
@@ -4258,12 +4258,12 @@ function install_xiaoya_alist_tvbox() {
         if [ "${RETURN_DATA}" == "None" ]; then
             INFO "请输入其他参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_alist_tvbox"
         else
             INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
+        data_crep "w" "install_xiaoya_alist_tvbox"
     fi
 
     if ls ${CONFIG_DIR}/*.txt 1> /dev/null 2>&1; then
@@ -4419,12 +4419,12 @@ function install_xiaoya_115_cleaner() {
         if [ "${RETURN_DATA}" == "None" ]; then
             INFO "请输入其他参数（默认 无 ）"
             read -erp "Extra parameters:" extra_parameters
-            data_crep "w" "install_xiaoya_115_cleaner"
         else
             INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             read -erp "Extra parameters:" extra_parameters
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
+        data_crep "w" "install_xiaoya_115_cleaner"
     fi
 
     docker_pull "ddsderek/xiaoya-115cleaner:latest"
