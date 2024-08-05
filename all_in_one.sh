@@ -826,7 +826,11 @@ function data_crep() { # container_run_extra_parameters
             echo "None"
         fi
     elif [ "${MODE}" == "write" ] || [ "${MODE}" == "w" ]; then
-        echo "${extra_parameters}" > ${DIR}/${DATA}.txt
+        if [ "${extra_parameters}" == "None" ]; then
+            echo > ${DIR}/${DATA}.txt
+        else
+            echo "${extra_parameters}" > ${DIR}/${DATA}.txt
+        fi
     else
         return 1
     fi
