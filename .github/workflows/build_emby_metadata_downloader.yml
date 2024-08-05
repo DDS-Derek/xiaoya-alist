@@ -66,3 +66,71 @@ jobs:
           repository: ${{ secrets.DOCKER_USERNAME }}/xiaoya-emd
           short-description: 小雅Alist的相关周边
           readme-filepath: ./emby_metadata_downloader/README.md
+
+  Windows-amd64:
+    runs-on: windows-latest
+    name: Build Windows Binary
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Init Python 3.12
+        uses: actions/setup-python@v4
+        with:
+            python-version: '3.12'
+            cache: 'pip'
+
+      - 
+        name: Install Dependent Packages
+        run: |
+            git clone -b main https://github.com/Rik-F5/xiaoya_db.git xiaoya_db
+            copy xiaoya_db/requirements.txt requirements.txt
+            copy xiaoya_db/solid.py solid.py
+            python -m pip install --upgrade pip
+            pip install wheel pyinstaller
+            pip install -r requirements.txt
+        shell: pwsh
+        working-directory: ./emby_metadata_downloader
+
+      - 
+        name: Pyinstaller
+        run: |
+            pyinstaller solid.spec
+        working-directory: ./emby_metadata_downloader
+        shell: pwsh
+
+      - 
+        name: Upload Windows File
+        uses: actions/upload-artifact@v3
+        with:
+            name: solid-windows-amd64
+            path: emby_metadata_downloader/dist/solid.exe
+
+  Update:
+    runs-on: ubuntu-latest
+    needs: [ Windows-amd64, build ]
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Download Artifact
+        uses: actions/download-artifact@v3
+
+      - 
+        name: Rename
+        shell: bash
+        run: |
+            mv ./solid-windows-amd64/solid.exe ./emby_metadata_downloader/solid-windows-amd64.exe
+
+      - 
+        uses: stefanzweifel/git-auto-commit-action@be823a7e51f116fecebc222b8307716921375992
+        with:
+            commit_message: 'chore: update solid windows exe'
+            branch: master
+            file_pattern: './emby_metadata_downloader/solid-windows-amd64.exe'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
