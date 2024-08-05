@@ -210,6 +210,7 @@ Docker镜像源选择 -> 9 6
 |      UGOS       |    ✅    |           ✅           |
 |     UGOS Pro    |    ✅    |           ✅           |
 |   LibreELEC     |    ❌    |           ❌           |
+|  Windows WSL Docker  |    ❌    |           ❌           |
 
 ## 免责声明
 
