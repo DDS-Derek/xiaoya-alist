@@ -112,6 +112,7 @@ jobs:
             path: quark_cookie/dist/quark_login-macos-amd64
 
   Update:
+    permissions: write-all
     runs-on: ubuntu-latest
     needs: [ Windows-amd64, Linux-amd64, macos-amd64]
     steps:
@@ -127,15 +128,16 @@ jobs:
         name: Rename
         shell: bash
         run: |
-            mv ./quark_login-windows-amd64/quark_login.exe ./quark_cookie/quark_login-windows-amd64.exe
-            mv ./quark_login-macos-amd64/quark_login-macos-amd64 ./quark_cookie/quark_login-macos-amd64
-            mv ./quark_login-linux-amd64/quark_login-linux-amd64 ./quark_cookie/quark_login-linux-amd64
+            mv ./quark_login-windows-amd64/quark_login.exe ./releases/quark_login-windows-amd64.exe
+            mv ./quark_login-macos-amd64/quark_login-macos-amd64 ./releases/quark_login-macos-amd64
+            mv ./quark_login-linux-amd64/quark_login-linux-amd64 ./releases/quark_login-linux-amd64
 
       - 
-        uses: stefanzweifel/git-auto-commit-action@be823a7e51f116fecebc222b8307716921375992
-        with:
-            commit_message: 'chore: update quark_login windows exe'
-            branch: master
-            file_pattern: './quark_cookie/*'
+        name: Upload Release Asset
+        uses: dwenegar/upload-release-assets@v3
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            release_id: 168891806
+            assets_path: |
+                ./releases/
