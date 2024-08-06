@@ -1,4 +1,4 @@
-name: quark cookie exe
+name: quark cookie
 
 on:
   workflow_dispatch:
@@ -128,6 +128,7 @@ jobs:
         name: Rename
         shell: bash
         run: |
+            mkdir releases
             mv ./quark_login-windows-amd64/quark_login.exe ./releases/quark_login-windows-amd64.exe
             mv ./quark_login-macos-amd64/quark_login-macos-amd64 ./releases/quark_login-macos-amd64
             mv ./quark_login-linux-amd64/quark_login-linux-amd64 ./releases/quark_login-linux-amd64
