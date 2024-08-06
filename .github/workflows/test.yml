@@ -34,4 +34,4 @@ jobs:
           SHFMT_OPTS: -d -i 4 -sr
         with:
           sh_checker_comment: true
-          sh_checker_exclude: "^backup/* ^xiaoyahelper/*"
+          sh_checker_exclude: "^deprecation/* ^xiaoyahelper/*"
