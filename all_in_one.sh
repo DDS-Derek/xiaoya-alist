@@ -5488,9 +5488,10 @@ function main_other_tools() {
     echo -e "4、安装/更新/卸载 Xiaoya Proxy                当前状态：$(judgment_container xiaoya-proxy)"
     echo -e "5、查看系统磁盘挂载"
     echo -e "6、安装/卸载 CasaOS"
+    echo -e "7、AI老G 安装脚本"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-6]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         clear
@@ -5521,13 +5522,17 @@ function main_other_tools() {
         clear
         main_casaos
         ;;
+    7)
+        clear
+        bash <(curl -sSLf https://xy.ggbond.org/xy/xy_install.sh)
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-6]'
+        ERROR '请输入正确数字 [0-7]'
         main_other_tools
         ;;
     esac
