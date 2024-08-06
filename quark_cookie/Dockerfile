@@ -1,6 +1,7 @@
 FROM python:3.12.4-slim-bookworm
 
-ENV DISPLAY=:956
+ENV DISPLAY=:956 \
+    PLAYWRIGHT_BROWSERS_PATH=/quark_cookie/firefox
 
 WORKDIR /quark_cookie
 

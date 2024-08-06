@@ -3,7 +3,7 @@
 import asyncio
 import os
 import shutil
-import subprocess
+#import subprocess
 import time
 from multiprocessing import Process
 from flask import Flask, send_file, render_template, jsonify
@@ -23,11 +23,12 @@ async def save_cookies(page) -> None:
 
 
 async def save_screenshot():
-    print("正在进行Playwright初始化...")
+    # print("正在进行Playwright初始化...")
     os.environ['PLAYWRIGHT_BROWSERS_PATH'] = './firefox'
-    result = subprocess.run(['playwright', 'install', 'firefox'])
-    if result.returncode != 0:
-        print("Playwright 安装失败！")
+    # result = subprocess.run(['playwright', 'install', 'firefox'])
+    # if result.returncode != 0:
+    #     print("Playwright 安装失败！")
+    print("获取二维码中...")
     async with async_playwright() as p:
         context = await p.firefox.launch_persistent_context(
             './firefox_user_data',
@@ -143,17 +144,9 @@ def run_display():
 
 
 def main():
-    if os.path.isdir('./firefox_user_data'):
-        shutil.rmtree('./firefox_user_data')
-    if os.path.isfile('cookies.txt'):
-        os.remove('cookies.txt')
-    if os.path.isfile('screenshot.png'):
-        os.remove('screenshot.png')
-    if os.path.isfile('last_status.txt'):
-        os.remove('last_status.txt')
     asyncio.run(save_screenshot())
     cookies = get_cookies()
-    with open(f'quark_cookie.txt', 'w', encoding='utf-8') as f:
+    with open(f'/data/quark_cookie.txt', 'w', encoding='utf-8') as f:
         f.write(str(cookies))
     with open('last_status.txt', 'w', encoding='utf-8') as f:
         f.write('1')
@@ -170,5 +163,13 @@ def main():
 
 if __name__ == '__main__':
     run_display()
+    if os.path.isdir('./firefox_user_data'):
+        shutil.rmtree('./firefox_user_data')
+    if os.path.isfile('cookies.txt'):
+        os.remove('cookies.txt')
+    if os.path.isfile('screenshot.png'):
+        os.remove('screenshot.png')
+    if os.path.isfile('last_status.txt'):
+        os.remove('last_status.txt')
     Process(target=main).start()
     Process(target=run_flask).start()
