@@ -7,7 +7,7 @@ WORKDIR /quark_cookie
 COPY --chmod=755 . /quark_cookie
 
 RUN apt-get update -y && \
-    apt-get install xvfb && \
+    apt-get install -y xvfb && \
     pip install --no-cache --upgrade pip && \
     pip install --no-cache -r requirements.txt && \
     PLAYWRIGHT_BROWSERS_PATH=/quark_cookie/firefox playwright install firefox && \
