@@ -673,11 +673,55 @@ function check_115_cookie() {
 
 function qrcode_aliyunpan_tvtoken() {
 
-    INFO "阿里云盘 TV Token 配置"
-    local config_dir local_ip
-    docker_pull ddsderek/xiaoya-glue:python
-    config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
-    if [ -n "${config_dir}" ]; then
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "阿里云盘 TV Token 配置"
+        local config_dir local_ip
+        docker_pull ddsderek/xiaoya-glue:python
+        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+        if [ -n "${config_dir}" ]; then
+            if [[ "${OSNAME}" = "macos" ]]; then
+                local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+            else
+                local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+            fi
+            if [ -z "${local_ip}" ]; then
+                local_ip="小雅服务器IP"
+            fi
+            INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+            docker run -i --rm \
+                -v "$config_dir:/data" \
+                -e LANG=C.UTF-8 \
+                --net=host \
+                ddsderek/xiaoya-glue:python \
+                /aliyuntvtoken/alitoken2.py
+            INFO "清理镜像中..."
+            docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
+            INFO "开始更新小雅容器..."
+            container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+            INFO "操作全部完成！"
+        else
+            ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
+            exit 1
+        fi
+        ;;
+    *)
+        WARN "目前 115 Cookie 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
+
+}
+
+function qrcode_115_cookie() {
+
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "115 Cookie 扫码获取"
+        local local_ip
+        INFO "拉取镜像中..."
+        docker_pull ddsderek/xiaoya-glue:python > /dev/null
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -688,47 +732,53 @@ function qrcode_aliyunpan_tvtoken() {
         fi
         INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
         docker run -i --rm \
-            -v "$config_dir:/data" \
+            -v "${1}:/data" \
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /aliyuntvtoken/alitoken2.py
+            /115cookie/115cookie.py
         INFO "清理镜像中..."
         docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
-        INFO "开始更新小雅容器..."
-        container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
         INFO "操作全部完成！"
-    else
-        ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
-        exit 1
-    fi
+        ;;
+    *)
+        WARN "目前 115 Cookie 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
 
 }
 
-function qrcode_115_cookie() {
+function qrcode_quark_cookie() {
 
-    INFO "115 Cookie 扫码获取"
-    local local_ip
-    INFO "拉取镜像中..."
-    docker_pull ddsderek/xiaoya-glue:python > /dev/null
-    if [[ "${OSNAME}" = "macos" ]]; then
-        local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-    else
-        local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-    fi
-    if [ -z "${local_ip}" ]; then
-        local_ip="小雅服务器IP"
-    fi
-    INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
-    docker run -i --rm \
-        -v "${1}:/data" \
-        -e LANG=C.UTF-8 \
-        --net=host \
-        ddsderek/xiaoya-glue:python \
-        /115cookie/115cookie.py
-    INFO "清理镜像中..."
-    docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
-    INFO "操作全部完成！"
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "夸克 Cookie 扫码获取"
+        local local_ip
+        INFO "拉取镜像中..."
+        docker_pull ddsderek/xiaoya-glue:quark_cookie
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用夸克APP扫描二维码！"
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            ddsderek/xiaoya-glue:quark_cookie
+        INFO "清理镜像中..."
+        docker rmi ddsderek/xiaoya-glue:quark_cookie
+        INFO "操作全部完成！"
+        ;;
+    *)
+        WARN "目前夸克 Cookie 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
 
 }
 
@@ -925,14 +975,17 @@ function install_xiaoya_alist() {
         [[ -z "${choose_quark_cookie}" ]] && choose_quark_cookie="n"
         if [[ ${choose_quark_cookie} == [Yy] ]]; then
             touch ${CONFIG_DIR}/quark_cookie.txt
-            while true; do
-                INFO "输入你的 夸克 Cookie"
-                read -erp "Cookie:" quark_cookie
-                echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
-                if check_quark_cookie "${CONFIG_DIR}"; then
-                    break
-                fi
-            done
+            qrcode_quark_cookie "${CONFIG_DIR}"
+            if ! check_quark_cookie "${CONFIG_DIR}"; then
+                while true; do
+                    INFO "输入你的 夸克 Cookie"
+                    read -erp "Cookie:" quark_cookie
+                    echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
+                    if check_quark_cookie "${CONFIG_DIR}"; then
+                        break
+                    fi
+                done
+            fi
         fi
     fi
 
