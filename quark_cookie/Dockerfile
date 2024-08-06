@@ -11,9 +11,9 @@ RUN apt-get update -y && \
     pip install --no-cache --upgrade pip && \
     pip install --no-cache -r requirements.txt && \
     PLAYWRIGHT_BROWSERS_PATH=/quark_cookie/firefox playwright install firefox && \
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -rf \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf \
         /tmp/* \
         /var/lib/apt/lists/* \
         /var/tmp/*

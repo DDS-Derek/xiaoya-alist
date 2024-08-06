@@ -169,5 +169,6 @@ def main():
 
 
 if __name__ == '__main__':
+    run_display()
     Process(target=main).start()
     Process(target=run_flask).start()
