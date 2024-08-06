@@ -13,11 +13,13 @@
   - [功能列表](#功能列表)
 - [相关地址](#相关地址)
 - [通用兼容性测试报告](#通用兼容性测试报告)
-- [免责声明](#免责声明)
 - [Star History](#star-history)
 - [小雅周边工具集合](#小雅周边工具集合)
 - [感谢](#感谢)
 - [捐赠](#捐赠)
+- [许可证](#许可证)
+  - [附加条款](#附加条款)
+  - [免责声明](#免责声明)
 
 > [!WARNING]
 > 请注意，本仓库的开源许可证已于2024年8月16日从 MIT License 切换至 GNU General Public License v3.0。我们建议所有使用者对此有所了解并遵守相关规定。
@@ -216,13 +218,6 @@ Docker镜像源选择 -> 9 6
 |   LibreELEC     |    ❌    |           ❌           |
 |  Windows WSL Docker  |    ❌    |           ❌           |
 
-## 免责声明
-
-- 请勿将 小雅系列软件 用于商业用途。
-- 请勿将 小雅系列软件 用于任何违反法律法规的行为。
-- 本仓库所有脚本均基于官方脚本制作，使用请自行承担数据损失但不限于此的风险。
-- 本仓库所有脚本仅供学习交流，使用本仓库脚本进行违法操作产生的法律责任由操作者自行承担。
-
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=DDS-Derek/xiaoya-alist&type=Date)](https://star-history.com/#DDS-Derek/xiaoya-alist)
@@ -262,3 +257,18 @@ Docker镜像源选择 -> 9 6
 - [捐赠项目作者DDSRem](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ddsrem.png)
 - [捐赠小雅](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-xiaoya.png)
 - [捐赠AI老G](https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/assets/appreciate-ailaog.png)
+
+## 许可证
+
+此项目根据 GNU General Public License v3.0 许可证进行许可，详见[`LICENSE`](LICENSE) 文件。
+
+### 附加条款
+
+- 请勿将 小雅系列软件 用于商业用途。
+- 请勿将 小雅系列软件 用于任何违反法律法规的行为。
+- 本仓库所有脚本均基于官方脚本制作，使用请自行承担数据损失但不限于此的风险。
+- 本仓库所有脚本仅供学习交流，使用本仓库脚本进行违法操作产生的法律责任由操作者自行承担。
+
+### 免责声明
+
+使用此项目则意味着你接受以上规定和 GNU General Public License v3.0 许可证。
