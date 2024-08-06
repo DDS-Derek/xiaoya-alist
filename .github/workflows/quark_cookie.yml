@@ -1,0 +1,75 @@
+name: quark cookie exe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "quark_cookie/**"
+      - ".github/workflows/quark_cookie.yml"
+
+jobs:
+  Windows-amd64:
+    runs-on: windows-latest
+    name: Build Windows Binary
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Init Python 3.12
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.12'
+            cache: 'pip'
+
+      - 
+        name: Install Dependent Packages
+        run: |
+            pip install wheel pyinstaller
+            pip install -r requirements.txt
+        shell: pwsh
+        working-directory: ./quark_cookie
+
+      - 
+        name: Pyinstaller
+        run: |
+            pyinstaller quark_login.spec
+        working-directory: ./quark_cookie
+        shell: pwsh
+
+      - 
+        name: Upload Windows File
+        uses: actions/upload-artifact@v3
+        with:
+            name: quark_login-windows-amd64
+            path: quark_cookie/dist/quark_login.exe
+
+  Update:
+    runs-on: ubuntu-latest
+    needs: [ Windows-amd64 ]
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Download Artifact
+        uses: actions/download-artifact@v3
+
+      - 
+        name: Rename
+        shell: bash
+        run: |
+            mv ./quark_login-windows-amd64/quark_login.exe ./quark_login/quark_login-windows-amd64.exe
+
+      - 
+        uses: stefanzweifel/git-auto-commit-action@be823a7e51f116fecebc222b8307716921375992
+        with:
+            commit_message: 'chore: update quark_login windows exe'
+            branch: master
+            file_pattern: './quark_login/quark_login-windows-amd64.exe'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

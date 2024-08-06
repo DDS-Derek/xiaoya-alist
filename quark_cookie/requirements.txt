@@ -1,0 +1,2 @@
+retrying==1.3.4
+playwright==1.43.0
