@@ -707,7 +707,42 @@ function qrcode_aliyunpan_tvtoken() {
         fi
         ;;
     *)
-        WARN "目前 115 Cookie 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        WARN "目前阿里云盘 TV Token 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
+
+}
+
+function qrcode_aliyunpan_refreshtoken() {
+
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "阿里云盘 Refresh Token 配置"
+        local local_ip
+        INFO "拉取镜像中..."
+        docker_pull ddsderek/xiaoya-glue:python
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            ddsderek/xiaoya-glue:python \
+            /aliyuntoken/aliyuntoken.py
+        INFO "清理镜像中..."
+        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
+        INFO "操作全部完成！"
+        ;;
+    *)
+        WARN "目前阿里云盘 Refresh Token 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
         ;;
     esac
 
