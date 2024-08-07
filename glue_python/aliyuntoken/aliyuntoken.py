@@ -16,6 +16,10 @@ from flask import Flask, send_file, render_template, jsonify
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 last_status = 0
+if sys.platform.startswith('win32'):
+    qrcode_dir = 'qrcode.png'
+else:
+    qrcode_dir= '/aliyuntoken/qrcode.png'
 
 
 headers = {
@@ -66,7 +70,7 @@ def index():
 
 @app.route('/image')
 def serve_image():
-    return send_file('qrcode.png', mimetype='image/png')
+    return send_file(qrcode_dir, mimetype='image/png')
 
 
 @app.route('/status')
@@ -83,14 +87,14 @@ def status():
 def shutdown():
     if os.path.isfile('last_status.txt'):
         os.remove('last_status.txt')
-    if os.path.isfile('qrcode.png'):
-        os.remove('qrcode.png')
+    if os.path.isfile(qrcode_dir):
+        os.remove(qrcode_dir)
     os._exit(0)
 
 
 if __name__ == '__main__':
-    if os.path.isfile('qrcode.png'):
-        os.remove('qrcode.png')
+    if os.path.isfile(qrcode_dir):
+        os.remove(qrcode_dir)
     logging.info('二维码生成中...')
     while True:
         re = requests.get('https://api.xhofe.top/alist/ali/qr', headers=headers)
@@ -104,9 +108,9 @@ if __name__ == '__main__':
             if re.status_code == 200:
                 image_stream = BytesIO(re.content)
                 image = Image.open(image_stream)
-                image.save('qrcode.png')
+                image.save(qrcode_dir)
                 data = {"ck": ck, "t": t}
-                if os.path.isfile('qrcode.png'):
+                if os.path.isfile(qrcode_dir):
                     logging.info('二维码生成完成！')
                     break
                 else:
