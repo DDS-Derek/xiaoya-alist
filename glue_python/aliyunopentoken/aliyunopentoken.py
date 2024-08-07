@@ -115,26 +115,28 @@ if __name__ == '__main__':
     if os.path.isfile(qrcode_dir):
         os.remove(qrcode_dir)
     logging.info('二维码生成中...')
-    re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers)
-    if re.status_code == 200:
-        re_data = json.loads(re.content)
-        qrCodeUrl = re_data['qrCodeUrl']
-        # sid = re_data['sid']
-        re = requests.get(qrCodeUrl, headers=headers)
+    while True:
+        re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers)
         if re.status_code == 200:
-            image_stream = BytesIO(re.content)
-            image = Image.open(image_stream)
-            image.save(qrcode_dir)
-            path = urlparse(qrCodeUrl).path.split('/')
-            components = path
-            value_after_qrcode = components[components.index('qrcode') + 1]
-            if os.path.isfile(qrcode_dir):
-                logging.info('二维码生成完成！')
-            else:
-                time.sleep(1)
-    else:
-        if json.loads(re.text)['code'] == 'Too Many Requests':
-            logging.warning("Too Many Requests 请一小时后重试！")
-            os._exit(0)
+            re_data = json.loads(re.content)
+            qrCodeUrl = re_data['qrCodeUrl']
+            # sid = re_data['sid']
+            re = requests.get(qrCodeUrl, headers=headers)
+            if re.status_code == 200:
+                image_stream = BytesIO(re.content)
+                image = Image.open(image_stream)
+                image.save(qrcode_dir)
+                path = urlparse(qrCodeUrl).path.split('/')
+                components = path
+                value_after_qrcode = components[components.index('qrcode') + 1]
+                if os.path.isfile(qrcode_dir):
+                    logging.info('二维码生成完成！')
+                    break
+                else:
+                    time.sleep(1)
+        else:
+            if json.loads(re.text)['code'] == 'Too Many Requests':
+                logging.warning("Too Many Requests 请一小时后重试！")
+                os._exit(0)
     threading.Thread(target=poll_qrcode_status, args=(value_after_qrcode,)).start()
     app.run(host='0.0.0.0', port=34256)
