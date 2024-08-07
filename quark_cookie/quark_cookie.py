@@ -130,8 +130,9 @@ def shutdown():
 
 def run_flask():
     while True:
+        time.sleep(2)
+        logging.info('等待二维码生成中...')
         if os.path.isfile('screenshot.png'):
-            logging.info('等待二维码生成中...')
             break
     app.run(host='0.0.0.0', port=34256)
 
