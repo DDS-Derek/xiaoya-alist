@@ -85,8 +85,6 @@ def status():
 
 @app.route('/shutdown_server', methods=['GET'])
 def shutdown():
-    if os.path.isfile('last_status.txt'):
-        os.remove('last_status.txt')
     if os.path.isfile(qrcode_dir):
         os.remove(qrcode_dir)
     os._exit(0)
