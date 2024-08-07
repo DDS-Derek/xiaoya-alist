@@ -947,15 +947,20 @@ function install_xiaoya_alist() {
     mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
     mytokenstringsize=${#mytokenfilesize}
     if [ "$mytokenstringsize" -le 31 ]; then
-        INFO "输入你的阿里云盘 Token（32位长）"
-        read -erp "TOKEN:" token
-        token_len=${#token}
-        if [ "$token_len" -ne 32 ]; then
-            ERROR "长度不对,阿里云盘 Token是32位长"
-            ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-            exit 1
-        else
-            echo "$token" > "${CONFIG_DIR}"/mytoken.txt
+        qrcode_aliyunpan_refreshtoken "${CONFIG_DIR}"
+        mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
+        mytokenstringsize=${#mytokenfilesize}
+        if [ "$mytokenstringsize" -le 31 ]; then
+            INFO "输入你的阿里云盘 Token（32位长）"
+            read -erp "TOKEN:" token
+            token_len=${#token}
+            if [ "$token_len" -ne 32 ]; then
+                ERROR "长度不对,阿里云盘 Token是32位长"
+                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+                exit 1
+            else
+                echo "$token" > "${CONFIG_DIR}"/mytoken.txt
+            fi
         fi
     fi
 
