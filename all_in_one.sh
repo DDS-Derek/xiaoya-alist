@@ -748,6 +748,41 @@ function qrcode_aliyunpan_refreshtoken() {
 
 }
 
+function qrcode_aliyunpan_opentoken() {
+
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "阿里云盘 Open Token 配置"
+        local local_ip
+        INFO "拉取镜像中..."
+        docker_pull ddsderek/xiaoya-glue:python
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            ddsderek/xiaoya-glue:python \
+            /aliyunopentoken/aliyunopentoken.py
+        INFO "清理镜像中..."
+        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
+        INFO "操作全部完成！"
+        ;;
+    *)
+        WARN "目前阿里云盘 Open Token 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
+
+}
+
 function qrcode_115_cookie() {
 
     cpu_arch=$(uname -m)
@@ -967,15 +1002,20 @@ function install_xiaoya_alist() {
     myopentokenfilesize=$(cat "${CONFIG_DIR}"/myopentoken.txt)
     myopentokenstringsize=${#myopentokenfilesize}
     if [ "$myopentokenstringsize" -le 279 ]; then
-        INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
-        read -erp "OPENTOKEN:" opentoken
-        opentoken_len=${#opentoken}
-        if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
-            ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
-            ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-            exit 1
-        else
-            echo "$opentoken" > "${CONFIG_DIR}"/myopentoken.txt
+        qrcode_aliyunpan_opentoken "${CONFIG_DIR}"
+        myopentokenfilesize=$(cat "${CONFIG_DIR}"/myopentoken.txt)
+        myopentokenstringsize=${#myopentokenfilesize}
+        if [ "$myopentokenstringsize" -le 279 ]; then
+            INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
+            read -erp "OPENTOKEN:" opentoken
+            opentoken_len=${#opentoken}
+            if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
+                ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
+                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+                exit 1
+            else
+                echo "$opentoken" > "${CONFIG_DIR}"/myopentoken.txt
+            fi
         fi
     fi
 
