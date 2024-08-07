@@ -92,19 +92,24 @@ if __name__ == '__main__':
     if os.path.isfile('qrcode.png'):
         os.remove('qrcode.png')
     logging.info('二维码生成中...')
-    re = requests.get('https://api.xhofe.top/alist/ali/qr', headers=headers)
-    if re.status_code == 200:
-        re_data = json.loads(re.content)
-        t = str(re_data['content']['data']['t'])
-        codeContent = re_data['content']['data']['codeContent']
-        ck = re_data['content']['data']['ck']
-        url = f"https://api.xhofe.top/qr/?size=400&text={codeContent}"
-        re = requests.get(url, headers=headers)
+    while True:
+        re = requests.get('https://api.xhofe.top/alist/ali/qr', headers=headers)
         if re.status_code == 200:
-            image_stream = BytesIO(re.content)
-            image = Image.open(image_stream)
-            image.save('qrcode.png')
-            data = {"ck": ck, "t": t}
-            logging.info('二维码生成完成！')
-            threading.Thread(target=poll_qrcode_status, args=(data,)).start()
+            re_data = json.loads(re.content)
+            t = str(re_data['content']['data']['t'])
+            codeContent = re_data['content']['data']['codeContent']
+            ck = re_data['content']['data']['ck']
+            url = f"https://api.xhofe.top/qr/?size=400&text={codeContent}"
+            re = requests.get(url, headers=headers)
+            if re.status_code == 200:
+                image_stream = BytesIO(re.content)
+                image = Image.open(image_stream)
+                image.save('qrcode.png')
+                data = {"ck": ck, "t": t}
+                if os.path.isfile('qrcode.png'):
+                    logging.info('二维码生成完成！')
+                    break
+                else:
+                    time.sleep(1)
+    threading.Thread(target=poll_qrcode_status, args=(data,)).start()
     app.run(host='0.0.0.0', port=34256)
