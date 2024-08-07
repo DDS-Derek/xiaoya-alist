@@ -3,17 +3,18 @@
 import asyncio
 import os
 import shutil
-#import subprocess
+import subprocess
+import logging
 import time
+import sys
 from multiprocessing import Process
 from flask import Flask, send_file, render_template, jsonify
 from playwright.async_api import async_playwright
 from typing import Dict, Union, List
-from pyvirtualdisplay import Display
 
 
 app = Flask(__name__)
-filename = 'screenshot.png'
+logging.basicConfig(level=logging.INFO)
 
 
 async def save_cookies(page) -> None:
@@ -23,12 +24,12 @@ async def save_cookies(page) -> None:
 
 
 async def save_screenshot():
-    # print("正在进行Playwright初始化...")
     os.environ['PLAYWRIGHT_BROWSERS_PATH'] = './firefox'
-    # result = subprocess.run(['playwright', 'install', 'firefox'])
-    # if result.returncode != 0:
-    #     print("Playwright 安装失败！")
-    print("获取二维码中...")
+    if sys.platform.startswith('win') or sys.platform.startswith('darwin'):
+        logging.info("正在进行Playwright初始化...")
+        result = subprocess.run(['playwright', 'install', 'firefox'])
+        if result.returncode != 0:
+            logging.error("Playwright 安装失败！")
     async with async_playwright() as p:
         context = await p.firefox.launch_persistent_context(
             './firefox_user_data',
@@ -43,7 +44,6 @@ async def save_screenshot():
         while page.url == initial_url:
             await asyncio.sleep(1)
         await save_cookies(page)
-        print('用户已扫码并登陆！')
         await context.close()
 
 
@@ -84,7 +84,7 @@ def check_cookies() -> Union[None, Union[Dict[str, str], str]]:
         else:
             return content.strip()
     except Exception as e:
-        print(f"Error checking cookies: {e}")
+        logging.error(f"Error checking cookies: {e}")
         return None
 
 
@@ -131,38 +131,42 @@ def shutdown():
 def run_flask():
     while True:
         if os.path.isfile('screenshot.png'):
+            logging.info('等待二维码生成中...')
             break
     app.run(host='0.0.0.0', port=34256)
 
 
 def run_display():
+    from pyvirtualdisplay import Display
     try:
         _display = Display(visible=False, size=(1024, 768), extra_args=[os.environ['DISPLAY']])
         _display.start()
     except Exception as err:
-        print(f"DisplayHelper init error: {str(err)}")
+        logging.error(f"DisplayHelper init error: {str(err)}")
 
 
 def main():
     asyncio.run(save_screenshot())
     cookies = get_cookies()
-    with open(f'/data/quark_cookie.txt', 'w', encoding='utf-8') as f:
+    if sys.platform.startswith('win') or sys.platform.startswith('darwin'):
+        cookie_data = 'quark_cookie.txt'
+    else:
+        cookie_data = '/data/quark_cookie.txt'
+    with open(cookie_data, 'w', encoding='utf-8') as f:
         f.write(str(cookies))
     with open('last_status.txt', 'w', encoding='utf-8') as f:
         f.write('1')
-    time.sleep(2)
-    # shutil.rmtree('./firefox')
-    if os.path.isdir('./firefox_user_data'):
-        shutil.rmtree('./firefox_user_data')
-    if os.path.isfile('cookies.txt'):
-        os.remove('cookies.txt')
-    if os.path.isfile('screenshot.png'):
-        os.remove('screenshot.png')
-    print("您的 夸克Cookie 已写入 quark_cookie.txt 文件！")
+    logging.info("您的 夸克Cookie 已写入 quark_cookie.txt 文件！")
 
 
 if __name__ == '__main__':
-    run_display()
+    if sys.platform.startswith('win'):
+        logging.info('当前系统为 Windows，无需启动 DisplayHelper')
+    elif sys.platform.startswith('darwin'):
+        logging.info('当前系统为 MacOS，无需启动 DisplayHelper')
+    else:
+        logging.info('启动 DisplayHelper 中...')
+        run_display()
     if os.path.isdir('./firefox_user_data'):
         shutil.rmtree('./firefox_user_data')
     if os.path.isfile('cookies.txt'):
