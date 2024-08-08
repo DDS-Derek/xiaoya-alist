@@ -1296,7 +1296,7 @@ function install_xiaoya_alist() {
         docker_command+=("--network=host")
     else
         docker_image="xiaoyaliu/alist:latest"
-        docker_command+=("-p 5678:80" "-p 2345:2345" "-p 2346:2346")
+        docker_command+=("-p 5678:80" "-p 2345:2345" "-p 2346:2346" "-p 2347:2347")
     fi
     if [[ -f ${CONFIG_DIR}/proxy.txt ]] && [[ -s ${CONFIG_DIR}/proxy.txt ]]; then
         proxy_url=$(head -n1 "${CONFIG_DIR}"/proxy.txt)
@@ -1323,6 +1323,7 @@ function update_xiaoya_alist() {
         echo -en "即将开始更新小雅Alist${Blue} $i ${Font}\r"
         sleep 1
     done
+    container_update_extra_command="if ! grep -q '2347' /tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt); then sed -i '2s/^/-p 2347:2347 /' /tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt); fi"
     container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
 
 }
