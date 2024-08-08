@@ -516,7 +516,7 @@ function wait_emby_start() {
             WARN "Emby 未正常启动超时 10 分钟！"
             break
         fi
-        sleep 3
+        sleep 8
     done
 
 }
@@ -559,7 +559,7 @@ function wait_xiaoya_start() {
             WARN "小雅alist 未正常启动超时 10 分钟！"
             break
         fi
-        sleep 3
+        sleep 8
     done
 
 }
