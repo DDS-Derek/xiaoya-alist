@@ -142,6 +142,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 一次性运行 小雅助手（xiaoyahelper）-> 4 2
 创建/删除 定时同步更新数据（小雅alist启动时拉取的数据）-> 1 4
 AI老G 安装脚本 -> 8 7
+账号管理 -> 1 5
 ```
 
 **高级功能**

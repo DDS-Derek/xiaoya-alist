@@ -595,7 +595,7 @@ function check_quark_cookie() {
         else
             member_type="${member//\"/}会员"
         fi
-        INFO "有效夸克 Cookie，欢迎你${member_type}"
+        INFO "有效夸克 Cookie，${member_type}"
         state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
         response=$(curl -s -H "$headers" "$state_url")
         sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
@@ -659,9 +659,9 @@ function check_115_cookie() {
     vip=$(echo -e "$response" | grep -o '"vip":[^,]*' | sed 's/"vip"://')
     if echo -e "${response}" | grep -q "user_id"; then
         if [ $vip == "0" ]; then
-            INFO "尊敬的白嫖用户，您的 115 Cookie 有效"
+            INFO "有效 115 Cookie，普通用户"
         else
-            INFO "尊敬的VIP用户，您的 115 Cookie 有效"
+            INFO "有效 115 Cookie，VIP用户"
         fi
         return 0
     else
@@ -791,7 +791,7 @@ function qrcode_115_cookie() {
         INFO "115 Cookie 扫码获取"
         local local_ip
         INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python > /dev/null
+        docker_pull ddsderek/xiaoya-glue:python
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -852,25 +852,196 @@ function qrcode_quark_cookie() {
 
 }
 
+function enter_aliyunpan_refreshtoken() {
+
+    INFO "是否使用扫码自动 Token [Y/n]（默认 Y）"
+    read -erp "Token:" choose_qrcode_aliyunpan_refreshtoken
+    [[ -z "${choose_qrcode_aliyunpan_refreshtoken}" ]] && choose_qrcode_aliyunpan_refreshtoken="y"
+    if [[ ${choose_qrcode_aliyunpan_refreshtoken} == [Yy] ]]; then
+        qrcode_aliyunpan_refreshtoken "${1}"
+    fi
+    while true; do
+        mytokenfilesize=$(cat "${1}"/mytoken.txt)
+        mytokenstringsize=${#mytokenfilesize}
+        if [ "$mytokenstringsize" -le 31 ]; then
+            INFO "输入你的阿里云盘 Token（32位长）"
+            read -erp "TOKEN:" token
+            token_len=${#token}
+            if [ "$token_len" -ne 32 ]; then
+                ERROR "长度不对,阿里云盘 Token是32位长"
+                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+            else
+                echo "$token" > "${1}"/mytoken.txt
+                break
+            fi
+        else
+            break
+        fi
+    done
+
+}
+
+function settings_aliyunpan_refreshtoken() {
+
+    if [ "${2}" == "force" ]; then
+        enter_aliyunpan_refreshtoken "${1}"
+    else
+        mytokenfilesize=$(cat "${1}"/mytoken.txt)
+        mytokenstringsize=${#mytokenfilesize}
+        if [ "$mytokenstringsize" -le 31 ]; then
+            enter_aliyunpan_refreshtoken "${1}"
+        fi
+    fi
+
+}
+
+function enter_aliyunpan_opentoken() {
+
+    INFO "是否使用扫码自动 Token [Y/n]（默认 Y）"
+    read -erp "Token:" choose_qrcode_aliyunpan_opentoken
+    [[ -z "${choose_qrcode_aliyunpan_opentoken}" ]] && choose_qrcode_aliyunpan_opentoken="y"
+    if [[ ${choose_qrcode_aliyunpan_opentoken} == [Yy] ]]; then
+        qrcode_aliyunpan_opentoken "${1}"
+    fi
+    while true; do
+        myopentokenfilesize=$(cat "${1}"/myopentoken.txt)
+        myopentokenstringsize=${#myopentokenfilesize}
+        if [ "$myopentokenstringsize" -le 279 ]; then
+            INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
+            read -erp "OPENTOKEN:" opentoken
+            opentoken_len=${#opentoken}
+            if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
+                ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
+                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+            else
+                echo "$opentoken" > "${1}"/myopentoken.txt
+                break
+            fi
+        else
+            break
+        fi
+    done
+
+}
+
+function settings_aliyunpan_opentoken() {
+
+    if [ "${2}" == "force" ]; then
+        qrcode_aliyunpan_opentoken "${1}"
+    else
+        myopentokenfilesize=$(cat "${1}"/myopentoken.txt)
+        myopentokenstringsize=${#myopentokenfilesize}
+        if [ "$myopentokenstringsize" -le 279 ]; then
+            qrcode_aliyunpan_opentoken "${1}"
+        fi
+    fi
+
+}
+
+function enter_115_cookie() {
+
+    touch ${1}/115_cookie.txt
+    INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+    read -erp "Cookie:" choose_qrcode_115_cookie
+    [[ -z "${choose_qrcode_115_cookie}" ]] && choose_qrcode_115_cookie="y"
+    if [[ ${choose_qrcode_115_cookie} == [Yy] ]]; then
+        qrcode_115_cookie "${1}"
+    fi
+    if ! check_115_cookie "${1}"; then
+        WARN "扫码获取115 Cookie 失败，请手动获取！"
+        while true; do
+            INFO "输入你的 115 Cookie"
+            read -erp "Cookie:" set_115_cookie
+            echo -e "${set_115_cookie}" > ${1}/115_cookie.txt
+            if check_115_cookie "${1}"; then
+                break
+            fi
+        done
+    fi
+
+}
+
 function settings_115_cookie() {
 
-    if [ ! -f "${1}/115_cookie.txt" ] || ! check_115_cookie "${1}"; then
-        INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
-        read -erp "Cookie:" choose_115_cookie
-        [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
-        if [[ ${choose_115_cookie} == [Yy] ]]; then
-            touch ${1}/115_cookie.txt
-            qrcode_115_cookie "${1}"
-            if ! check_115_cookie "${1}"; then
-                WARN "扫码获取115 Cookie 失败，请手动获取！"
-                while true; do
-                    INFO "输入你的 115 Cookie"
-                    read -erp "Cookie:" set_115_cookie
-                    echo -e "${set_115_cookie}" > ${1}/115_cookie.txt
-                    if check_115_cookie "${1}"; then
-                        break
-                    fi
-                done
+    if [ "${2}" == "force" ]; then
+        enter_115_cookie "${1}"
+    else
+        if [ ! -f "${1}/115_cookie.txt" ] || ! check_115_cookie "${1}"; then
+            INFO "是否配置 115 Cookie [Y/n]（默认 n 不配置）"
+            read -erp "Cookie:" choose_115_cookie
+            [[ -z "${choose_115_cookie}" ]] && choose_115_cookie="n"
+            if [[ ${choose_115_cookie} == [Yy] ]]; then
+                enter_115_cookie "${1}"
+            fi
+        fi
+    fi
+
+}
+
+function enter_quark_cookie() {
+
+    touch ${1}/quark_cookie.txt
+    INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+    read -erp "Cookie:" choose_qrcode_quark_cookie
+    [[ -z "${choose_qrcode_quark_cookie}" ]] && choose_qrcode_quark_cookie="y"
+    if [[ ${choose_qrcode_quark_cookie} == [Yy] ]]; then
+        qrcode_quark_cookie "${1}"
+    fi
+    if ! check_quark_cookie "${1}"; then
+        while true; do
+            INFO "输入你的 夸克 Cookie"
+            read -erp "Cookie:" quark_cookie
+            echo -e "${quark_cookie}" > ${1}/quark_cookie.txt
+            if check_quark_cookie "${1}"; then
+                break
+            fi
+        done
+    fi
+
+}
+
+function settings_quark_cookie() {
+
+    if [ "${2}" == "force" ]; then
+        enter_quark_cookie "${1}"
+    else
+        if [ ! -f "${1}/quark_cookie.txt" ] || ! check_quark_cookie "${1}"; then
+            INFO "是否配置 夸克 Cookie [Y/n]（默认 n 不配置）"
+            read -erp "Cookie:" choose_quark_cookie
+            [[ -z "${choose_quark_cookie}" ]] && choose_quark_cookie="n"
+            if [[ ${choose_quark_cookie} == [Yy] ]]; then
+                enter_quark_cookie "${1}"
+            fi
+        fi
+    fi
+
+}
+
+function enter_uc_cookie() {
+
+    touch ${1}/uc_cookie.txt
+    while true; do
+        INFO "输入你的 UC Cookie"
+        read -erp "Cookie:" uc_cookie
+        echo -e "${uc_cookie}" > ${1}/uc_cookie.txt
+        if check_uc_cookie "${1}"; then
+            break
+        fi
+    done
+
+}
+
+function settings_uc_cookie() {
+
+    if [ "${2}" == "force" ]; then
+        enter_uc_cookie "${1}"
+    else
+        if [ ! -f "${1}/uc_cookie.txt" ] || ! check_uc_cookie "${1}"; then
+            INFO "是否配置 UC Cookie [Y/n]（默认 n 不配置）"
+            read -erp "Cookie:" choose_uc_cookie
+            [[ -z "${choose_uc_cookie}" ]] && choose_uc_cookie="n"
+            if [[ ${choose_uc_cookie} == [Yy] ]]; then
+                enter_uc_cookie "${1}"
             fi
         fi
     fi
@@ -958,6 +1129,87 @@ function data_crep() { # container_run_extra_parameters
 
 }
 
+function main_account_management() {
+
+    clear
+
+    local config_dir
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+    fi
+    if [ -z "${config_dir}" ]; then
+        get_config_dir
+        config_dir=${CONFIG_DIR}
+    fi
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}账号管理${Font}\n"
+    echo -ne "${INFO} 界面加载中...${Font}\r"
+    echo -e "1、115 Cookie                        （当前：$(if CHECK_OUT=$(check_115_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Green}错误${Font}"; fi)）
+2、夸克 Cookie                       （当前：$(if CHECK_OUT=$(check_quark_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Green}错误${Font}"; fi)）
+3、阿里云盘 Refresh Token（mytoken） （当前：$(if [ -f "${config_dir}/mytoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Green}未配置${Font}"; fi)）
+4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Green}未配置${Font}"; fi)）
+5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Green}错误${Font}"; fi)）"
+    echo -e "6、应用配置（自动重启小雅，并返回上级菜单）"
+    echo -e "0、返回上级（从此处退出不会重启小雅，如果更改了上述配置请手动重启）"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-6]:" num
+    case "$num" in
+    1)
+        clear
+        settings_115_cookie "${config_dir}" force
+        main_account_management
+        ;;
+    2)
+        clear
+        settings_quark_cookie "${config_dir}" force
+        main_account_management
+        ;;
+    3)
+        clear
+        settings_aliyunpan_refreshtoken "${config_dir}" force
+        main_account_management
+        ;;
+    4)
+        clear
+        settings_aliyunpan_opentoken "${config_dir}" force
+        main_account_management
+        ;;
+    5)
+        clear
+        settings_uc_cookie "${CONFIG_DIR}" force
+        main_account_management
+        ;;
+    6)
+        clear
+        if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+            INFO "重启小雅容器中..."
+            docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+            wait_xiaoya_start
+        else
+            WARN "您未安装小雅，请先安装小雅容器！"
+        fi
+        if docker container inspect xiaoya-115cleaner > /dev/null 2>&1; then
+            docker restart xiaoya-115cleaner
+        fi
+        INFO "配置保存完成，按任意键返回菜单！"
+        read -rs -n 1 -p ""
+        clear
+        main_xiaoya_alist
+        ;;
+    0)
+        clear
+        main_xiaoya_alist
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-6]'
+        main_account_management
+        ;;
+    esac
+
+}
+
 function install_xiaoya_alist() {
 
     if [ ! -d "${CONFIG_DIR}" ]; then
@@ -979,45 +1231,9 @@ function install_xiaoya_alist() {
         fi
     done
 
-    mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
-    mytokenstringsize=${#mytokenfilesize}
-    if [ "$mytokenstringsize" -le 31 ]; then
-        qrcode_aliyunpan_refreshtoken "${CONFIG_DIR}"
-        mytokenfilesize=$(cat "${CONFIG_DIR}"/mytoken.txt)
-        mytokenstringsize=${#mytokenfilesize}
-        if [ "$mytokenstringsize" -le 31 ]; then
-            INFO "输入你的阿里云盘 Token（32位长）"
-            read -erp "TOKEN:" token
-            token_len=${#token}
-            if [ "$token_len" -ne 32 ]; then
-                ERROR "长度不对,阿里云盘 Token是32位长"
-                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-                exit 1
-            else
-                echo "$token" > "${CONFIG_DIR}"/mytoken.txt
-            fi
-        fi
-    fi
+    settings_aliyunpan_refreshtoken "${CONFIG_DIR}"
 
-    myopentokenfilesize=$(cat "${CONFIG_DIR}"/myopentoken.txt)
-    myopentokenstringsize=${#myopentokenfilesize}
-    if [ "$myopentokenstringsize" -le 279 ]; then
-        qrcode_aliyunpan_opentoken "${CONFIG_DIR}"
-        myopentokenfilesize=$(cat "${CONFIG_DIR}"/myopentoken.txt)
-        myopentokenstringsize=${#myopentokenfilesize}
-        if [ "$myopentokenstringsize" -le 279 ]; then
-            INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
-            read -erp "OPENTOKEN:" opentoken
-            opentoken_len=${#opentoken}
-            if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
-                ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
-                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-                exit 1
-            else
-                echo "$opentoken" > "${CONFIG_DIR}"/myopentoken.txt
-            fi
-        fi
-    fi
+    settings_aliyunpan_opentoken "${CONFIG_DIR}"
 
     folderidfilesize=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
     folderidstringsize=${#folderidfilesize}
@@ -1049,42 +1265,9 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/quark_cookie.txt" ] || ! check_quark_cookie "${CONFIG_DIR}"; then
-        INFO "是否配置 夸克 Cookie [Y/n]（默认 n 不配置）"
-        read -erp "Cookie:" choose_quark_cookie
-        [[ -z "${choose_quark_cookie}" ]] && choose_quark_cookie="n"
-        if [[ ${choose_quark_cookie} == [Yy] ]]; then
-            touch ${CONFIG_DIR}/quark_cookie.txt
-            qrcode_quark_cookie "${CONFIG_DIR}"
-            if ! check_quark_cookie "${CONFIG_DIR}"; then
-                while true; do
-                    INFO "输入你的 夸克 Cookie"
-                    read -erp "Cookie:" quark_cookie
-                    echo -e "${quark_cookie}" > ${CONFIG_DIR}/quark_cookie.txt
-                    if check_quark_cookie "${CONFIG_DIR}"; then
-                        break
-                    fi
-                done
-            fi
-        fi
-    fi
+    settings_quark_cookie "${CONFIG_DIR}"
 
-    if [ ! -f "${CONFIG_DIR}/uc_cookie.txt" ] || ! check_uc_cookie "${CONFIG_DIR}"; then
-        INFO "是否配置 UC Cookie [Y/n]（默认 n 不配置）"
-        read -erp "Cookie:" choose_uc_cookie
-        [[ -z "${choose_uc_cookie}" ]] && choose_uc_cookie="n"
-        if [[ ${choose_uc_cookie} == [Yy] ]]; then
-            touch ${CONFIG_DIR}/uc_cookie.txt
-            while true; do
-                INFO "输入你的 UC Cookie"
-                read -erp "Cookie:" uc_cookie
-                echo -e "${uc_cookie}" > ${CONFIG_DIR}/uc_cookie.txt
-                if check_uc_cookie "${CONFIG_DIR}"; then
-                    break
-                fi
-            done
-        fi
-    fi
+    settings_uc_cookie "${CONFIG_DIR}"
 
     settings_115_cookie "${CONFIG_DIR}"
 
@@ -1227,9 +1410,10 @@ function main_xiaoya_alist() {
     echo -e "2、更新"
     echo -e "3、卸载"
     echo -e "4、创建/删除 定时同步更新数据（${Red}功能已弃用，只提供删除${Font}）  当前状态：$(judgment_xiaoya_alist_sync_data_status)"
+    echo -e "5、账号管理"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-4]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         clear
@@ -1279,13 +1463,17 @@ function main_xiaoya_alist() {
         fi
         return_menu "main_xiaoya_alist"
         ;;
+    5)
+        clear
+        main_account_management
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-4]'
+        ERROR '请输入正确数字 [0-5]'
         main_xiaoya_alist
         ;;
     esac
@@ -5684,7 +5872,7 @@ function main_return() {
             out_tips="${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}\n"
         fi
     fi
-    echo -e "${out_tips}1、安装/更新/卸载 小雅Alist                   当前状态：$(judgment_container "${xiaoya_alist_name}")
+    echo -e "${out_tips}1、安装/更新/卸载 小雅Alist & 账号管理        当前状态：$(judgment_container "${xiaoya_alist_name}")
 2、安装/卸载 小雅Emby全家桶                   当前状态：$(judgment_container "${xiaoya_emby_name}")
 3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")
 4、安装/更新/卸载 小雅助手（xiaoyahelper）    当前状态：$(judgment_container xiaoyakeeper)
