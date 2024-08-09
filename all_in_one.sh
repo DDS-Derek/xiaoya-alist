@@ -564,6 +564,15 @@ function wait_xiaoya_start() {
 
 }
 
+function clear_qrcode_container() {
+
+    # shellcheck disable=SC2046
+    docker rm -f $(docker ps -a -q --filter ancestor=ddsderek/xiaoya-glue:quark_cookie) > /dev/null 2>&1
+    # shellcheck disable=SC2046
+    docker rm -f $(docker ps -a -q --filter ancestor=ddsderek/xiaoya-glue:python) > /dev/null 2>&1
+
+}
+
 function check_quark_cookie() {
 
     if [[ ! -f "${1}/quark_cookie.txt" ]] && [[ ! -s "${1}/quark_cookie.txt" ]]; then
@@ -673,6 +682,7 @@ function check_115_cookie() {
 
 function qrcode_aliyunpan_tvtoken() {
 
+    clear_qrcode_container
     cpu_arch=$(uname -m)
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
@@ -715,6 +725,7 @@ function qrcode_aliyunpan_tvtoken() {
 
 function qrcode_aliyunpan_refreshtoken() {
 
+    clear_qrcode_container
     cpu_arch=$(uname -m)
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
@@ -750,6 +761,7 @@ function qrcode_aliyunpan_refreshtoken() {
 
 function qrcode_aliyunpan_opentoken() {
 
+    clear_qrcode_container
     cpu_arch=$(uname -m)
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
@@ -785,6 +797,7 @@ function qrcode_aliyunpan_opentoken() {
 
 function qrcode_115_cookie() {
 
+    clear_qrcode_container
     cpu_arch=$(uname -m)
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
@@ -820,6 +833,7 @@ function qrcode_115_cookie() {
 
 function qrcode_quark_cookie() {
 
+    clear_qrcode_container
     cpu_arch=$(uname -m)
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
@@ -3137,7 +3151,8 @@ function install_emby_xiaoya_all_emby() {
         get_nsswitch_conf_path
 
         while true; do
-            if [ "${CHOOSE_EMBY}" == "amilys_embyserver" ]; then
+            case ${CHOOSE_EMBY} in
+            "amilys_embyserver")
                 cpu_arch=$(uname -m)
                 if [[ $cpu_arch == "aarch64" || $cpu_arch == *"arm64"* || $cpu_arch == *"armv8"* || $cpu_arch == *"arm/v8"* ]]; then
                     WARN "amilys/embyserver_arm64v8 镜像无法指定版本号，默认拉取 latest 镜像！"
@@ -3161,11 +3176,13 @@ function install_emby_xiaoya_all_emby() {
                         ;;
                     esac
                 fi
-            elif [ "${CHOOSE_EMBY}" == "install_lovechen_embyserver" ]; then
+                ;;
+            "install_lovechen_embyserver")
                 WARN "lovechen/embyserver 镜像无法指定版本号，默认拉取 4.7.14.0 镜像！"
                 IMAGE_VERSION=4.7.14.0
                 break
-            elif [ "${CHOOSE_EMBY}" == "emby_embyserver" ]; then
+                ;;
+            "emby_embyserver")
                 INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；4.8.8.0 | 3；latest ]（默认 1）"
                 read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
                 [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
@@ -3186,7 +3203,8 @@ function install_emby_xiaoya_all_emby() {
                     ERROR "输入无效，请重新选择"
                     ;;
                 esac
-            fi
+                ;;
+            esac
         done
 
         case ${CHOOSE_EMBY} in
