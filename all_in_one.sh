@@ -1323,7 +1323,7 @@ function update_xiaoya_alist() {
         echo -en "即将开始更新小雅Alist${Blue} $i ${Font}\r"
         sleep 1
     done
-    cat > "/tmp/container_update_xiaoya_alist_run.sh" <<-EOF
+    cat > "/tmp/container_update_xiaoya_alist_run.sh" <<- EOF
 #!/bin/bash
 if ! grep -q '2347' "/tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"; then
     sed -i '2s/^/-p 2347:2347 /' "/tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
