@@ -5829,10 +5829,11 @@ function main_other_tools() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}其他工具${Font}\n"
-    echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")"
-    echo -e "2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")"
-    echo -e "3、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")"
-    echo -e "4、安装/更新/卸载 Xiaoya Proxy                当前状态：$(judgment_container xiaoya-proxy)"
+    echo -ne "${INFO} 界面加载中...${Font}\r"
+    echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")
+2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")
+3、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")
+4、安装/更新/卸载 Xiaoya Proxy                当前状态：$(judgment_container xiaoya-proxy)"
     echo -e "5、查看系统磁盘挂载"
     echo -e "6、安装/卸载 CasaOS"
     echo -e "7、AI老G 安装脚本"
@@ -5977,13 +5978,17 @@ function first_init() {
 
     root_need
 
+    INFO "获取系统信息中..."
     get_os
 
+    INFO "获取 IP 地址中..."
     CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
     if [ -n "${CITY}" ]; then
         IP_CITY="IP City: ${Yellow}${CITY}${Font}"
+        INFO "获取 IP 地址成功！"
     fi
 
+    INFO "检查 Docker 版本"
     DOCKER_VERSION="$(docker -v | sed "s/Docker version //g" | cut -d',' -f1)"
 
     if [ ! -d ${DDSREM_CONFIG_DIR} ]; then
@@ -5993,6 +5998,7 @@ function first_init() {
     if [ -f /xiaoya_alist_media_dir.txt ]; then
         mv /xiaoya_alist_media_dir.txt ${DDSREM_CONFIG_DIR}
     fi
+    INFO "初始化容器名称中..."
     init_container_name
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt ]; then
@@ -6019,6 +6025,7 @@ function first_init() {
         echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
     fi
 
+    INFO "设置 Docker 镜像源中..."
     if [ ! -f "${DDSREM_CONFIG_DIR}/image_mirror.txt" ]; then
         if ! auto_choose_image_mirror; then
             echo 'docker.io' > ${DDSREM_CONFIG_DIR}/image_mirror.txt
@@ -6028,6 +6035,7 @@ function first_init() {
         touch ${DDSREM_CONFIG_DIR}/image_mirror_user.txt
     fi
 
+    INFO "清理旧配置文件中..."
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt ]; then
         rm -rf ${DDSREM_CONFIG_DIR}/xiaoya_emby_url.txt
     fi
@@ -6054,6 +6062,8 @@ function first_init() {
             echo -e "alias xiaoya='bash -c \"\$(curl -sLk https://ddsrem.com/xiaoya_install.sh)\"'" >> /etc/profile
         fi
     fi
+    INFO "初始化完成！"
+    sleep 1
 
 }
 
