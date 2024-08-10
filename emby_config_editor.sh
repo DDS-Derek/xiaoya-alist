@@ -1,7 +1,5 @@
 #!/bin/bash
 # shellcheck shell=bash
-# shellcheck disable=SC1091
-# shellcheck disable=SC2154
 PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -157,6 +155,7 @@ function set_resilio() {
 
 function main_return() {
 
+    # shellcheck disable=SC1091
     source "${config_dir}/emby_config.txt"
 
     cat /tmp/xiaoya_alist
@@ -244,6 +243,7 @@ if [ ! -s "${config_dir}/emby_config.txt" ]; then
         echo "version=4.8.0.56"
     } >> "${config_dir}/emby_config.txt"
 else
+    # shellcheck disable=SC1091
     source "${config_dir}/emby_config.txt"
     if [ -z "${dev_dri}" ]; then
         echo "dev_dri=no" >> "${config_dir}/emby_config.txt"

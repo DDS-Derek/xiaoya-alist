@@ -1,6 +1,5 @@
 #!/bin/bash
 # shellcheck shell=bash
-# shellcheck disable=SC2068
 PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -61,6 +60,7 @@ else
     fi
 fi
 INFO "脚本获取成功！"
+# shellcheck disable=SC2068
 bash /tmp/xiaoya_install.sh $@
 if [ -f /tmp/xiaoya_install.sh ]; then
     rm -rf /tmp/xiaoya_install.sh
