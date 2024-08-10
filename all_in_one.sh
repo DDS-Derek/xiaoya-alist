@@ -1,9 +1,6 @@
 #!/bin/bash
 # shellcheck shell=bash
 # shellcheck disable=SC2086
-# shellcheck disable=SC1091
-# shellcheck disable=SC2154
-# shellcheck disable=SC2004
 PATH=${PATH}:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
 export PATH
 #
@@ -1096,7 +1093,9 @@ function get_media_dir() {
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
+            # shellcheck disable=SC1091
             source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
+            # shellcheck disable=SC2154
             echo "${media_dir}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
             INFO "媒体库目录通过 emby_config.txt 获取"
         fi
@@ -3077,8 +3076,10 @@ function install_emby_xiaoya_all_emby() {
 
     XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
     if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
+        # shellcheck disable=SC1091
         source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
 
+        # shellcheck disable=SC2154
         if [ "${mode}" == "bridge" ]; then
             MODE=bridge
             NET_MODE="-p 6908:6908"
@@ -3091,6 +3092,7 @@ function install_emby_xiaoya_all_emby() {
 
         get_xiaoya_hosts
 
+        # shellcheck disable=SC2154
         if [ "${dev_dri}" == "yes" ]; then
             extra_parameters="--device /dev/dri:/dev/dri --privileged -e GIDLIST=0,0 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all"
         fi
@@ -3103,6 +3105,7 @@ function install_emby_xiaoya_all_emby() {
             IMAGE_VERSION=4.8.0.56
         fi
 
+        # shellcheck disable=SC2154
         if [ "${image}" == "emby" ]; then
             install_emby_embyserver
         else
@@ -4235,7 +4238,9 @@ function main_xiaoya_all_emby() {
         if [ ! -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
             install_resilio
         else
+            # shellcheck disable=SC1091
             source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
+            # shellcheck disable=SC2154
             if [ "${resilio}" == "yes" ]; then
                 install_resilio
             elif [ "${resilio}" == "no" ]; then
@@ -5422,7 +5427,9 @@ function auto_choose_image_mirror() {
             curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "${mirrors[$i]}"
             echo $? > /tmp/curl_exit_status_${i} &
         )
+        # shellcheck disable=SC2004
         status[$i]=$!
+        # shellcheck disable=SC2004
         delays[$i]=$output
     done
     better_time=9999999999
@@ -5480,7 +5487,9 @@ function choose_image_mirror() {
             curl -s -o /dev/null -m 4 -w '%{time_total}' --head --request GET "${mirrors[$i]}"
             echo $? > /tmp/curl_exit_status_${i} &
         )
+        # shellcheck disable=SC2004
         status[$i]=$!
+        # shellcheck disable=SC2004
         delays[$i]=$(printf "%.2f" $output)
     done
     for i in "${!mirrors[@]}"; do
