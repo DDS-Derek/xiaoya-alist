@@ -601,7 +601,7 @@ function check_quark_cookie() {
         else
             member_type="${member//\"/}会员"
         fi
-        INFO "有效夸克 Cookie，${member_type}"
+        INFO "有效 夸克 Cookie，${member_type}"
         state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
         response=$(curl -s -H "$headers" "$state_url")
         sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
