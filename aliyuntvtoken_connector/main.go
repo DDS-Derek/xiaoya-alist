@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 )
 
 type Token struct {
@@ -72,7 +71,6 @@ func main() {
 				refresh_token = val.(string)
 			}
 		}
-		fmt.Println(refresh_token)
 		reqBodyJson := `{"refresh_token": "` + refresh_token + `"}`
 
 		resp, err := http.Post("http://api.extscreen.com/aliyundrive/v2/token", "application/json", strings.NewReader(reqBodyJson))
@@ -93,14 +91,8 @@ func main() {
 
 			var token Token
 			json.Unmarshal([]byte(token_data), &token)
-
-			resultBody, _ := sjson.Set("", "token_type", token.TokenType)
-			resultBody, _ = sjson.Set(resultBody, "access_token", token.AccessToken)
-			resultBody, _ = sjson.Set(resultBody, "refresh_token", token.RefreshToken)
-			resultBody, _ = sjson.Set(resultBody, "expires_in", token.ExpiresIn)
-
-			json.NewEncoder(w).Encode(resultBody)
-
+			fmt.Println(token)
+			json.NewEncoder(w).Encode(token)
 		} else {
 			json.NewEncoder(w).Encode(string(respBody))
 		}
