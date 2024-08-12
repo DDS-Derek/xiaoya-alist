@@ -91,7 +91,9 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 单独 解压 config.mp4 -> 2 2 7
 单独 下载 pikpak.mp4 -> 2 2 8
 单独 解压 pikpak.mp4 -> 2 2 9
-选择 下载器【aria2/wget】-> 2 2 10
+单独 下载 115.mp4 -> 2 2 10
+单独 解压 115.mp4 -> 2 2 11
+选择 下载器【aria2/wget】-> 2 2 12
 单独 安装Emby（可选择版本，支持官方，amilys，lovechen）-> 2 3
 立即 同步小雅Emby的config目录 -> 2 6
 单独 创建/删除 同步定时更新任务 -> 2 7

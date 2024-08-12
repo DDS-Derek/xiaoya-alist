@@ -1742,6 +1742,22 @@ function unzip_xiaoya_emby() {
 
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/xiaoya
+    elif [ "${1}" == "115.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        __115_size=$(du -k ${MEDIA_DIR}/temp/115.mp4 | cut -f1)
+        if [[ "$__115_size" -le 16000000 ]]; then
+            ERROR "115.mp4 下载不完整，文件大小(in KB):$__115_size 小于预期"
+            exit 1
+        else
+            INFO "115.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/115.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
     fi
 
     end_time1=$(date +%s)
@@ -1931,14 +1947,7 @@ function download_wget_xiaoya_emby() {
 
     extra_parameters="--workdir=/media/temp"
 
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
-        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "${1} 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
         ERROR "${1} 下载失败！"
         exit 1
     fi
@@ -2002,40 +2011,30 @@ function download_wget_unzip_xiaoya_all_emby() {
     chown 0:0 "${MEDIA_DIR}"
     chmod 777 "${MEDIA_DIR}"
 
+    local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
+    for file in "${files[@]}"; do
+        if [ -f "${MEDIA_DIR}/temp/${file}.aria2" ]; then
+            rm -rf "${MEDIA_DIR}/temp/${file}.aria2"
+        fi
+    done
+
     INFO "开始下载解压..."
 
     extra_parameters="--workdir=/media/temp"
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/config.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/config.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "config.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.mp4"; then
         ERROR "config.mp4 下载失败！"
         exit 1
     fi
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/all.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/all.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "all.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/all.mp4"; then
         ERROR "all.mp4 下载失败！"
         exit 1
     fi
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/pikpak.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/pikpak.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "pikpak.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/pikpak.mp4"; then
         ERROR "pikpak.mp4 下载失败！"
+        exit 1
+    fi
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/115.mp4"; then
+        ERROR "115.mp4 下载失败！"
         exit 1
     fi
 
@@ -2064,6 +2063,14 @@ function download_wget_unzip_xiaoya_all_emby() {
     fi
     extra_parameters="--workdir=/media/xiaoya"
     pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
+
+    __115_size=$(du -k ${MEDIA_DIR}/temp/115.mp4 | cut -f1)
+    if [[ "$__115_size" -le 16000000 ]]; then
+        ERROR "115.mp4 下载不完整，文件大小(in KB):$__115_size 小于预期"
+        exit 1
+    fi
+    extra_parameters="--workdir=/media/xiaoya"
+    pull_run_glue 7z x -aoa -mmt=16 /media/temp/115.mp4
 
     end_time1=$(date +%s)
     total_time1=$((end_time1 - start_time1))
@@ -2096,10 +2103,12 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "7、解压 config.mp4"
     echo -e "8、下载 pikpak.mp4"
     echo -e "9、解压 pikpak.mp4"
-    echo -e "10、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
+    echo -e "10、下载 115.mp4"
+    echo -e "11、解压 115.mp4"
+    echo -e "12、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-10]:" num
+    read -erp "请输入数字 [0-12]:" num
     case "$num" in
     1)
         clear
@@ -2163,6 +2172,20 @@ function main_download_unzip_xiaoya_emby() {
         return_menu "main_download_unzip_xiaoya_emby"
         ;;
     10)
+        clear
+        if [ "${__data_downloader}" == "wget" ]; then
+            download_wget_xiaoya_emby "115.mp4"
+        else
+            download_xiaoya_emby "115.mp4"
+        fi
+        return_menu "main_download_unzip_xiaoya_emby"
+        ;;
+    11)
+        clear
+        unzip_xiaoya_emby "115.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
+        ;;
+    12)
         if [ "${__data_downloader}" == "wget" ]; then
             echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
         elif [ "${__data_downloader}" == "aria2" ]; then
@@ -2179,7 +2202,7 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-10]'
+        ERROR '请输入正确数字 [0-12]'
         main_download_unzip_xiaoya_emby
         ;;
     esac
@@ -2206,39 +2229,25 @@ function download_wget_unzip_xiaoya_all_jellyfin() {
     chown 0:0 "${MEDIA_DIR}"
     chmod 777 "${MEDIA_DIR}"
 
+    local files=("config_jf.mp4" "all_jf.mp4" "PikPak_jf.mp4")
+    for file in "${files[@]}"; do
+        if [ -f "${MEDIA_DIR}/temp/${file}.aria2" ]; then
+            rm -rf "${MEDIA_DIR}/temp/${file}.aria2"
+        fi
+    done
+
     INFO "开始下载解压..."
 
     extra_parameters="--workdir=/media/temp"
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/config_jf.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/config_jf.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/config_jf.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "config_jf.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/config_jf.mp4"; then
         ERROR "config_jf.mp4 下载失败！"
         exit 1
     fi
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/all_jf.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/all_jf.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/all_jf.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "all_jf.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/all_jf.mp4"; then
         ERROR "all_jf.mp4 下载失败！"
         exit 1
     fi
-    if pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/PikPak_jf.mp4"; then
-        if [ -f "${MEDIA_DIR}/temp/PikPak_jf.mp4.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/PikPak_jf.mp4.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "PikPak_jf.mp4 下载成功！"
-        fi
-    else
+    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/Jellyfin/PikPak_jf.mp4"; then
         ERROR "PikPak_jf.mp4 下载失败！"
         exit 1
     fi
@@ -2300,6 +2309,13 @@ function download_unzip_xiaoya_all_jellyfin() {
     mkdir -p "${MEDIA_DIR}/temp"
     chown 0:0 "${MEDIA_DIR}"
     chmod 777 "${MEDIA_DIR}"
+
+    local files=("config_jf.mp4" "all_jf.mp4" "PikPak_jf.mp4")
+    for file in "${files[@]}"; do
+        if [ -f "${MEDIA_DIR}/temp/${file}.aria2" ]; then
+            rm -rf "${MEDIA_DIR}/temp/${file}.aria2"
+        fi
+    done
 
     INFO "开始下载解压..."
 
