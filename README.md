@@ -100,6 +100,11 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 图形化编辑 emby_config.txt -> 2 8
 一键升级Emby容器（可选择镜像版本） -> 2 10
 ————————————————————————————Jellyfin手动全家桶配置——————————————————————————————————
+
+注意：目前官方 Jellyfin 安装方案已经长久未维护！
+如果您需要安装 小雅Jellyfin 全家桶，请使用 AI老G 的脚本安装，风险自担。
+脚本命令：bash <(curl -sSLf https://xy.ggbond.org/xy/xy_install.sh)
+
 单独 下载并解压 全部元数据 -> 3 2 1
 单独 解压 全部元数据 -> 3 2 2
 单独 下载 all_jf.mp4 -> 3 2 3

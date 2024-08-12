@@ -4375,12 +4375,15 @@ function main_xiaoya_all_jellyfin() {
     echo -e "Jellyfin 全家桶安装前提条件："
     echo -e "1. 硬盘140G以上（如果无需完整安装则 60G 以上即可）"
     echo -e "2. 内存3.5G以上空余空间${Font}"
+    echo -e "\n${Red}注意：目前官方 Jellyfin 安装方案已经长久未维护！"
+    echo -e "如果您需要安装 小雅Jellyfin 全家桶，请使用 AI老G 的脚本安装，风险自担。"
+    echo -e "脚本命令：bash <(curl -sSLf https://xy.ggbond.org/xy/xy_install.sh)${Font}"
     if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
         local container_status
         container_status=$(docker inspect --format='{{.State.Status}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")
         case "${container_status}" in
         "running")
-            echo -e "\n"
+            echo
             ;;
         *)
             echo -e "\n${Red}警告：您的小雅容器未正常启动，请先检查小雅容器后再安装全家桶${Font}\n"
