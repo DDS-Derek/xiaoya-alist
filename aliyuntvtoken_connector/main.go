@@ -59,9 +59,20 @@ func decrypt_AES256_CBC_PKCS7(ciphertext, key, iv string) (string, error) {
 
 func main() {
 	http.HandleFunc("/oauth/alipan/token", func(w http.ResponseWriter, r *http.Request) {
-		body, _ := io.ReadAll(r.Body)
-
-		refresh_token := gjson.Get(string(body), "refresh_token").String()
+		r.ParseForm()
+		refresh_token := r.FormValue("refresh_token")
+		if refresh_token == "" {
+			var body map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			if val, ok := body["refresh_token"]; ok {
+				refresh_token = val.(string)
+			}
+		}
+		fmt.Println(refresh_token)
 		reqBodyJson := `{"refresh_token": "` + refresh_token + `"}`
 
 		resp, err := http.Post("http://api.extscreen.com/aliyundrive/v2/token", "application/json", strings.NewReader(reqBodyJson))
