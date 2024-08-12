@@ -371,6 +371,22 @@ function update_media() {
 
         INFO "设置目录权限..."
         chmod 777 -R "${MEDIA_DIR}"/xiaoya
+    elif [ "${1}" == "115.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya
+
+        __115_size=$(du -k ${MEDIA_DIR}/temp/115.mp4 | cut -f1)
+        if [[ "$__115_size" -le 16000000 ]]; then
+            ERROR "115.mp4 下载不完整，文件大小(in KB):$__115_size 小于预期"
+            return 1
+        else
+            INFO "115.mp4 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/115.mp4
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 -R "${MEDIA_DIR}"/xiaoya
     fi
 
     if docker container inspect "${RESILIO_NAME}" > /dev/null 2>&1; then
@@ -626,6 +642,15 @@ function detection_all_pikpak_update() {
         fi
     fi
 
+    compare_metadata_size "115.mp4"
+    if [ "${__COMPARE_METADATA_SIZE}" == "1" ]; then
+        INFO "跳过 115.mp4 更新"
+    else
+        if ! update_media "115.mp4"; then
+            ERROR "115.mp4 元数据更新失败！"
+        fi
+    fi
+
     INFO "全部媒体元数据更新完成！"
 
 }
@@ -825,11 +850,11 @@ EOF
 
     test_xiaoya_status
 
-    # all.mp4 和 pikpak.mp4
+    # all.mp4 和 pikpak.mp4 和 115.mp4
     if [ "${AUTO_UPDATE_ALL_PIKPAK}" == "yes" ]; then
         detection_all_pikpak_update
     else
-        INFO "all.mp4 和 pikpak.mp4 更新已关闭"
+        INFO "all.mp4 pikpak.mp4 115.mp4 更新已关闭"
     fi
     # config.mp4
     if [ "${AUTO_UPDATE_CONFIG}" == "yes" ]; then
