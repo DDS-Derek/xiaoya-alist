@@ -4264,7 +4264,7 @@ function main_xiaoya_all_emby() {
         container_status=$(docker inspect --format='{{.State.Status}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)")
         case "${container_status}" in
         "running")
-            echo -e "\n"
+            echo
             ;;
         *)
             echo -e "\n${Red}警告：您的小雅容器未正常启动，请先检查小雅容器后再安装全家桶${Font}\n"
@@ -4273,17 +4273,18 @@ function main_xiaoya_all_emby() {
     else
         echo -e "${Red}\n警告：您未安装小雅容器，请先安装小雅容器后再安装全家桶${Font}\n"
     fi
-    echo -e "1、一键安装Emby全家桶"
-    echo -e "2、下载/解压 元数据"
-    echo -e "3、安装Emby（可选择版本）"
-    echo -e "4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）"
-    echo -e "5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")"
-    echo -e "6、立即同步小雅Emby config目录"
-    echo -e "7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)"
-    echo -e "8、图形化编辑 emby_config.txt"
-    echo -e "9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)"
-    echo -e "10、一键升级Emby容器（可选择镜像版本）"
-    echo -e "11、卸载Emby全家桶"
+    echo -ne "${INFO} 界面加载中...${Font}\r"
+    echo -e "1、一键安装Emby全家桶
+2、下载/解压 元数据
+3、安装Emby（可选择版本）
+4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）
+5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")
+6、立即同步小雅Emby config目录
+7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)
+8、图形化编辑 emby_config.txt
+9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)
+10、一键升级Emby容器（可选择镜像版本）
+11、卸载Emby全家桶"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字 [0-11]:" num
