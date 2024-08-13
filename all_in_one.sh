@@ -1771,17 +1771,11 @@ function unzip_xiaoya_emby() {
 
 function unzip_appoint_xiaoya_emby_jellyfin() {
 
-    if [ "${2}" == "emby" ]; then
-        file_name="all.mp4"
-    elif [ "${2}" == "jellyfin" ]; then
-        file_name="all_jf.mp4"
-    fi
-
     get_config_dir
 
     get_media_dir
 
-    if [ "${1}" == "${file_name}" ]; then
+    if [ "${1}" == "all.mp4" ] || [ "${1}" == "all_jf.mp4" ]; then
         INFO "请选择要解压的压缩包目录 [ 1:动漫 | 2:每日更新 | 3:电影 | 4:电视剧 | 5:纪录片 | 6:纪录片（已刮削）| 7:综艺 ]"
         valid_choice=false
         while [ "$valid_choice" = false ]; do
@@ -1819,6 +1813,32 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
             UNZIP_FOLD=综艺
             ;;
         esac
+    elif [ "${1}" == "115.mp4" ]; then
+        INFO "请选择要解压的压缩包目录 [ 1:电视剧 | 2:电影 | 3:动漫 ]"
+        valid_choice=false
+        while [ "$valid_choice" = false ]; do
+            read -erp "请输入数字 [1-3]:" choice
+            for i in {1..3}; do
+                if [ "$choice" = "$i" ]; then
+                    valid_choice=true
+                    break
+                fi
+            done
+            if [ "$valid_choice" = false ]; then
+                ERROR "请输入正确数字 [1-3]"
+            fi
+        done
+        case $choice in
+        1)
+            UNZIP_FOLD=电视剧
+            ;;
+        2)
+            UNZIP_FOLD=电影
+            ;;
+        3)
+            UNZIP_FOLD=动漫
+            ;;
+       esac
     else
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
@@ -1840,18 +1860,34 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
 
     start_time1=$(date +%s)
 
-    if [ "${1}" == "${file_name}" ]; then
+    if [ "${1}" == "all.mp4" ] || [ "${1}" == "all_jf.mp4" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
         mkdir -p "${MEDIA_DIR}"/xiaoya
 
-        all_size=$(du -k ${MEDIA_DIR}/temp/${file_name} | cut -f1)
+        all_size=$(du -k ${MEDIA_DIR}/temp/${1} | cut -f1)
         if [[ "$all_size" -le 30000000 ]]; then
-            ERROR "${file_name} 下载不完整，文件大小(in KB):$all_size 小于预期"
+            ERROR "${1} 下载不完整，文件大小(in KB):$all_size 小于预期"
             exit 1
         else
-            INFO "${file_name} 文件大小验证正常"
-            pull_run_glue 7z x -aoa -mmt=16 /media/temp/${file_name} ${UNZIP_FOLD}/* -o/media/xiaoya
+            INFO "${1} 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} ${UNZIP_FOLD}/* -o/media/xiaoya
+        fi
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    elif [ "${1}" == "115.mp4" ]; then
+        extra_parameters="--workdir=/media/xiaoya"
+
+        mkdir -p "${MEDIA_DIR}"/xiaoya/115
+
+        all_size=$(du -k ${MEDIA_DIR}/temp/${1} | cut -f1)
+        if [[ "$all_size" -le 16000000 ]]; then
+            ERROR "${1} 下载不完整，文件大小(in KB):$all_size 小于预期"
+            exit 1
+        else
+            INFO "${1} 文件大小验证正常"
+            pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} 115/${UNZIP_FOLD}/* -o/media/xiaoya
         fi
 
         INFO "设置目录权限..."
@@ -2105,10 +2141,11 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "9、解压 pikpak.mp4"
     echo -e "10、下载 115.mp4"
     echo -e "11、解压 115.mp4"
-    echo -e "12、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
+    echo -e "12、解压 115.mp4 的指定元数据目录【非全部解压】"
+    echo -e "13、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-12]:" num
+    read -erp "请输入数字 [0-13]:" num
     case "$num" in
     1)
         clear
@@ -2140,7 +2177,7 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     5)
         clear
-        unzip_appoint_xiaoya_emby "all.mp4" "emby"
+        unzip_appoint_xiaoya_emby_jellyfin "all.mp4"
         return_menu "main_download_unzip_xiaoya_emby"
         ;;
     6)
@@ -2186,6 +2223,11 @@ function main_download_unzip_xiaoya_emby() {
         return_menu "main_download_unzip_xiaoya_emby"
         ;;
     12)
+        clear
+        unzip_appoint_xiaoya_emby_jellyfin "115.mp4"
+        return_menu "main_download_unzip_xiaoya_emby"
+        ;;
+    13)
         if [ "${__data_downloader}" == "wget" ]; then
             echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
         elif [ "${__data_downloader}" == "aria2" ]; then
@@ -2202,7 +2244,7 @@ function main_download_unzip_xiaoya_emby() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-12]'
+        ERROR '请输入正确数字 [0-13]'
         main_download_unzip_xiaoya_emby
         ;;
     esac
@@ -2678,7 +2720,7 @@ function main_download_unzip_xiaoya_jellyfin() {
         ;;
     5)
         clear
-        unzip_appoint_xiaoya_emby_jellyfin "all_jf.mp4" "jellyfin"
+        unzip_appoint_xiaoya_emby_jellyfin "all_jf.mp4"
         return_menu "main_download_unzip_xiaoya_jellyfin"
         ;;
     6)
