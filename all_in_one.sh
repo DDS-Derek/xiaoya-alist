@@ -1838,7 +1838,7 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
         3)
             UNZIP_FOLD=动漫
             ;;
-       esac
+        esac
     else
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
