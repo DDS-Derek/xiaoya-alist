@@ -310,12 +310,6 @@ public class XiaoyaProxyHandler {
                     return;
                 }
                 
-                Pattern pattern = Pattern.compile("([&?]authorization=)([^&]*)");
-                Matcher matcher = pattern.matcher(url);
-                if (matcher.find()) {
-                    headers.put("Authorization", matcher.group(2));
-                }
-
                 URL urlObj = new URL(url);
                 String host = urlObj.getProtocol() + "://" + urlObj.getHost();
                 int port = urlObj.getPort();
