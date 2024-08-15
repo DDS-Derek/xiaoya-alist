@@ -335,10 +335,9 @@ public class XiaoyaProxyHandler {
                 Request request = requestBuilder.build();
                 Response response = defaultClient.newCall(request).execute();
                 JSONObject object = new JSONObject(response.body().string());
-                String data = object.getString("data");
-                object = new JSONObject(data);
-                cookie = object.getString("cookie");
-                String location = object.getString("download_link");
+                JSONObject dataObject = object.getJSONObject("data");
+                cookie = dataObject.getString("cookie");
+                String location = dataObject.getString("download_link");
                 location = unescapeUnicode(location);
                 if(location != null && cookie != null && !location.isEmpty() && !cookie.isEmpty()){
                     QurakLinkCacheInfo var = new QurakLinkCacheInfo();
