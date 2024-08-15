@@ -130,7 +130,7 @@ public class XiaoyaProxyHandler {
                 }
 
                 Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-                List<String> keys = Arrays.asList("referer", "icy-metadata", "range", "connection", "accept-encoding", "user-agent", "cookie");
+                List<String> keys = Arrays.asList("referer", "icy-metadata", "range", "connection", "accept-encoding", "user-agent", "cookie", "authorization");
                 for (String key : params.keySet()) if (keys.contains(key)) headers.put(key, params.get(key));
                 if(url.contains("夸克")) {
                     headers.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch");
