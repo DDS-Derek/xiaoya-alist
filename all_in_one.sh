@@ -5059,11 +5059,26 @@ function install_xiaoya_proxy() {
         config_dir=${CONFIG_DIR}
     fi
     INFO "小雅配置文件目录：${config_dir}"
+    container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
+    if [ "${container_run_extra_parameters}" == "true" ]; then
+        local RETURN_DATA
+        RETURN_DATA="$(data_crep "r" "install_xiaoya_proxy")"
+        if [ "${RETURN_DATA}" == "None" ]; then
+            INFO "请输入其他参数（默认 无 ）"
+            read -erp "Extra parameters:" extra_parameters
+        else
+            INFO "已读取您上次设置的参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
+            read -erp "Extra parameters:" extra_parameters
+            [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
+        fi
+        extra_parameters=$(data_crep "w" "install_xiaoya_proxy")
+    fi
     docker_pull "ddsderek/xiaoya-proxy:latest"
     docker run -d \
         --name=xiaoya-proxy \
         --restart=always \
         --net=host \
+        ${extra_parameters} \
         -e TZ=Asia/Shanghai \
         ddsderek/xiaoya-proxy:latest
     if [[ "${OSNAME}" = "macos" ]]; then
