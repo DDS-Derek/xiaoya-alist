@@ -284,7 +284,7 @@ public class XiaoyaProxyHandler {
             for (int i = 0; i < originalHeaders.size(); i++) {
                 String name = originalHeaders.name(i);
                 String value = originalHeaders.value(i);
-                if(!name.equals("Content-Length") && !name.equals("Content-Type")){
+                if(!name.equals("Content-Length") && !name.equals("Content-Type") && !name.equals("Transfer-Encoding")){
                     headersBuilder.add(name, value);
                 }
             }
