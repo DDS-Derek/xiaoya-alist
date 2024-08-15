@@ -328,7 +328,11 @@ public class XiaoyaProxyHandler {
                 FormBody.Builder formBody = new FormBody.Builder();
                 if (params != null) for (String key : params.keySet()) formBody.add(key, params.get(key));
                 RequestBody requestBody = formBody.build();
-                Request request = new Request.Builder().post(requestBody).url(alistApi).build();
+                Request.Builder requestBuilder = new Request.Builder().post(requestBody).url(alistApi);
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    requestBuilder.addHeader(entry.getKey(), entry.getValue());
+                }
+                Request request = requestBuilder.build();
                 Response response = defaultClient.newCall(request).execute();
                 JSONObject object = new JSONObject(response.body().string());
                 String data = object.getString("data");
