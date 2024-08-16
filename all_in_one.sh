@@ -5786,17 +5786,27 @@ function reset_script_configuration() {
             echo -en "即将开始清理配置文件${Blue} $i ${Font}\r"
             sleep 1
         done
-        rm -rf ${DDSREM_CONFIG_DIR}/container_name
-        rm -f \
-            xiaoya_alist_tvbox_config_dir.txt \
-            xiaoya_alist_media_dir.txt \
-            xiaoya_alist_config_dir.txt \
-            resilio_config_dir.txt \
-            portainer_config_dir.txt \
-            onelist_config_dir.txt \
-            container_run_extra_parameters.txt \
-            auto_symlink_config_dir.txt \
-            data_downloader.txt
+        FILES_TO_REMOVE=(
+            "xiaoya_alist_tvbox_config_dir.txt"
+            "xiaoya_alist_media_dir.txt"
+            "xiaoya_alist_config_dir.txt"
+            "resilio_config_dir.txt"
+            "portainer_config_dir.txt"
+            "onelist_config_dir.txt"
+            "container_run_extra_parameters.txt"
+            "auto_symlink_config_dir.txt"
+            "data_downloader.txt"
+            "disk_capacity_detection.txt"
+            "xiaoya_connectivity_detection.txt"
+            "image_mirror.txt"
+            "image_mirror_user.txt"
+        )
+        for file in "${FILES_TO_REMOVE[@]}"; do
+            rm -f ${DDSREM_CONFIG_DIR}/$file
+        done
+        rm -rf \
+            ${DDSREM_CONFIG_DIR}/container_name \
+            ${DDSREM_CONFIG_DIR}/data_crep
         INFO "清理完成！"
 
         for i in $(seq -w 3 -1 0); do
