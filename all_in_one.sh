@@ -1574,7 +1574,7 @@ function test_disk_capacity() {
         WARN "您已设置跳过磁盘容量检测"
         INFO "磁盘容量：${free_size_G}G"
     else
-        if [ "$free_size" -le 230686720 ]; then   
+        if [ "$free_size" -le 230686720 ]; then
             ERROR "空间剩余容量不够：${free_size_G}G 小于最低要求 220G"
             exit 1
         else
