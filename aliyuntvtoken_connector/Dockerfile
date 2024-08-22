@@ -1,15 +1,21 @@
-FROM golang:1.22-alpine3.20 as builder
+FROM python:3.12-alpine3.20
 
-WORKDIR /app/
+ENV TZ=Asia/Shanghai
+
+WORKDIR /app
 
 COPY . .
 
-RUN go build
-
-FROM alpine:3.20
-
-COPY --from=builder --chmod=755 /app/aliyuntvtoken_connector /aliyuntvtoken_connector
+RUN set -ex && \
+    apk add --no-cache \
+        bash \
+        tzdata && \
+    python3 -m pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /app/requirements.txt && \
+    rm -rf \
+        /root/.cache \
+        /tmp/*
 
 EXPOSE 34278
 
-ENTRYPOINT ["/aliyuntvtoken_connector"]
+ENTRYPOINT [ "python3", "/app/main.py" ]
