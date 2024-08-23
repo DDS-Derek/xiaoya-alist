@@ -4,6 +4,8 @@
 
 ## Run
 
+**docker-cli**
+
 ```shell
 docker run -d \
     --name=xiaoya-emd \
@@ -14,4 +16,22 @@ docker run -d \
     -e RESTART_AUTO_UPDATE=false \
     ddsderek/xiaoya-emd:latest \
     --media /media
+```
+
+**docker-compose**
+
+```yaml
+version: "3"
+services:
+    xiaoya-emd:
+        container_name: xiaoya-emd
+        restart: always
+        network_mode: host
+        volumes:
+            - 媒体库目录:/media
+        environment:
+            - CYCLE=86400
+            - RESTART_AUTO_UPDATE=false
+        image: ddsderek/xiaoya-emd:latest
+        command: --media /media
 ```
