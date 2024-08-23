@@ -1274,7 +1274,9 @@ function install_xiaoya_alist() {
             read -erp "PikPak_Username:" PikPak_Username
             INFO "输入你的 PikPak 账号密码"
             read -erp "PikPak_Password:" PikPak_Password
-            echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\"" > ${CONFIG_DIR}/pikpak.txt
+            INFO "输入你的 PikPak X-Device-Id"
+            read -erp "PikPak_Device_Id:" PikPak_Device_Id
+            echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\" \"web\" \"${PikPak_Device_Id}\"" > ${CONFIG_DIR}/pikpak.txt
         fi
     fi
 
