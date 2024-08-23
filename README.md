@@ -191,6 +191,10 @@ Docker镜像源选择 -> 9 6
 | 小雅Cron容器（xiaoya-cron）  |        ✅         |         ✅         |        ✅        |
 | 小雅代理容器（xiaoya-proxy）  |        ✅         |         ✅         |        ✅        |
 | 115清理助手（xiaoya-115cleaner）  |        ✅         |         ✅         |        ✅        |
+| xiaoya-glue（官方 python） |        ✅         |         ✅         |        ❌        |
+| xiaoya-glue（官方 latest） |        ✅         |         ✅         |        ❌        |
+| xiaoya-glue（DDSRem python） |        ✅         |         ✅         |        ❌        |
+| xiaoya-glue（DDSRem aliyuntvtoken_connector） |        ✅         |         ✅         |        ❌        |
 
 |    系统名称     | main.sh | emby_config_editor.sh |
 | :-------------: | :-----: | :-------------------: |
