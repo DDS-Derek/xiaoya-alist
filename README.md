@@ -237,12 +237,12 @@ Docker镜像源选择 -> 9 6
 
 ## 小雅周边工具集合
 
-- [CatVod](https://pcoof.com/git/https://github.com/catvod/CatVodOpen): 猫影视
 - [Xiaoya-convert](https://github.com/ypq123456789/xiaoya-convert): 自动批量将阿里云盘分享链接转换为小雅`alishare_list.txt`中的格式
 - [Xiaoyahelper](https://github.com/DDS-Derek/xiaoya-alist/tree/master/xiaoyahelper): 一劳永逸的小雅转存清理工具
 - [Alist-TVBox](https://hub.docker.com/r/haroldli/alist-tvbox): 一个基于`AList`和`xiaoya`的`TVBox`管理工具
 - [`strm`文件生成](https://xiaoyaliu.notion.site/strm-2c8d136ceb37445fb6c0222eafb966ce): 小雅官方提供的一键生成`strm`文件脚本
 - [monlor/docker-xiaoya](https://github.com/monlor/docker-xiaoya): Docker Compose 方式一键部署小雅全家桶
+- [907739769/xiaoya-sync](https://github.com/907739769/xiaoya-sync): Java 编写的小雅元数据爬虫
 - [AI老G 脚本推荐](https://b23.tv/3Zo0IvD)
   - 小雅全家桶安装脚本（支持AI老G版小雅Alist安装，Jellyfin安装，快速Emby安装）:
     ```shell
@@ -262,6 +262,7 @@ Docker镜像源选择 -> 9 6
 - [Portainer](https://github.com/portainer/portainer)
 - [AI老G](https://space.bilibili.com/252166818)
 - [monlor](https://link.monlor.com)
+- [Rik](https://github.com/Rik-F5)
 
 <a href="https://github.com/DDS-Derek/xiaoya-alist/graphs/contributors"><img src="https://contrib.rocks/image?repo=DDS-Derek/xiaoya-alist"></a>
 
