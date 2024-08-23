@@ -196,40 +196,41 @@ Docker镜像源选择 -> 9 6
 | xiaoya-glue（DDSRem python） |        ✅         |         ✅         |        ❌        |
 | xiaoya-glue（DDSRem aliyuntvtoken_connector） |        ✅         |         ✅         |        ❌        |
 
-|    系统名称     | main.sh | emby_config_editor.sh |
-| :-------------: | :-----: | :-------------------: |
-|   CentOS 7.9    |    ✅    |           ✅           |
-|   CentOS 8.4    |    ✅    |           ✅           |
-| CentOS 8 Stream |    ✅    |           ✅           |
-| CentOS 9 Stream |    ✅    |           ✅           |
-|   Debian 10.3   |    ✅    |           ✅           |
-|   Debian 11.3   |    ✅    |           ✅           |
-|   Debian 12.0   |    ✅    |           ✅           |
-|  Ubuntu 18.04   |    ✅    |           ✅           |
-|  Ubuntu 20.04   |    ✅    |           ✅           |
-|  Ubuntu 22.04   |    ✅    |           ✅           |
-|    Fedora 31    |    ✅    |           ✅           |
-|    Fedora 32    |    ✅    |           ✅           |
-|   AlmaLinux 9   |    ✅    |           ✅           |
-| RockyLinux 8.6  |    ✅    |           ✅           |
-|   Arch Linux    |    ✅    |           ✅           |
-|  openSUSE 15.4  |    ✅    |           ✅           |
-|     FreeBSD     |    ✅    |           ✅           |
-|     EulerOS     |    ✅    |           ✅           |
-|  Amazon Linux   |    ✅    |           ✅           |
-|     Alpine      |    ✅    |           ✅           |
-|      MacOS      |    🚧    |           🚧           |
-|     UnRaid      |    ✅    |           ✅           |
-| OpenMediaVault  |    ✅    |           ✅           |
-|      QNAP       |    ✅    |           ✅           |
-|     OpenWRT     |    ✅    |           ✅           |
-|    Synology     |    ✅    |           ✅           |
-|  TrueNAS CORE   |    🚧    |           🚧           |
-|  TrueNAS SCALE  |    🚧    |           🚧           |
-|      UGOS       |    ✅    |           ✅           |
-|     UGOS Pro    |    ✅    |           ✅           |
-|   LibreELEC     |    ❌    |           ❌           |
-|  Windows WSL Docker  |    ❌    |           ❌           |
+|    系统名称     | all_in_one.sh | emby_config_editor.sh | xiaoya_notify.sh |
+| :-------------: | :-----: | :-------------------: | :-------------: |
+|   CentOS 7.9    |    ✅    |           ✅           | ✅ |
+|   CentOS 8.4    |    ✅    |           ✅           | ✅ |
+| CentOS 8 Stream |    ✅    |           ✅           | ✅ |
+| CentOS 9 Stream |    ✅    |           ✅           | ✅ |
+|   Debian 10.3   |    ✅    |           ✅           | ✅ |
+|   Debian 11.3   |    ✅    |           ✅           | ✅ |
+|   Debian 12.0   |    ✅    |           ✅           | ✅ |
+|  Ubuntu 18.04   |    ✅    |           ✅           | ✅ |
+|  Ubuntu 20.04   |    ✅    |           ✅           | ✅ |
+|  Ubuntu 22.04   |    ✅    |           ✅           | ✅ |
+|    Fedora 31    |    ✅    |           ✅           | ✅ |
+|    Fedora 32    |    ✅    |           ✅           | ✅ |
+|   AlmaLinux 9   |    ✅    |           ✅           | ✅ |
+| RockyLinux 8.6  |    ✅    |           ✅           | ✅ |
+|   Arch Linux    |    ✅    |           ✅           | ✅ |
+|  openSUSE 15.4  |    ✅    |           ✅           | ✅ |
+|     FreeBSD     |    ✅    |           ✅           | ✅ |
+|     EulerOS     |    ✅    |           ✅           | ✅ |
+|  Amazon Linux   |    ✅    |           ✅           | ✅ |
+|     Alpine      |    ✅    |           ✅           | ✅ |
+|      MacOS      |    🚧    |           🚧           | 🚧 |
+|     UnRaid      |    ✅    |           ✅           | ✅ |
+| OpenMediaVault  |    ✅    |           ✅           | ✅ |
+|      QNAP（威联通）      |    ✅    |           ✅           | ✅ |
+|     OpenWRT     |    ✅    |           ✅           | ✅ |
+|    Synology（群晖）    |    ✅    |           ✅           | ✅ |
+|  TrueNAS CORE   |    🚧    |           🚧           | 🚧 |
+|  TrueNAS SCALE  |    🚧    |           🚧           | 🚧 |
+|      UGOS（绿联云）      |    ✅    |           ✅           | ✅ |
+|    UGOS Pro（绿联云 Pro）    |    ✅    |           ✅           | ✅ |
+|   LibreELEC     |    ❌    |           ❌           | ❌ |
+|  Windows WSL Docker  |    ❌    |           ❌           | ❌ |
+| ZSpace（极空间） | 🚧 | 🚧 | 🚧 |
 
 ## Star History
 
