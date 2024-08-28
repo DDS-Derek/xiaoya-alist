@@ -648,7 +648,18 @@ function settings_pikpak_account() {
 
 function get_config_dir() {
 
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+    if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
+        xiaoya_config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+    fi
+
+    if [ -n "${xiaoya_config_dir}" ]; then
+        xiaoya_config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+        INFO "小雅配置目录通过小雅容器获取"
+        INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
+        read -erp "CONFIG_DIR:" CONFIG_DIR
+        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${xiaoya_config_dir}
+        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
+    elif [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "CONFIG_DIR:" CONFIG_DIR
