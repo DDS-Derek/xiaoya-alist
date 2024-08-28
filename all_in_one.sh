@@ -489,6 +489,10 @@ function enter_aliyunpan_opentoken() {
 
 function settings_aliyunpan_opentoken() {
 
+    if [ -f "${1}/open_tv_token_url.txt" ]; then
+        mv "${1}/open_tv_token_url.txt" "${1}/open_tv_token_url.txt.bak"
+    fi
+
     if [ "${2}" == "force" ]; then
         qrcode_aliyunpan_opentoken "${1}"
     else
@@ -611,6 +615,37 @@ function settings_uc_cookie() {
 
 }
 
+function enter_pikpak_account() {
+
+    touch ${1}/pikpak.txt
+    INFO "输入你的 PikPak 账号（手机号或邮箱）"
+    INFO "如果手机号，要\"+区号\"，比如你的手机号\"12345678900\"那么就填\"+8612345678900\""
+    read -erp "PikPak_Username:" PikPak_Username
+    INFO "输入你的 PikPak 账号密码"
+    read -erp "PikPak_Password:" PikPak_Password
+    INFO "输入你的 PikPak X-Device-Id"
+    read -erp "PikPak_Device_Id:" PikPak_Device_Id
+    echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\" \"web\" \"${PikPak_Device_Id}\"" > ${1}/pikpak.txt
+
+}
+
+function settings_pikpak_account() {
+
+    if [ "${2}" == "force" ]; then
+        enter_pikpak_account "${1}"
+    else
+        if [ ! -f "${1}/pikpak.txt" ]; then
+            INFO "是否继续配置 PikPak 账号密码 [Y/n]（默认 n 不配置）"
+            read -erp "PikPak_Set:" PikPak_Set
+            [[ -z "${PikPak_Set}" ]] && PikPak_Set="n"
+            if [[ ${PikPak_Set} == [Yy] ]]; then
+                enter_pikpak_account "${1}"
+            fi
+        fi
+    fi
+
+}
+
 function get_config_dir() {
 
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
@@ -688,12 +723,13 @@ function main_account_management() {
     echo -e "1、115 Cookie                        （当前：$(if CHECK_OUT=$(check_115_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 2、夸克 Cookie                       （当前：$(if CHECK_OUT=$(check_quark_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 3、阿里云盘 Refresh Token（mytoken） （当前：$(if [ -f "${config_dir}/mytoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
-4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
-5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）"
-    echo -e "6、应用配置（自动重启小雅，并返回上级菜单）"
+4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then if [ -f "${config_dir}/open_tv_token_url.txt" ]; then echo -e "${Green}已配置 TV Token${Font}"; else echo -e "${Green}已配置${Font}"; fi; else echo -e "${Red}未配置${Font}"; fi)）
+5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
+6、PikPak                            （当前：$(if [ -f "${config_dir}/pikpak.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）"
+    echo -e "7、应用配置（自动重启小雅，并返回上级菜单）"
     echo -e "0、返回上级（从此处退出不会重启小雅，如果更改了上述配置请手动重启）"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-6]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         clear
@@ -717,10 +753,15 @@ function main_account_management() {
         ;;
     5)
         clear
-        settings_uc_cookie "${CONFIG_DIR}" force
+        settings_uc_cookie "${config_dir}" force
         main_account_management
         ;;
     6)
+        clear
+        settings_pikpak_account "${config_dir}" force
+        main_account_management
+        ;;
+    7)
         clear
         if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
             INFO "重启小雅容器中..."
@@ -743,7 +784,7 @@ function main_account_management() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-6]'
+        ERROR '请输入正确数字 [0-7]'
         main_account_management
         ;;
     esac
@@ -790,22 +831,7 @@ function install_xiaoya_alist() {
         fi
     fi
 
-    if [ ! -f "${CONFIG_DIR}/pikpak.txt" ]; then
-        INFO "是否继续配置 PikPak 账号密码 [Y/n]（默认 n 不配置）"
-        read -erp "PikPak_Set:" PikPak_Set
-        [[ -z "${PikPak_Set}" ]] && PikPak_Set="n"
-        if [[ ${PikPak_Set} == [Yy] ]]; then
-            touch ${CONFIG_DIR}/pikpak.txt
-            INFO "输入你的 PikPak 账号（手机号或邮箱）"
-            INFO "如果手机号，要\"+区号\"，比如你的手机号\"12345678900\"那么就填\"+8612345678900\""
-            read -erp "PikPak_Username:" PikPak_Username
-            INFO "输入你的 PikPak 账号密码"
-            read -erp "PikPak_Password:" PikPak_Password
-            INFO "输入你的 PikPak X-Device-Id"
-            read -erp "PikPak_Device_Id:" PikPak_Device_Id
-            echo -e "\"${PikPak_Username}\" \"${PikPak_Password}\" \"web\" \"${PikPak_Device_Id}\"" > ${CONFIG_DIR}/pikpak.txt
-        fi
-    fi
+    settings_pikpak_account "${CONFIG_DIR}"
 
     settings_quark_cookie "${CONFIG_DIR}"
 
