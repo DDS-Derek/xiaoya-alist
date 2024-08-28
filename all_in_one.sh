@@ -3551,6 +3551,7 @@ function update_xiaoya_alist_tvbox() {
         echo -en "即将开始更新小雅Alist-TVBox${Blue} $i ${Font}\r"
         sleep 1
     done
+    # shellcheck disable=SC2034
     container_update_extra_command="sedsh '/\/opt\/atv\/data/d; \/opt\/alist\/data/d' "/tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)""
     container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
 
@@ -4572,6 +4573,7 @@ function main_return() {
             out_tips="${Red}警告：当前环境无法访问Docker镜像仓库，请输入96进入Docker镜像源设置更改镜像源${Font}\n"
         fi
     fi
+    # shellcheck disable=SC2154
     echo -e "${out_tips}1、安装/更新/卸载 小雅Alist & 账号管理        当前状态：$(judgment_container "${xiaoya_alist_name}")
 2、安装/更新/卸载 小雅Emby全家桶              当前状态：$(judgment_container "${xiaoya_emby_name}")
 3、安装/卸载 小雅Jellyfin全家桶               当前状态：$(judgment_container "${xiaoya_jellyfin_name}")
