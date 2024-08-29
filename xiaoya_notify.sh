@@ -772,6 +772,10 @@ EOF
     elif grep -Eqi "Debian" /etc/os-release && grep -Eqi "UGOSPRO" /etc/issue; then
         OSNAME='ugos pro'
         DDSREM_CONFIG_DIR=/etc/DDSRem
+    # fnOS 基于 Debian
+    elif grep -Eqi "Debian" /etc/os-release && grep -Eqi "fnOS" /etc/issue; then
+        OSNAME='fnos'
+        DDSREM_CONFIG_DIR=/etc/DDSRem
     # OpenMediaVault 基于 Debian
     elif grep -Eqi "openmediavault" /etc/issue || grep -Eqi "openmediavault" /etc/os-release; then
         OSNAME='openmediavault'
