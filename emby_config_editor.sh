@@ -42,6 +42,16 @@ function WARN() {
     echo -e "${WARN} ${1}"
 }
 
+function sedsh() {
+
+    if [[ "$(uname -s)" = "Darwin" ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+
+}
+
 function get_dev_dri() {
 
     if [ "${dev_dri}" == "no" ]; then
@@ -64,7 +74,7 @@ function set_dev_dri() {
         new_dev_dri=no
     fi
 
-    sed -i "s/dev_dri=.*/dev_dri=${new_dev_dri}/" "${config_dir}/emby_config.txt"
+    sedsh "s/dev_dri=.*/dev_dri=${new_dev_dri}/" "${config_dir}/emby_config.txt"
 
 }
 
@@ -78,7 +88,7 @@ function set_mode() {
         new_mode=host
     fi
 
-    sed -i "s/mode=.*/mode=${new_mode}/" "${config_dir}/emby_config.txt"
+    sedsh "s/mode=.*/mode=${new_mode}/" "${config_dir}/emby_config.txt"
 
 }
 
@@ -92,7 +102,7 @@ function set_image() {
         new_image=emby
     fi
 
-    sed -i "s/image=.*/image=${new_image}/" "${config_dir}/emby_config.txt"
+    sedsh "s/image=.*/image=${new_image}/" "${config_dir}/emby_config.txt"
 
 }
 
@@ -106,7 +116,7 @@ function set_version() {
         new_version=4.8.0.56
     fi
 
-    sed -i "s/version=.*/version=${new_version}/" "${config_dir}/emby_config.txt"
+    sedsh "s/version=.*/version=${new_version}/" "${config_dir}/emby_config.txt"
 
 }
 
@@ -117,12 +127,12 @@ function get_media_dir() {
         INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
         read -erp "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
-        sed -i "s#media_dir=.*#media_dir=${MEDIA_DIR}#" "${config_dir}/emby_config.txt"
+        sedsh "s#media_dir=.*#media_dir=${MEDIA_DIR}#" "${config_dir}/emby_config.txt"
     else
         INFO "请输入媒体库目录（默认 /media ）"
         read -erp "MEDIA_DIR:" MEDIA_DIR
         [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/media"
-        sed -i "s#media_dir=.*#media_dir=${MEDIA_DIR}#" "${config_dir}/emby_config.txt"
+        sedsh "s#media_dir=.*#media_dir=${MEDIA_DIR}#" "${config_dir}/emby_config.txt"
     fi
 
 }
@@ -149,7 +159,7 @@ function set_resilio() {
         new_resilio=no
     fi
 
-    sed -i "s/resilio=.*/resilio=${new_resilio}/" "${config_dir}/emby_config.txt"
+    sedsh "s/resilio=.*/resilio=${new_resilio}/" "${config_dir}/emby_config.txt"
 
 }
 
@@ -218,6 +228,10 @@ clear
 if [[ $EUID -ne 0 ]]; then
     ERROR '此脚本必须以 root 身份运行！'
     exit 1
+fi
+
+if [[ "$(uname -s)" = "Darwin" ]]; then
+    stty -icanon
 fi
 
 if [ ! "$1" ]; then
