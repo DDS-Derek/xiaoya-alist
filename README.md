@@ -232,6 +232,7 @@ Docker镜像源选择 -> 9 6
 |   LibreELEC     |    ❌    |           ❌           | ❌ |
 |  Windows WSL Docker  |    ❌    |           ❌           | ❌ |
 | ZSpace（极空间） | 🚧 | 🚧 | 🚧 |
+| fnOS (飞牛私有云) | ✅ | ✅ | ✅ |
 
 ## Star History
 
