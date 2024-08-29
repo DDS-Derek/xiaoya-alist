@@ -647,6 +647,61 @@ function settings_pikpak_account() {
 
 }
 
+function enter_ali2115() {
+
+    touch ${1}/ali2115.txt
+    if [ -f "${1}/115_cookie.txt" ] && check_115_cookie "${1}"; then
+        INFO "自动获取 115 Cookie！"
+        set_115_cookie="$(cat ${1}/115_cookie.txt | head -n1)"
+    else
+        while true; do
+            INFO "输入你的 115 Cookie"
+            read -erp "Cookie:" set_115_cookie
+            if [ -n "${set_115_cookie}" ]; then
+                break
+            fi
+        done
+    fi
+    INFO "是否自动删除115转存文件 [Y/n]（默认 Y）"
+    read -erp "purge_pan115_temp:" purge_pan115_temp
+    [[ -z "${purge_pan115_temp}" ]] && purge_pan115_temp="y"
+    INFO "是否自动删除阿里云盘转存文件 [Y/n]（默认 Y）"
+    read -erp "purge_ali_temp:" purge_ali_temp
+    [[ -z "${purge_ali_temp}" ]] && purge_ali_temp="y"
+    INFO "输入你的 115 转存文件夹 id（默认 0）"
+    read -erp "dir_id:" dir_id
+    [[ -z "${dir_id}" ]] && dir_id=0
+    if [[ ${purge_pan115_temp} == [Yy] ]]; then
+        purge_pan115_temp=true
+    else
+        purge_pan115_temp=false
+    fi
+    if [[ ${purge_ali_temp} == [Yy] ]]; then
+        purge_ali_temp=true
+    else
+        purge_ali_temp=false
+    fi
+    echo -e "purge_ali_temp=${purge_ali_temp}\ncookie=\"${set_115_cookie}\"\npurge_pan115_temp=${purge_pan115_temp}\ndir_id=${dir_id}" > ${1}/ali2115.txt
+
+}
+
+function settings_ali2115() {
+
+    if [ "${2}" == "force" ]; then
+        enter_ali2115 "${1}"
+    else
+        if [ ! -f "${1}/ali2115.txt" ]; then
+            INFO "是否配置 阿里转存115播放（ali2115.txt） [Y/n]（默认 n 不配置）"
+            read -erp "ali2115:" ali2115_set
+            [[ -z "${ali2115_set}" ]] && ali2115_set="n"
+            if [[ ${ali2115_set} == [Yy] ]]; then
+                enter_ali2115 "${1}"
+            fi
+        fi
+    fi
+
+}
+
 function get_config_dir() {
 
     if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
@@ -731,17 +786,23 @@ function main_account_management() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}账号管理${Font}\n"
+    echo -e "${Sky_Blue}小雅留言，会员购买指南：
+基础版：阿里非会员+115会员+夸克88vip
+升级版：阿里svip+115会员+夸克88vip（用TV token破解阿里svip的高速流量限制）
+豪华版：阿里svip+第三方权益包+115会员+夸克svip
+乞丐版：满足看emby画报但不要播放，播放用tvbox各种免费源${Font}\n"
     echo -ne "${INFO} 界面加载中...${Font}\r"
     echo -e "1、115 Cookie                        （当前：$(if CHECK_OUT=$(check_115_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 2、夸克 Cookie                       （当前：$(if CHECK_OUT=$(check_quark_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 3、阿里云盘 Refresh Token（mytoken） （当前：$(if [ -f "${config_dir}/mytoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
 4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then if [ -f "${config_dir}/open_tv_token_url.txt" ]; then echo -e "${Green}已配置 TV Token${Font}"; else echo -e "${Green}已配置${Font}"; fi; else echo -e "${Red}未配置${Font}"; fi)）
 5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
-6、PikPak                            （当前：$(if [ -f "${config_dir}/pikpak.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）"
-    echo -e "7、应用配置（自动重启小雅，并返回上级菜单）"
+6、PikPak                            （当前：$(if [ -f "${config_dir}/pikpak.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
+7、阿里转存115播放（ali2115.txt）    （当前：$(if [ -f "${config_dir}/ali2115.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）"
+    echo -e "8、应用配置（自动重启小雅，并返回上级菜单）"
     echo -e "0、返回上级（从此处退出不会重启小雅，如果更改了上述配置请手动重启）"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-7]:" num
+    read -erp "请输入数字 [0-8]:" num
     case "$num" in
     1)
         clear
@@ -775,6 +836,11 @@ function main_account_management() {
         ;;
     7)
         clear
+        settings_ali2115 "${config_dir}" force
+        main_account_management
+        ;;
+    8)
+        clear
         if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
             INFO "重启小雅容器中..."
             docker restart "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
@@ -796,7 +862,7 @@ function main_account_management() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-7]'
+        ERROR '请输入正确数字 [0-8]'
         main_account_management
         ;;
     esac
@@ -850,6 +916,8 @@ function install_xiaoya_alist() {
     settings_uc_cookie "${CONFIG_DIR}"
 
     settings_115_cookie "${CONFIG_DIR}"
+
+    settings_ali2115 "${CONFIG_DIR}"
 
     if [[ "${OSNAME}" = "macos" ]]; then
         localip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
