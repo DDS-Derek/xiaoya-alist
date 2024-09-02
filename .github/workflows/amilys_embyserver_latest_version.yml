@@ -26,7 +26,7 @@ jobs:
             sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
 
       - 
-        uses: stefanzweifel/git-auto-commit-action@be823a7e51f116fecebc222b8307716921375992
+        uses: stefanzweifel/git-auto-commit-action@ac8823709a85c7ce090849ac3e5fe24d006f6e18
         with:
             commit_message: 'chore: update amilys embyserver latest version'
             branch: master
