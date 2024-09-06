@@ -25,6 +25,7 @@ DATE_VERSION="v1.7.3-2024_08_17_15_25"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 amilys_embyserver_latest_version=4.8.8.0
+emby_embyserver_latest_version=
 # ——————————————————————————————————————————————————————————————————————————————————
 
 Sky_Blue="\e[36m"
@@ -2355,7 +2356,7 @@ function install_emby_xiaoya_all_emby() {
                 break
                 ;;
             "emby_embyserver")
-                INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；4.8.8.0 | 3；latest ]（默认 1）"
+                INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；4.8.8.0 | 3；latest（${emby_embyserver_latest_version}） ]（默认 1）"
                 read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
                 [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
                 case ${CHOOSE_IMAGE_VERSION} in

@@ -1,4 +1,4 @@
-name: amilys embyserver latest version
+name: embyserver latest version
 
 on:
     workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         branches:
             - master
         paths:
-            - ".github/workflows/amilys_embyserver_latest_version.yml"
+            - ".github/workflows/embyserver_latest_version.yml"
 
 jobs:
   get:
@@ -19,11 +19,18 @@ jobs:
         uses: actions/checkout@master
 
       -
-        name: Get Version
+        name: Get Version Amilys
         run: |
             docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:latest /system/EmbyServer.deps.json /data
             LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
             sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
+
+      -
+        name: Get Version Emby
+        run: |
+            docker run --entrypoint cp -v ${PWD}/emby:/data emby/embyserver:latest /system/EmbyServer.deps.json /data
+            LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+            sed -i "1,40s|emby_embyserver_latest_version=.*|emby_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
 
       - 
         uses: stefanzweifel/git-auto-commit-action@ac8823709a85c7ce090849ac3e5fe24d006f6e18
