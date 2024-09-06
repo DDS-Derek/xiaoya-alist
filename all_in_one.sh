@@ -1780,109 +1780,109 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "13、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-13]:" num
-    case "$num" in
-    1)
-        clear
-        if [ "${__data_downloader}" == "wget" ]; then
-            download_wget_unzip_xiaoya_all_emby
+    read -erp "请输入数字（支持输入多个数字，空格分离，按输入顺序执行）[0-13]:" -a nums
+    for num in "${nums[@]}"; do
+        if [ $num -ge 1 ] && [ $num -le 12 ]; then
+            case "$num" in
+            1)
+                clear
+                if [ "${__data_downloader}" == "wget" ]; then
+                    download_wget_unzip_xiaoya_all_emby
+                else
+                    download_unzip_xiaoya_all_emby
+                fi
+                ;;
+            2)
+                clear
+                unzip_xiaoya_all_emby
+                ;;
+            3)
+                clear
+                if [ "${__data_downloader}" == "wget" ]; then
+                    download_wget_xiaoya_emby "all.mp4"
+                else
+                    download_xiaoya_emby "all.mp4"
+                fi
+                ;;
+            4)
+                clear
+                unzip_xiaoya_emby "all.mp4"
+                ;;
+            5)
+                clear
+                unzip_appoint_xiaoya_emby_jellyfin "all.mp4"
+                ;;
+            6)
+                clear
+                if [ "${__data_downloader}" == "wget" ]; then
+                    download_wget_xiaoya_emby "config.mp4"
+                else
+                    download_xiaoya_emby "config.mp4"
+                fi
+                ;;
+            7)
+                clear
+                unzip_xiaoya_emby "config.mp4"
+                ;;
+            8)
+                clear
+                if [ "${__data_downloader}" == "wget" ]; then
+                    download_wget_xiaoya_emby "pikpak.mp4"
+                else
+                    download_xiaoya_emby "pikpak.mp4"
+                fi
+                ;;
+            9)
+                clear
+                unzip_xiaoya_emby "pikpak.mp4"
+                ;;
+            10)
+                clear
+                if [ "${__data_downloader}" == "wget" ]; then
+                    download_wget_xiaoya_emby "115.mp4"
+                else
+                    download_xiaoya_emby "115.mp4"
+                fi
+                ;;
+            11)
+                clear
+                unzip_xiaoya_emby "115.mp4"
+                ;;
+            12)
+                clear
+                unzip_appoint_xiaoya_emby_jellyfin "115.mp4"
+                ;;
+            esac
+            __next_operate=return_menu
+        elif [ $num == 13 ]; then
+            if [ "${__data_downloader}" == "wget" ]; then
+                echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+            elif [ "${__data_downloader}" == "aria2" ]; then
+                echo 'wget' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+            else
+                echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
+            fi
+            clear
+            __next_operate=main_download_unzip_xiaoya_emby
+            break
+        elif [ $num == 0 ]; then
+            clear
+            __next_operate=main_xiaoya_all_emby
+            break
         else
-            download_unzip_xiaoya_all_emby
+            clear
+            ERROR '请输入正确数字 [0-13]'
+            __next_operate=main_download_unzip_xiaoya_emby
+            break
         fi
+    done
+    if [ "${__next_operate}" == "return_menu" ]; then
         return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    2)
-        clear
-        unzip_xiaoya_all_emby
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    3)
-        clear
-        if [ "${__data_downloader}" == "wget" ]; then
-            download_wget_xiaoya_emby "all.mp4"
-        else
-            download_xiaoya_emby "all.mp4"
-        fi
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    4)
-        clear
-        unzip_xiaoya_emby "all.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    5)
-        clear
-        unzip_appoint_xiaoya_emby_jellyfin "all.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    6)
-        clear
-        if [ "${__data_downloader}" == "wget" ]; then
-            download_wget_xiaoya_emby "config.mp4"
-        else
-            download_xiaoya_emby "config.mp4"
-        fi
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    7)
-        clear
-        unzip_xiaoya_emby "config.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    8)
-        clear
-        if [ "${__data_downloader}" == "wget" ]; then
-            download_wget_xiaoya_emby "pikpak.mp4"
-        else
-            download_xiaoya_emby "pikpak.mp4"
-        fi
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    9)
-        clear
-        unzip_xiaoya_emby "pikpak.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    10)
-        clear
-        if [ "${__data_downloader}" == "wget" ]; then
-            download_wget_xiaoya_emby "115.mp4"
-        else
-            download_xiaoya_emby "115.mp4"
-        fi
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    11)
-        clear
-        unzip_xiaoya_emby "115.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    12)
-        clear
-        unzip_appoint_xiaoya_emby_jellyfin "115.mp4"
-        return_menu "main_download_unzip_xiaoya_emby"
-        ;;
-    13)
-        if [ "${__data_downloader}" == "wget" ]; then
-            echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
-        elif [ "${__data_downloader}" == "aria2" ]; then
-            echo 'wget' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
-        else
-            echo 'aria2' > ${DDSREM_CONFIG_DIR}/data_downloader.txt
-        fi
-        clear
+    elif [ "${__next_operate}" == "main_download_unzip_xiaoya_emby" ]; then
         main_download_unzip_xiaoya_emby
-        ;;
-    0)
-        clear
+    elif [ "${__next_operate}" == "main_xiaoya_all_emby" ]; then
         main_xiaoya_all_emby
-        ;;
-    *)
-        clear
-        ERROR '请输入正确数字 [0-13]'
-        main_download_unzip_xiaoya_emby
-        ;;
-    esac
+    fi
 
 }
 
