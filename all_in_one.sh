@@ -2457,7 +2457,7 @@ function oneclick_upgrade_emby() {
             WARN "lovechen/embyserver 镜像无法更新！"
             exit 0
         elif [ "${old_image_name}" == "emby/embyserver" ] || [ "${old_image_name}" == "emby/embyserver_arm64v8" ]; then
-            INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest | 3；beta（此版本请勿轻易尝试） ]（默认 1）"
+            INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest（${emby_embyserver_latest_version}） | 3；beta（此版本请勿轻易尝试） ]（默认 1）"
             read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
             [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
             case ${CHOOSE_IMAGE_VERSION} in
