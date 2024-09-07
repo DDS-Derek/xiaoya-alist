@@ -238,34 +238,26 @@ function qrcode_aliyunpan_tvtoken() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 TV Token 配置"
-        local config_dir local_ip
+        local local_ip
         docker_pull ddsderek/xiaoya-glue:python
-        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
-        if [ -n "${config_dir}" ]; then
-            if [[ "${OSNAME}" = "macos" ]]; then
-                local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-            else
-                local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-            fi
-            if [ -z "${local_ip}" ]; then
-                local_ip="小雅服务器IP"
-            fi
-            INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
-            docker run -i --rm \
-                -v "$config_dir:/data" \
-                -e LANG=C.UTF-8 \
-                --net=host \
-                ddsderek/xiaoya-glue:python \
-                /aliyuntvtoken/alitoken2.py
-            INFO "清理镜像中..."
-            docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
-            INFO "开始更新小雅容器..."
-            container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
-            INFO "操作全部完成！"
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
-            ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
-            exit 1
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
         fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            ddsderek/xiaoya-glue:python \
+            /aliyuntvtoken/alitoken2.py
+        INFO "清理镜像中..."
+        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
+        INFO "操作全部完成！"
         ;;
     *)
         WARN "目前阿里云盘 TV Token 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
@@ -496,12 +488,12 @@ function settings_aliyunpan_opentoken() {
     fi
 
     if [ "${2}" == "force" ]; then
-        qrcode_aliyunpan_opentoken "${1}"
+        enter_aliyunpan_opentoken "${1}"
     else
         myopentokenfilesize=$(cat "${1}"/myopentoken.txt)
         myopentokenstringsize=${#myopentokenfilesize}
         if [ "$myopentokenstringsize" -le 279 ]; then
-            qrcode_aliyunpan_opentoken "${1}"
+            enter_aliyunpan_opentoken "${1}"
         fi
     fi
 
@@ -4445,7 +4437,15 @@ function main_return() {
     fuckaliyun)
         clear
         INFO "AliyunPan ありがとう、あなたのせいで世界は爆発する"
-        qrcode_aliyunpan_tvtoken
+        config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
+        if [ -n "${config_dir}" ]; then
+            qrcode_aliyunpan_tvtoken "${config_dir}"
+            INFO "开始更新小雅容器..."
+            container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+        else
+            ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
+            exit 1
+        fi
         return_menu "main_return"
         ;;
     0)
