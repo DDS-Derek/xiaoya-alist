@@ -2575,7 +2575,7 @@ function install_xiaoya_notify_cron() {
         auto_update_config=no
     fi
 
-    INFO "是否开启自动同步 all 与 pikpak 元数据 [Y/n]（默认 Y 开启）"
+    INFO "是否开启自动同步 all pikpak 和 115 元数据 [Y/n]（默认 Y 开启）"
     read -erp "Auto update all & pikpak:" AUTO_UPDATE_ALL_PIKPAK
     [[ -z "${AUTO_UPDATE_ALL_PIKPAK}" ]] && AUTO_UPDATE_ALL_PIKPAK="y"
     if [[ ${AUTO_UPDATE_ALL_PIKPAK} == [Yy] ]]; then

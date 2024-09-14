@@ -739,7 +739,7 @@ function main() {
 
     cat << EOF
 可添加参数解释：
-1. --auto_update_all_pikpak：是否开启all和pikpak自动下载更新（yes开启，no关闭）（可选，默认开启）
+1. --auto_update_all_pikpak：是否开启all,pikpak,115自动下载更新（yes开启，no关闭）（可选，默认开启）
 2. --auto_update_config：是否开启config自动同步（yes开启，no关闭）（可选，默认开启）
 3. --force_update_config：强制同步config（yes开启，no关闭）（可选，默认关闭）
 4. --media_dir：媒体库路径
