@@ -21,9 +21,6 @@
   - [附加条款](#附加条款)
   - [免责声明](#免责声明)
 
-> [!WARNING]
-> 请注意，本仓库的开源许可证已于2024年8月16日从 MIT License 切换至 GNU General Public License v3.0。我们建议所有使用者对此有所了解并遵守相关规定。
-
 ## main.sh
 
 > [!NOTE]
