@@ -61,6 +61,7 @@ mirrors=(
     "docker.luyao.dynv6.net"
     "freeno.xyz"
     "docker.1panel.live"
+    "dockerpull.com"
 )
 
 function root_need() {
