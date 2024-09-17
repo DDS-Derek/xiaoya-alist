@@ -291,7 +291,7 @@ function qrcode_aliyunpan_refreshtoken() {
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /aliyuntoken/aliyuntoken_vercel.py
+            /aliyuntoken/aliyuntoken_nn.ci.py
         INFO "清理镜像中..."
         docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
@@ -327,7 +327,7 @@ function qrcode_aliyunpan_opentoken() {
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /aliyunopentoken/aliyunopentoken.py
+            /aliyunopentoken/aliyunopentoken_nn.ci.py
         INFO "清理镜像中..."
         docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
