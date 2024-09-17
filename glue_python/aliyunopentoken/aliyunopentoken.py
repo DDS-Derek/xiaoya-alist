@@ -59,13 +59,13 @@ headers_2 = {
 def poll_qrcode_status(data):
     global last_status
     while True:
-        re = requests.get(f"https://api.nn.ci/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status", headers=headers)
+        re = requests.get(f"https://api.xhofe.top/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status", headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.text)
             if re_data['status'] == "LoginSuccess":
                 authCode = re_data['authCode']
                 data_2 = {"code": authCode,"grant_type": "authorization_code" ,"client_id": "" ,"client_secret": ""}
-                re = requests.post('https://api.nn.ci/alist/ali_open/code', json=data_2, headers=headers_2)
+                re = requests.post('https://api.xhofe.top/alist/ali_open/code', json=data_2, headers=headers_2)
                 if re.status_code == 200:
                     re_data = json.loads(re.text)
                     refresh_token = re_data['refresh_token']
@@ -118,7 +118,7 @@ if __name__ == '__main__':
         os.remove(qrcode_dir)
     logging.info('二维码生成中...')
     while True:
-        re = requests.get('https://api.nn.ci/alist/ali_open/qr', headers=headers)
+        re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             qrCodeUrl = re_data['qrCodeUrl']
@@ -139,9 +139,6 @@ if __name__ == '__main__':
         else:
             if json.loads(re.text)['code'] == 'Too Many Requests':
                 logging.warning("Too Many Requests 请一小时后重试！")
-                os._exit(0)
-            else:
-                logging.error("二维码生成失败！")
                 os._exit(0)
     threading.Thread(target=poll_qrcode_status, args=(value_after_qrcode,)).start()
     app.run(host='0.0.0.0', port=34256)

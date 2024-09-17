@@ -42,7 +42,7 @@ headers = {
 def poll_qrcode_status(data):
     global last_status
     while True:
-        re = requests.post('https://api.nn.ci/alist/ali/ck', json=data, headers=headers)
+        re = requests.post('https://api.xhofe.top/alist/ali/ck', json=data, headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.text)
             if re_data['content']['data']['qrCodeStatus'] == 'CONFIRMED':
@@ -95,13 +95,13 @@ if __name__ == '__main__':
         os.remove(qrcode_dir)
     logging.info('二维码生成中...')
     while True:
-        re = requests.get('https://api.nn.ci/alist/ali/qr', headers=headers)
+        re = requests.get('https://api.xhofe.top/alist/ali/qr', headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             t = str(re_data['content']['data']['t'])
             codeContent = re_data['content']['data']['codeContent']
             ck = re_data['content']['data']['ck']
-            url = f"https://api.nn.ci/qr/?size=400&text={codeContent}"
+            url = f"https://api.xhofe.top/qr/?size=400&text={codeContent}"
             re = requests.get(url, headers=headers)
             if re.status_code == 200:
                 image_stream = BytesIO(re.content)
@@ -113,8 +113,5 @@ if __name__ == '__main__':
                     break
                 else:
                     time.sleep(1)
-        else:
-            logging.error("二维码生成失败！")
-            os._exit(0)
     threading.Thread(target=poll_qrcode_status, args=(data,)).start()
     app.run(host='0.0.0.0', port=34256)
