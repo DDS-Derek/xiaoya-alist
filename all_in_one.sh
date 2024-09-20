@@ -274,9 +274,19 @@ function qrcode_aliyunpan_refreshtoken() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Refresh Token 配置"
-        local local_ip
+        local local_ip command_file
         INFO "拉取镜像中..."
         docker_pull ddsderek/xiaoya-glue:python
+        if curl -Is https://api.xhofe.top/alist/ali/qr | head -n 1 | grep -q '200'; then
+            command_file="aliyuntoken.py"
+            INFO "使用 api.xhofe.top 地址"
+        elif curl -Is https://api-cf.nn.ci/alist/ali/qr | head -n 1 | grep -q '200'; then
+            command_file="aliyuntoken_nn.ci.py"
+            INFO "使用 api-cf.nn.ci 地址"
+        else
+            command_file="aliyuntoken_vercel.py"
+            INFO "使用 aliyuntoken.vercel.app 地址"
+        fi
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -291,7 +301,7 @@ function qrcode_aliyunpan_refreshtoken() {
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /aliyuntoken/aliyuntoken_nn.ci.py
+            "/aliyuntoken/${command_file}"
         INFO "清理镜像中..."
         docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
@@ -310,9 +320,16 @@ function qrcode_aliyunpan_opentoken() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Open Token 配置"
-        local local_ip
+        local local_ip command_file
         INFO "拉取镜像中..."
         docker_pull ddsderek/xiaoya-glue:python
+        if curl -Is https://api.xhofe.top/alist/ali_open/qr | head -n 1 | grep -q '200'; then
+            command_file="aliyunopentoken.py"
+            INFO "使用 api.xhofe.top 地址"
+        else
+            command_file="aliyunopentoken_nn.ci.py"
+            INFO "使用 api-cf.nn.ci 地址"
+        fi
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -327,7 +344,7 @@ function qrcode_aliyunpan_opentoken() {
             -e LANG=C.UTF-8 \
             --net=host \
             ddsderek/xiaoya-glue:python \
-            /aliyunopentoken/aliyunopentoken_nn.ci.py
+            "/aliyunopentoken/${command_file}"
         INFO "清理镜像中..."
         docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
