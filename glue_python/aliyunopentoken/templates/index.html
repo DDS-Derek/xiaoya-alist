@@ -24,7 +24,7 @@
     var poll = function() {
         $.get('/status', function(data) {
             if (data.status === 'success') {
-                alert('扫码成功，Cookie 已写入文件！');
+                alert('扫码成功，Token 已写入文件！');
                 shutdown();
             } else if (data.status === 'failure') {
                 alert('扫码失败！');

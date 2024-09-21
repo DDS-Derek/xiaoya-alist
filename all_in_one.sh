@@ -119,8 +119,6 @@ function wait_xiaoya_start() {
 function clear_qrcode_container() {
 
     # shellcheck disable=SC2046
-    docker rm -f $(docker ps -a -q --filter ancestor=ddsderek/xiaoya-glue:quark_cookie) > /dev/null 2>&1
-    # shellcheck disable=SC2046
     docker rm -f $(docker ps -a -q --filter ancestor=ddsderek/xiaoya-glue:python) > /dev/null 2>&1
 
 }
@@ -401,7 +399,7 @@ function qrcode_quark_cookie() {
         INFO "夸克 Cookie 扫码获取"
         local local_ip
         INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:quark_cookie
+        docker_pull ddsderek/xiaoya-glue:python
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -415,9 +413,10 @@ function qrcode_quark_cookie() {
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
             --net=host \
-            ddsderek/xiaoya-glue:quark_cookie
+            ddsderek/xiaoya-glue:python \
+            /quark_cookie/quark_cookie.py
         INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:quark_cookie
+        docker rmi ddsderek/xiaoya-glue:python
         INFO "操作全部完成！"
         ;;
     *)
