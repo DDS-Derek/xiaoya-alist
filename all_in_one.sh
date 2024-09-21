@@ -426,6 +426,42 @@ function qrcode_quark_cookie() {
 
 }
 
+function qrcode_uc_cookie() {
+
+    clear_qrcode_container
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "UC Cookie 扫码获取"
+        local local_ip
+        INFO "拉取镜像中..."
+        docker_pull ddsderek/xiaoya-glue:python
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            local_ip="小雅服务器IP"
+        fi
+        INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用UC浏览器APP扫描二维码！"
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            --net=host \
+            ddsderek/xiaoya-glue:python \
+            /uc_cookie/uc_cookie.py
+        INFO "清理镜像中..."
+        docker rmi ddsderek/xiaoya-glue:python
+        INFO "操作全部完成！"
+        ;;
+    *)
+        WARN "目前 UC Cookie 扫码获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
+
+}
+
 function enter_aliyunpan_refreshtoken() {
 
     INFO "是否使用扫码自动 Token [Y/n]（默认 Y）"
@@ -598,14 +634,22 @@ function settings_quark_cookie() {
 function enter_uc_cookie() {
 
     touch ${1}/uc_cookie.txt
-    while true; do
-        INFO "输入你的 UC Cookie"
-        read -erp "Cookie:" uc_cookie
-        echo -e "${uc_cookie}" > ${1}/uc_cookie.txt
-        if check_uc_cookie "${1}"; then
-            break
-        fi
-    done
+    INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+    read -erp "Cookie:" choose_qrcode_uc_cookie
+    [[ -z "${choose_qrcode_uc_cookie}" ]] && choose_qrcode_uc_cookie="y"
+    if [[ ${choose_qrcode_uc_cookie} == [Yy] ]]; then
+        qrcode_uc_cookie "${1}"
+    fi
+    if ! check_uc_cookie "${1}"; then
+        while true; do
+            INFO "输入你的 UC Cookie"
+            read -erp "Cookie:" uc_cookie
+            echo -e "${uc_cookie}" > ${1}/uc_cookie.txt
+            if check_uc_cookie "${1}"; then
+                break
+            fi
+        done
+    fi
 
 }
 

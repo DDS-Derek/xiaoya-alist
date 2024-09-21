@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UC Cookie</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+    </style>
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+</head>
+<body>
+    <h1>请打开UC浏览器APP扫描此二维码！</h1>
+    <img src="{{ url_for('serve_image') }}" alt="image">
+    <script>
+    var poll = function() {
+        $.get('/status', function(data) {
+            if (data.status === 'success') {
+                alert('扫码成功，Cookie 已写入文件！');
+                shutdown();
+            } else if (data.status === 'failure') {
+                alert('扫码失败！');
+                shutdown();
+            }
+        });
+    }
+
+    var shutdown = function() {
+        $.ajax({
+            url: '/shutdown_server',
+            type: 'get',
+            complete: function() {
+                window.close();
+                clearInterval(pollInterval);
+            }
+        });
+    }
+
+    var pollInterval = setInterval(poll, 1000);
+    </script>
+</body>
+</html>
