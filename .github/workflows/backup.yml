@@ -30,7 +30,7 @@ jobs:
                 mv ./xiaoyahelper/aliyun_clear.sh.backup ./xiaoyahelper/aliyun_clear.sh
             fi
 
-        - uses: stefanzweifel/git-auto-commit-action@ac8823709a85c7ce090849ac3e5fe24d006f6e18
+        - uses: stefanzweifel/git-auto-commit-action@e961da7576511032beb0d75de8af56bbce1121b9
           with:
             commit_message: 'chore: backup xiaoyahelper'
             branch: master
