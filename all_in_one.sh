@@ -24,8 +24,8 @@ export PATH
 DATE_VERSION="v1.7.3-2024_08_17_15_25"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
-amilys_embyserver_latest_version=4.8.8.0
-emby_embyserver_latest_version=4.8.8.0
+amilys_embyserver_latest_version=4.8.9.0
+emby_embyserver_latest_version=4.8.9.0
 # ——————————————————————————————————————————————————————————————————————————————————
 
 Sky_Blue="\e[36m"
