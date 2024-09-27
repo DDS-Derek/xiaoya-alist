@@ -2466,7 +2466,7 @@ function install_emby_xiaoya_all_emby() {
                     IMAGE_VERSION=latest
                     break
                 else
-                    INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；latest（${amilys_embyserver_latest_version}） ]（默认 1）"
+                    INFO "请选择 Emby 镜像版本 [ 1；4.8.0.56 | 2；4.8.8.0 | 3；latest（${amilys_embyserver_latest_version}） ]（默认 1）"
                     read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
                     [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
                     case ${CHOOSE_IMAGE_VERSION} in
@@ -2475,6 +2475,10 @@ function install_emby_xiaoya_all_emby() {
                         break
                         ;;
                     2)
+                        IMAGE_VERSION=4.8.8.0
+                        break
+                        ;;
+                    3)
                         IMAGE_VERSION=latest
                         break
                         ;;
@@ -2570,15 +2574,19 @@ function oneclick_upgrade_emby() {
                 IMAGE_VERSION=latest
                 break
             else
-                INFO "请选择 Emby 镜像版本 [ 1；latest（${amilys_embyserver_latest_version}）| 2；beta（此版本请勿轻易尝试）]（默认 1）"
+                INFO "请选择 Emby 镜像版本 [ 1；4.8.8.0 | 2；latest（${amilys_embyserver_latest_version}）| 3；beta（此版本请勿轻易尝试）]（默认 1）"
                 read -erp "CHOOSE_IMAGE_VERSION:" CHOOSE_IMAGE_VERSION
                 [[ -z "${CHOOSE_IMAGE_VERSION}" ]] && CHOOSE_IMAGE_VERSION="1"
                 case ${CHOOSE_IMAGE_VERSION} in
                 1)
-                    IMAGE_VERSION=latest
+                    IMAGE_VERSION=4.8.8.0
                     break
                     ;;
                 2)
+                    IMAGE_VERSION=latest
+                    break
+                    ;;
+                3)
                     IMAGE_VERSION=beta
                     break
                     ;;
