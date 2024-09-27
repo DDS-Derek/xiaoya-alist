@@ -116,13 +116,6 @@ function wait_xiaoya_start() {
 
 }
 
-function clear_qrcode_container() {
-
-    # shellcheck disable=SC2046
-    docker rm -f $(docker ps -a -q --filter ancestor=ddsderek/xiaoya-glue:python) > /dev/null 2>&1
-
-}
-
 function check_quark_cookie() {
 
     if [[ ! -f "${1}/quark_cookie.txt" ]] && [[ ! -s "${1}/quark_cookie.txt" ]]; then
@@ -238,7 +231,7 @@ function qrcode_aliyunpan_tvtoken() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 TV Token 配置"
         local local_ip
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -254,8 +247,6 @@ function qrcode_aliyunpan_tvtoken() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             /aliyuntvtoken/alitoken2.py
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
         ;;
     *)
@@ -273,8 +264,7 @@ function qrcode_aliyunpan_refreshtoken() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Refresh Token 配置"
         local local_ip command_file
-        INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if curl -Is https://api.xhofe.top/alist/ali/qr | head -n 1 | grep -q '200'; then
             command_file="aliyuntoken.py"
             INFO "使用 api.xhofe.top 地址"
@@ -300,8 +290,6 @@ function qrcode_aliyunpan_refreshtoken() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             "/aliyuntoken/${command_file}"
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
         ;;
     *)
@@ -319,8 +307,7 @@ function qrcode_aliyunpan_opentoken() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Open Token 配置"
         local local_ip command_file
-        INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if curl -Is https://api.xhofe.top/alist/ali_open/qr | head -n 1 | grep -q '200'; then
             command_file="aliyunopentoken.py"
             INFO "使用 api.xhofe.top 地址"
@@ -343,8 +330,6 @@ function qrcode_aliyunpan_opentoken() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             "/aliyunopentoken/${command_file}"
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
         ;;
     *)
@@ -362,8 +347,7 @@ function qrcode_115_cookie() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "115 Cookie 扫码获取"
         local local_ip
-        INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -379,8 +363,6 @@ function qrcode_115_cookie() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             /115cookie/115cookie.py
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python > /dev/null 2>&1
         INFO "操作全部完成！"
         ;;
     *)
@@ -398,8 +380,7 @@ function qrcode_quark_cookie() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "夸克 Cookie 扫码获取"
         local local_ip
-        INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -415,8 +396,6 @@ function qrcode_quark_cookie() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             /quark_cookie/quark_cookie.py
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python
         INFO "操作全部完成！"
         ;;
     *)
@@ -434,8 +413,7 @@ function qrcode_uc_cookie() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "UC Cookie 扫码获取"
         local local_ip
-        INFO "拉取镜像中..."
-        docker_pull ddsderek/xiaoya-glue:python
+        pull_glue_python_ddsrem
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -451,8 +429,6 @@ function qrcode_uc_cookie() {
             --net=host \
             ddsderek/xiaoya-glue:python \
             /uc_cookie/uc_cookie.py
-        INFO "清理镜像中..."
-        docker rmi ddsderek/xiaoya-glue:python
         INFO "操作全部完成！"
         ;;
     *)
