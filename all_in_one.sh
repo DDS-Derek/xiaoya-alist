@@ -3870,9 +3870,11 @@ function update_xiaoya_alist_tvbox() {
         echo -en "即将开始更新小雅Alist-TVBox${Blue} $i ${Font}\r"
         sleep 1
     done
+    VOLUMES="$(docker inspect -f '{{range .Mounts}}{{if eq .Type "volume"}}{{println .}}{{end}}{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)" | cut -d' ' -f2 | awk 'NF' | tr '\n' ' ')"
     # shellcheck disable=SC2034
     container_update_extra_command="sedsh '/\/opt\/atv\/data/d; \/opt\/alist\/data/d' "/tmp/container_update_$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)""
     container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_tvbox_name.txt)"
+    docker volume rm ${VOLUMES}
 
 }
 
