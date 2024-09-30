@@ -3976,6 +3976,65 @@ function install_xiaoya_115_cleaner() {
         echo -e "${password_key}" > ${config_dir}/115_key.txt
     fi
 
+    while true; do
+        INFO "请选择 115 Cleaner 清理模式（默认 1）"
+        INFO "1：标准模式，清空 /我的接收 下面的文件并同时清理回收站的对应文件"
+        INFO "2：只清空 115云盘 回收站文件，不会清理其他地方的文件"
+        INFO "3：清空 /我的接收 下面的文件并同时清空回收站"
+        read -erp "CHOOSE_RUN_MODE:" CHOOSE_RUN_MODE
+        [[ -z "${CHOOSE_RUN_MODE}" ]] && CHOOSE_RUN_MODE="1"
+        case ${CHOOSE_RUN_MODE} in
+        1)
+            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
+            fi
+            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
+            fi
+            break
+            ;;
+        2)
+            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
+            fi
+            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
+            fi
+            touch "${config_dir}/115_cleaner_only_recyclebin.txt"
+            break
+            ;;
+        3)
+            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
+            fi
+            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
+                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
+            fi
+            touch "${config_dir}/115_cleaner_all_recyclebin.txt"
+            break
+            ;;
+        *)
+            ERROR "输入无效，请重新选择"
+            ;;
+        esac
+    done
+
+    if [ -f "${config_dir}/ali2115.txt" ]; then
+        while true; do
+            INFO "是否将 ali2115 转存文件交由 115 Cleaner 清理 [Y/n]（默认 y）"
+            read -erp "ali2115:" choose_ali2115
+            [[ -z "${choose_ali2115}" ]] && choose_ali2115="y"
+            if [[ ${choose_ali2115} == [YyNn] ]]; then
+                break
+            else
+                ERROR "非法输入，请输入 [Y/n]"
+            fi
+        done
+    fi
+    if [[ ${choose_ali2115} == [Yy] ]]; then
+        touch "${config_dir}/115_cleaner_auto_set_ali2115.txt"
+    fi
+
     container_run_extra_parameters=$(cat ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt)
     if [ "${container_run_extra_parameters}" == "true" ]; then
         local RETURN_DATA
