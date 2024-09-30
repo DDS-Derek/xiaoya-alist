@@ -3983,33 +3983,21 @@ function install_xiaoya_115_cleaner() {
         INFO "3：清空 /我的接收 下面的文件并同时清空回收站"
         read -erp "CHOOSE_RUN_MODE:" CHOOSE_RUN_MODE
         [[ -z "${CHOOSE_RUN_MODE}" ]] && CHOOSE_RUN_MODE="1"
+        if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
+            rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
+        fi
+        if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
+            rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
+        fi
         case ${CHOOSE_RUN_MODE} in
         1)
-            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
-            fi
-            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
-            fi
             break
             ;;
         2)
-            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
-            fi
-            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
-            fi
             touch "${config_dir}/115_cleaner_only_recyclebin.txt"
             break
             ;;
         3)
-            if [ -f "${config_dir}/115_cleaner_all_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_all_recyclebin.txt"
-            fi
-            if [ -f "${config_dir}/115_cleaner_only_recyclebin.txt" ]; then
-                rm -rf "${config_dir}/115_cleaner_only_recyclebin.txt"
-            fi
             touch "${config_dir}/115_cleaner_all_recyclebin.txt"
             break
             ;;
