@@ -3242,7 +3242,7 @@ function install_xiaoya_emd() {
         INFO "是否开启重启容器自动更新到最新程序 [Y/n]（默认 n 不开启）"
         WARN "需要拥有良好的上网环境才可以更新成功，要能访问 Github 和 Python PIP 库！"
         read -erp "RESTART_AUTO_UPDATE:" RESTART_AUTO_UPDATE
-        [[ -z "${RESTART_AUTO_UPDATE}" ]] && TG="n"
+        [[ -z "${RESTART_AUTO_UPDATE}" ]] && RESTART_AUTO_UPDATE="n"
         if [[ ${RESTART_AUTO_UPDATE} == [YyNn] ]]; then
             break
         else
