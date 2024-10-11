@@ -62,6 +62,10 @@ mirrors=(
     "freeno.xyz"
     "docker.1panel.live"
     "dockerpull.com"
+    "docker.anyhub.us.kg"
+    "dockerhub.jobcher.com"
+    "dockerhub.icu"
+    "docker.awsl9527.cn"
 )
 
 function root_need() {
