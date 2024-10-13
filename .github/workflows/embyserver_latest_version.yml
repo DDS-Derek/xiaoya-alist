@@ -16,7 +16,7 @@ jobs:
     steps:
       - 
         name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       -
         name: Get Version Amilys
@@ -33,9 +33,9 @@ jobs:
             sed -i "1,40s|emby_embyserver_latest_version=.*|emby_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
 
       - 
-        uses: stefanzweifel/git-auto-commit-action@050015d40644de3e8d2365687c1fbc235352bcff
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-            commit_message: 'chore: update amilys embyserver latest version'
+            commit_message: 'chore: update embyserver latest version'
             branch: master
             file_pattern: 'all_in_one.sh'
         env:
