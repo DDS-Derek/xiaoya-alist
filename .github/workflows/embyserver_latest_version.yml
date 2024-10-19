@@ -2,8 +2,6 @@ name: embyserver latest version
 
 on:
     workflow_dispatch:
-    schedule:
-        - cron: '0 3 */3 * *'
     push:
         branches:
             - master
