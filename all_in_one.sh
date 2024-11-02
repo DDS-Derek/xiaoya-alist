@@ -1099,6 +1099,16 @@ function install_xiaoya_alist() {
     fi
     INFO "本地IP：${localip}"
 
+    ports=(5678 2345 2346 2347)
+    for port in "${ports[@]}"; do
+        if ! check_port "${port}"; then
+            check_ports_result=false
+        fi
+    done
+    if [ "${check_ports_result}" == false ]; then
+        exit 1
+    fi
+
     if [ "${SET_NET_MODE}" == true ]; then
         while true; do
             INFO "是否使用host网络模式 [Y/n]（默认 n 不使用）"
@@ -2438,6 +2448,11 @@ function install_emby_xiaoya_all_emby() {
         # shellcheck disable=SC1091
         source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
 
+        if ! check_port "6908"; then
+            ERROR "6908 端口被占用，请关闭占用此端口的程序！"
+            exit 1
+        fi
+
         # shellcheck disable=SC2154
         if [ "${mode}" == "bridge" ]; then
             MODE=bridge
@@ -2488,6 +2503,11 @@ function install_emby_xiaoya_all_emby() {
 
     else
         choose_emby_image
+
+        if ! check_port "6908"; then
+            ERROR "6908 端口被占用，请关闭占用此端口的程序！"
+            exit 1
+        fi
 
         choose_network_mode
 
@@ -3819,13 +3839,27 @@ function install_xiaoya_alist_tvbox() {
         echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
     fi
 
-    INFO "请输入Alist端口（默认 5344 ）"
-    read -erp "ALIST_PORT:" ALIST_PORT
-    [[ -z "${ALIST_PORT}" ]] && ALIST_PORT="5344"
+    while true; do
+        INFO "请输入Alist端口（默认 5344 ）"
+        read -erp "ALIST_PORT:" ALIST_PORT
+        [[ -z "${ALIST_PORT}" ]] && ALIST_PORT="5344"
+        if check_port "${ALIST_PORT}"; then
+            break
+        else
+            ERROR "${ALIST_PORT} 此端口被占用，请输入其他端口！"
+        fi
+    done
 
-    INFO "请输入后台管理端口（默认 4567 ）"
-    read -erp "HT_PORT:" HT_PORT
-    [[ -z "${HT_PORT}" ]] && HT_PORT="4567"
+    while true; do
+        INFO "请输入后台管理端口（默认 4567 ）"
+        read -erp "HT_PORT:" HT_PORT
+        [[ -z "${HT_PORT}" ]] && HT_PORT="4567"
+        if check_port "${HT_PORT}"; then
+            break
+        else
+            ERROR "${HT_PORT} 此端口被占用，请输入其他端口！"
+        fi
+    done
 
     INFO "请输入内存限制（默认 -Xmx512M ）"
     read -erp "MEM_OPT:" MEM_OPT
@@ -4219,6 +4253,10 @@ function install_xiaoya_proxy() {
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
         extra_parameters=$(data_crep "w" "install_xiaoya_proxy")
+    fi
+    if ! check_port "9988"; then
+        ERROR "9988 端口被占用，请关闭占用此端口的程序！"
+        exit 1
     fi
     docker_pull "ddsderek/xiaoya-proxy:latest"
     docker run -d \
