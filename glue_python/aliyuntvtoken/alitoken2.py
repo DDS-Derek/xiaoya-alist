@@ -50,12 +50,12 @@ def decrypt(ciphertext, iv, t, unique_id, wifimac):
 def get_params(t, unique_id, wifimac):
     params = {
         'akv': '2.8.1496',
-        'apv': '1.3.6',
-        'b': 'OnePlus',
+        'apv': '1.3.8',
+        'b': 'samsung',
         'd': unique_id,
-        'm': 'PJX110',
+        'm': 'SM-S908E',
         'mac': '',
-        'n': 'PJX110',
+        'n': 'SM-S908E',
         't': t,
         'wifiMac': wifimac,
     }
