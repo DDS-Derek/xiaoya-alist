@@ -2062,6 +2062,7 @@ function download_unzip_xiaoya_emby_new_config() {
     chmod -R 777 "${MEDIA_DIR}/config"
 
     docker start "${emby_name}"
+    sleep 5
     wait_emby_start
 
     INFO "操作完成！"
