@@ -45,14 +45,14 @@ PikPak/
 
 ### 部署前参数需要修改
 
-> warning
+> [!WARNING]
 > 必要参数
 
 ```shell
 /volume1/docker-data/xiaoya/xiaoya   修改成媒体库路径
 ```
 
-> info
+> [!NOTE]
 > 可选参数
 
 ```shell
