@@ -1952,6 +1952,122 @@ function download_wget_unzip_xiaoya_all_emby() {
 
 }
 
+function download_unzip_xiaoya_emby_new_config() {
+
+    function compare_version() {
+
+        if [ "${1}" == "4.8.9.0" ]; then
+            return 0
+        fi
+
+        if [ "$(echo -e "${1}\n4.8.9.0" | sort -V | head -n1)" == "${1}" ]; then
+            return 1
+        else
+            return 0
+        fi
+
+    }
+
+    WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
+    while true; do
+        INFO "是否${Red}继续操作${Font} [Y/n]（默认 Y）"
+        read -erp "OPERATE:" OPERATE
+        [[ -z "${OPERATE}" ]] && OPERATE="y"
+        if [[ ${OPERATE} == [YyNn] ]]; then
+            break
+        else
+            ERROR "非法输入，请输入 [Y/n]"
+        fi
+    done
+    if [[ "${OPERATE}" == [Nn] ]]; then
+        exit 0
+    fi
+
+    get_config_dir
+
+    get_media_dir
+
+    local emby_name emby_image_name emby_version
+    emby_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+    emby_image_name="$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")"
+    if [ -z "${emby_image_name}" ]; then
+        ERROR "获取 Emby 镜像标签失败，请确保您已安装 Emby！"
+        exit 1
+    fi
+    docker run --rm --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+    emby_version=$(grep "EmbyServer" "${MEDIA_DIR}/EmbyServer.deps.json" | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+    if [ -n "${emby_version}" ]; then
+        INFO "当前 Emby 版本：${emby_version}"
+    else
+        ERROR "当前 Emby 版本获取失败！"
+        exit 1
+    fi
+    if ! compare_version "${emby_version}"; then
+        INFO "您的 Emby 版本过低，开始进入升级流程，请升级到 4.8.9.0 或更高版本！"
+        oneclick_upgrade_emby
+    fi
+
+    INFO "关闭 Emby 容器中..."
+    if ! docker stop "${emby_name}"; then
+        if ! docker kill "${emby_name}"; then
+            ERROR "关闭 Emby 容器失败！"
+            exit 1
+        fi
+    fi
+
+    test_xiaoya_status
+
+    rm -rf "${MEDIA_DIR}/config"
+
+    mkdir -p "${MEDIA_DIR}/config"
+
+    if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
+        rm -rf "${MEDIA_DIR}/temp/config.new.mp4.aria2"
+    fi
+
+    INFO "开始下载解压..."
+
+    extra_parameters="--workdir=/media/temp"
+    if [ "$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)" == "wget" ]; then
+        if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.new.mp4"; then
+            ERROR "config.new.mp4 下载失败！"
+            exit 1
+        fi
+    else
+        if pull_run_glue aria2c -o "config.new.mp4" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/config.new.mp4"; then
+            if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
+                ERROR "存在 ${MEDIA_DIR}/temp/config.new.mp4.aria2 文件，下载不完整！"
+                exit 1
+            else
+                INFO "config.new.mp4 下载成功！"
+            fi
+        else
+            ERROR "config.new.mp4 下载失败！"
+            exit 1
+        fi
+    fi
+
+    start_time1=$(date +%s)
+
+    config_size=$(du -k ${MEDIA_DIR}/temp/config.new.mp4 | cut -f1)
+    if [[ "$config_size" -le 3200000 ]]; then
+        ERROR "config.new.mp4 下载不完整，文件大小(in KB):$config_size 小于预期"
+        exit 1
+    fi
+    extra_parameters="--workdir=/media"
+    pull_run_glue 7z x -aoa -mmt=16 temp/config.new.mp4
+
+    INFO "设置目录权限..."
+    INFO "这可能需要一定时间，请耐心等待！"
+    chmod -R 777 "${MEDIA_DIR}/config"
+
+    docker start "${emby_name}"
+    wait_emby_start
+
+    INFO "操作完成！"
+
+}
+
 function main_download_unzip_xiaoya_emby() {
 
     __data_downloader=$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)
