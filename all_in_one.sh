@@ -1970,7 +1970,7 @@ function download_unzip_xiaoya_emby_new_config() {
 
     WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
     while true; do
-        INFO "是否${Red}继续操作${Font} [Y/n]（默认 Y）"
+        INFO "是否继续操作 [Y/n]（默认 Y）"
         read -erp "OPERATE:" OPERATE
         [[ -z "${OPERATE}" ]] && OPERATE="y"
         if [[ ${OPERATE} == [YyNn] ]]; then
@@ -1994,8 +1994,16 @@ function download_unzip_xiaoya_emby_new_config() {
         ERROR "获取 Emby 镜像标签失败，请确保您已安装 Emby！"
         exit 1
     fi
+    if [ -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
+        rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
+    fi
     docker run --rm --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+    if [ ! -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
+        ERROR "Emby 版本数据文件复制失败！"
+        exit 1
+    fi
     emby_version=$(grep "EmbyServer" "${MEDIA_DIR}/EmbyServer.deps.json" | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+    rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
     if [ -n "${emby_version}" ]; then
         INFO "当前 Emby 版本：${emby_version}"
     else
