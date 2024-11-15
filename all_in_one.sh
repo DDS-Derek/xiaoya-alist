@@ -1968,58 +1968,62 @@ function download_unzip_xiaoya_emby_new_config() {
 
     }
 
-    WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
-    while true; do
-        INFO "是否继续操作 [Y/n]（默认 Y）"
-        read -erp "OPERATE:" OPERATE
-        [[ -z "${OPERATE}" ]] && OPERATE="y"
-        if [[ ${OPERATE} == [YyNn] ]]; then
-            break
-        else
-            ERROR "非法输入，请输入 [Y/n]"
-        fi
-    done
-    if [[ "${OPERATE}" == [Nn] ]]; then
-        exit 0
-    fi
-
     get_config_dir
 
     get_media_dir
 
-    local emby_name emby_image_name emby_version
-    emby_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
-    emby_image_name="$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")"
-    if [ -z "${emby_image_name}" ]; then
-        ERROR "获取 Emby 镜像标签失败，请确保您已安装 Emby！"
-        exit 1
-    fi
-    if [ -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
-        rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
-    fi
-    docker run --rm --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
-    if [ ! -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
-        ERROR "Emby 版本数据文件复制失败！"
-        exit 1
-    fi
-    emby_version=$(grep "EmbyServer" "${MEDIA_DIR}/EmbyServer.deps.json" | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
-    rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
-    if [ -n "${emby_version}" ]; then
-        INFO "当前 Emby 版本：${emby_version}"
-    else
-        ERROR "当前 Emby 版本获取失败！"
-        exit 1
-    fi
-    if ! compare_version "${emby_version}"; then
-        INFO "您的 Emby 版本过低，开始进入升级流程，请升级到 4.8.9.0 或更高版本！"
-        oneclick_upgrade_emby
-    fi
+    if [ -f "${MEDIA_DIR}/config/config/system.xml" ]; then
+        INFO "检测到非第一次安装全家桶..."
+        WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
+        local OPERATE
+        while true; do
+            INFO "是否继续操作 [Y/n]（默认 Y）"
+            read -erp "OPERATE:" OPERATE
+            [[ -z "${OPERATE}" ]] && OPERATE="y"
+            if [[ ${OPERATE} == [YyNn] ]]; then
+                break
+            else
+                ERROR "非法输入，请输入 [Y/n]"
+            fi
+        done
+        if [[ "${OPERATE}" == [Nn] ]]; then
+            exit 0
+        fi
 
-    INFO "关闭 Emby 容器中..."
-    if ! docker stop "${emby_name}"; then
-        if ! docker kill "${emby_name}"; then
-            ERROR "关闭 Emby 容器失败！"
+        local emby_name emby_image_name emby_version
+        emby_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
+        emby_image_name="$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")"
+        if [ -z "${emby_image_name}" ]; then
+            ERROR "获取 Emby 镜像标签失败，请确保您已安装 Emby！"
             exit 1
+        fi
+        if [ -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
+            rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
+        fi
+        docker run --rm --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+        if [ ! -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
+            ERROR "Emby 版本数据文件复制失败！"
+            exit 1
+        fi
+        emby_version=$(grep "EmbyServer" "${MEDIA_DIR}/EmbyServer.deps.json" | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+        rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
+        if [ -n "${emby_version}" ]; then
+            INFO "当前 Emby 版本：${emby_version}"
+        else
+            ERROR "当前 Emby 版本获取失败！"
+            exit 1
+        fi
+        if ! compare_version "${emby_version}"; then
+            INFO "您的 Emby 版本过低，开始进入升级流程，请升级到 4.8.9.0 或更高版本！"
+            oneclick_upgrade_emby
+        fi
+
+        INFO "关闭 Emby 容器中..."
+        if ! docker stop "${emby_name}"; then
+            if ! docker kill "${emby_name}"; then
+                ERROR "关闭 Emby 容器失败！"
+                exit 1
+            fi
         fi
     fi
 
@@ -2031,6 +2035,10 @@ function download_unzip_xiaoya_emby_new_config() {
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
         rm -rf "${MEDIA_DIR}/temp/config.new.mp4.aria2"
+    fi
+    if [ -f "${MEDIA_DIR}/temp/config.new.mp4" ]; then
+        INFO "清理旧 config.new.mp4 中..."
+        rm -rf "${MEDIA_DIR}/temp/config.new.mp4"
     fi
 
     INFO "开始下载解压..."
@@ -2096,6 +2104,7 @@ function main_download_unzip_xiaoya_emby() {
     echo -e "11、解压 115.mp4"
     echo -e "12、解压 115.mp4 的指定元数据目录【非全部解压】"
     echo -e "13、当前下载器【aria2/wget】                  当前状态：${Green}${__data_downloader}${Font}"
+    echo -e "101、下载并解压 config.new.mp4"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     read -erp "请输入数字（支持输入多个数字，空格分离，按输入顺序执行）[0-13]:" -a nums
@@ -2171,6 +2180,10 @@ function main_download_unzip_xiaoya_emby() {
                 unzip_appoint_xiaoya_emby_jellyfin "115.mp4"
                 ;;
             esac
+            __next_operate=return_menu
+        elif [ $num == 101 ]; then
+            clear
+            download_unzip_xiaoya_emby_new_config
             __next_operate=return_menu
         elif [ $num == 13 ]; then
             if [ "${__data_downloader}" == "wget" ]; then
