@@ -230,6 +230,25 @@ function check_115_cookie() {
 
 }
 
+function check_aliyunpan_refreshtoken() {
+
+    local token header referer response refresh_token
+    token=$(head -n1 "${1}/mytoken.txt")
+    header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.54 Safari/537.36"
+    referer=https://www.aliyundrive.com/
+    response=$(curl -s https://auth.aliyundrive.com/v2/account/token -X POST -H "User-Agent: $header" -H "Content-Type:application/json" -H "Referer: $referer" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
+    refresh_token=$(echo "$response" | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+    if [ -n "${refresh_token}" ]; then
+        echo "${refresh_token}" > "${1}/mytoken.txt"
+        INFO "有效 阿里云盘 Refresh Token"
+        return 0
+    else
+        ERROR "无效 阿里云盘 Refresh Token"
+        return 1
+    fi
+
+}
+
 function qrcode_aliyunpan_tvtoken() {
 
     clear_qrcode_container
@@ -463,13 +482,13 @@ function enter_aliyunpan_refreshtoken() {
     while true; do
         mytokenfilesize=$(cat "${1}"/mytoken.txt)
         mytokenstringsize=${#mytokenfilesize}
-        if [ "$mytokenstringsize" -le 31 ]; then
+        if [ "$mytokenstringsize" -le 31 ] || ! check_aliyunpan_refreshtoken "${1}"; then
             INFO "输入你的阿里云盘 Token（32位长）"
             read -erp "TOKEN:" token
             token_len=${#token}
-            if [ "$token_len" -ne 32 ]; then
+            if [ "$token_len" -ne 32 ] || ! check_aliyunpan_refreshtoken "${1}"; then
                 ERROR "长度不对,阿里云盘 Token是32位长"
-                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+                ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             else
                 echo "$token" > "${1}"/mytoken.txt
                 break
@@ -488,7 +507,7 @@ function settings_aliyunpan_refreshtoken() {
     else
         mytokenfilesize=$(cat "${1}"/mytoken.txt)
         mytokenstringsize=${#mytokenfilesize}
-        if [ "$mytokenstringsize" -le 31 ]; then
+        if [ "$mytokenstringsize" -le 31 ] || ! check_aliyunpan_refreshtoken "${1}"; then
             enter_aliyunpan_refreshtoken "${1}"
         fi
     fi
@@ -915,7 +934,7 @@ function main_account_management() {
     echo -ne "${INFO} 界面加载中...${Font}\r"
     echo -e "1、115 Cookie                        （当前：$(if CHECK_OUT=$(check_115_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 2、夸克 Cookie                       （当前：$(if CHECK_OUT=$(check_quark_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
-3、阿里云盘 Refresh Token（mytoken） （当前：$(if [ -f "${config_dir}/mytoken.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
+3、阿里云盘 Refresh Token（mytoken） （当前：$(if CHECK_OUT=$(check_aliyunpan_refreshtoken "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi))）
 4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then if [ -f "${config_dir}/open_tv_token_url.txt" ]; then echo -e "${Green}已配置 TV Token${Font}"; else echo -e "${Green}已配置${Font}"; fi; else echo -e "${Red}未配置${Font}"; fi)）
 5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 6、PikPak                            （当前：$(if [ -f "${config_dir}/pikpak.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
