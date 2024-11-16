@@ -128,7 +128,7 @@ function check_quark_cookie() {
     if [[ ! -f "${1}/quark_cookie.txt" ]] && [[ ! -s "${1}/quark_cookie.txt" ]]; then
         return 1
     fi
-    local cookie user_agent url headers response status state_url sign_daily_reward sign_daily_reward_mb url2 response2 member member_type vip_88
+    local cookie user_agent url headers response status url2 response2 member member_type vip_88
     cookie=$(head -n1 "${1}/quark_cookie.txt")
     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch"
     url="https://drive-pc.quark.cn/1/clouddrive/config?pr=ucpro&fr=pc&uc_param_str="
@@ -155,13 +155,6 @@ function check_quark_cookie() {
             member_type="${member//\"/}会员"
         fi
         INFO "有效 夸克 Cookie，${member_type}"
-        state_url="https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=pc&uc_param_str="
-        response=$(curl -s -H "$headers" "$state_url")
-        sign_daily_reward=$(echo "$response" | cut -f6 -d\{ | cut -f4 -d: | cut -f1 -d,)
-        if [ -n "${sign_daily_reward}" ]; then
-            sign_daily_reward_mb=$(echo "$sign_daily_reward 1024 1024" | awk '{printf "%.2f\n", $1 / ($2 * $3)}')
-            INFO "夸克签到获取 $sign_daily_reward_mb MB"
-        fi
         return 0
     else
         ERROR "请求失败，请检查 Cookie 或网络连接是否正确。"
