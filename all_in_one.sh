@@ -4579,6 +4579,196 @@ function main_xiaoya_proxy() {
 
 }
 
+function install_xiaoya_aliyuntvtoken_connector() {
+
+    CONFIG_DIR=$1
+
+    if [ ! -f "${CONFIG_DIR}/open_tv_token_url.txt" ]; then
+        INFO "当前未配置 阿里云盘 TV Token，开始进入 TV Token 配置流程..."
+        qrcode_aliyunpan_tvtoken "${CONFIG_DIR}"
+    else
+        INFO "阿里云盘 TV Token 当前已配置！"
+    fi
+
+    if ! check_port "34278"; then
+        ERROR "34278 端口被占用，请关闭占用此端口的程序！"
+        exit 1
+    fi
+
+    docker_pull "ddsderek/xiaoya-glue:aliyuntvtoken_connector"
+
+    docker run -d \
+        --net=host \
+        --name=xiaoya-aliyuntvtoken_connector \
+        --restart=always \
+        ddsderek/xiaoya-glue:aliyuntvtoken_connector
+
+    sleep 2
+
+    get_docker0_url
+    local xiaoya_name aliyuntvtoken_connector_addr local_ip xiaoya_running
+    xiaoya_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+    xiaoya_running=false
+    if docker container inspect "${xiaoya_name}" > /dev/null 2>&1; then
+        case "$(docker inspect --format='{{.State.Status}}' "${xiaoya_name}")" in
+        "running")
+            xiaoya_running=true
+            ;;
+        esac
+    fi
+    function set_local_ip() {
+        if [[ "${OSNAME}" = "macos" ]]; then
+            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
+        if [ -z "${local_ip}" ]; then
+            WARN "请手动配置 ${CONFIG_DIR}/open_tv_token_url.txt 文件，内容为 http://小雅服务器IP:34278/oauth/alipan/token"
+        else
+            INFO "本机IP：${local_ip}"
+            aliyuntvtoken_connector_addr="http://${local_ip}:34278/oauth/alipan/token"
+        fi
+    }
+    if [ "${xiaoya_running}" == "true" ]; then
+        if docker exec -it "${xiaoya_name}" curl -siL -m 10 http://127.0.0.1:34278/oauth/alipan/token | grep 405; then
+            aliyuntvtoken_connector_addr="http://127.0.0.1:34278/oauth/alipan/token"
+        elif docker exec -it "${xiaoya_name}" curl -siL -m 10 http://${docker0}:34278/oauth/alipan/token | grep 405; then
+            aliyuntvtoken_connector_addr="http://${docker0}:34278/oauth/alipan/token"
+        else
+            set_local_ip
+        fi
+    else
+        set_local_ip
+    fi
+    if [ -n "${aliyuntvtoken_connector_addr}" ]; then
+        INFO "本地阿里云盘 TV Token 鉴权接口地址：${aliyuntvtoken_connector_addr}"
+        echo "${aliyuntvtoken_connector_addr}" > "${CONFIG_DIR}/open_tv_token_url.txt"
+    fi
+
+    if docker container inspect "${xiaoya_name}" > /dev/null 2>&1; then
+        docker restart "${xiaoya_name}"
+        sleep 5
+        wait_xiaoya_start
+    fi
+
+    INFO "安装完成！"
+
+}
+
+function update_xiaoya_aliyuntvtoken_connector() {
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新 xiaoya-aliyuntvtoken_connector${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    container_update xiaoya-aliyuntvtoken_connector
+
+}
+
+function uninstall_xiaoya_aliyuntvtoken_connector() {
+
+    while true; do
+        INFO "是否停止使用 阿里云盘 TV Token 配置 [Y/n]（默认 n）"
+        read -erp "Use_TV_Token:" USE_TV_TOKEN
+        [[ -z "${USE_TV_TOKEN}" ]] && USE_TV_TOKEN="n"
+        if [[ ${USE_TV_TOKEN} == [YyNn] ]]; then
+            break
+        else
+            ERROR "非法输入，请输入 [Y/n]"
+        fi
+    done
+
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始卸载 xiaoya-aliyuntvtoken_connector${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker stop xiaoya-aliyuntvtoken_connector
+    docker rm xiaoya-aliyuntvtoken_connector
+    docker rmi ddsderek/xiaoya-glue:aliyuntvtoken_connector
+
+    local xiaoya_name config_dir
+    xiaoya_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+    if docker container inspect "${xiaoya_name}" > /dev/null 2>&1; then
+        config_dir="$(docker inspect -f '{{ range .Mounts }}{{ if eq .Destination "/data" }}{{ .Source }}{{ end }}{{ end }}' "${xiaoya_name}")"
+    elif [ -f "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt" ]; then
+        config_dir="$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)"
+    else
+        get_config_dir
+        config_dir="${CONFIG_DIR}"
+    fi
+    INFO "小雅容器配置目录：${config_dir}"
+
+    if [[ ${USE_TV_TOKEN} == [Yy] ]]; then
+        rm -f "${config_dir}/open_tv_token_url.txt"
+        rm -f "${config_dir}/myopentoken.txt"
+        while true; do
+            INFO "是否配置阿里云盘 Open Token（myopentoken文件） [Y/n]（默认 y）"
+            read -erp "Set_Open_Token:" SET_OPEN_TOKEN
+            [[ -z "${SET_OPEN_TOKEN}" ]] && SET_OPEN_TOKEN="y"
+            if [[ ${SET_OPEN_TOKEN} == [YyNn] ]]; then
+                break
+            else
+                ERROR "非法输入，请输入 [Y/n]"
+            fi
+        done
+        if [[ ${SET_OPEN_TOKEN} == [Yy] ]]; then
+            settings_aliyunpan_opentoken "${config_dir}" force
+        fi
+    else
+        INFO "切换使用公共鉴权接口：https://www.voicehub.top/api/v1/oauth/alipan/token"
+        echo "https://www.voicehub.top/api/v1/oauth/alipan/token" > "${config_dir}/open_tv_token_url.txt"
+    fi
+
+    if docker container inspect "${xiaoya_name}" > /dev/null 2>&1; then
+        docker restart "${xiaoya_name}"
+        sleep 5
+        wait_xiaoya_start
+    fi
+
+    INFO "xiaoya-aliyuntvtoken_connector 卸载成功！"
+
+}
+
+function main_xiaoya_aliyuntvtoken_connector() {
+
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    echo -e "${Blue}阿里云盘 TV Token 令牌刷新接口（xiaoya-aliyuntvtoken_connector）${Font}\n"
+    echo -e "1、安装"
+    echo -e "2、更新"
+    echo -e "3、卸载"
+    echo -e "0、返回上级"
+    echo -e "——————————————————————————————————————————————————————————————————————————————————"
+    read -erp "请输入数字 [0-3]:" num
+    case "$num" in
+    1)
+        clear
+        get_config_dir
+        install_xiaoya_aliyuntvtoken_connector "${CONFIG_DIR}"
+        return_menu "main_xiaoya_aliyuntvtoken_connector"
+        ;;
+    2)
+        clear
+        update_xiaoya_aliyuntvtoken_connector
+        return_menu "main_xiaoya_aliyuntvtoken_connector"
+        ;;
+    3)
+        clear
+        uninstall_xiaoya_aliyuntvtoken_connector
+        return_menu "main_xiaoya_aliyuntvtoken_connector"
+        ;;
+    0)
+        clear
+        main_other_tools
+        ;;
+    *)
+        clear
+        ERROR '请输入正确数字 [0-3]'
+        main_xiaoya_aliyuntvtoken_connector
+        ;;
+    esac
+
+}
+
 function main_docker_compose() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -4921,16 +5111,17 @@ function main_other_tools() {
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}其他工具${Font}\n"
     echo -ne "${INFO} 界面加载中...${Font}\r"
-    echo -e "1、安装/更新/卸载 Portainer                   当前状态：$(judgment_container "${portainer_name}")
-2、安装/更新/卸载 Auto_Symlink                当前状态：$(judgment_container "${auto_symlink_name}")
-3、安装/更新/卸载 Onelist                     当前状态：$(judgment_container "${xiaoya_onelist_name}")
-4、安装/更新/卸载 Xiaoya Proxy                当前状态：$(judgment_container xiaoya-proxy)"
-    echo -e "5、查看系统磁盘挂载"
-    echo -e "6、安装/卸载 CasaOS"
-    echo -e "7、AI老G 安装脚本"
+    echo -e "1、安装/更新/卸载 Portainer                       当前状态：$(judgment_container "${portainer_name}")
+2、安装/更新/卸载 Auto_Symlink                    当前状态：$(judgment_container "${auto_symlink_name}")
+3、安装/更新/卸载 Onelist                         当前状态：$(judgment_container "${xiaoya_onelist_name}")
+4、安装/更新/卸载 Xiaoya Proxy                    当前状态：$(judgment_container xiaoya-proxy)
+5、安装/更新/卸载 Xiaoya aliyuntvtoken_connector  当前状态：$(judgment_container xiaoya-aliyuntvtoken_connector)"
+    echo -e "6、查看系统磁盘挂载"
+    echo -e "7、安装/卸载 CasaOS"
+    echo -e "8、AI老G 安装脚本"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-7]:" num
+    read -erp "请输入数字 [0-8]:" num
     case "$num" in
     1)
         clear
@@ -4950,6 +5141,10 @@ function main_other_tools() {
         ;;
     5)
         clear
+        main_xiaoya_aliyuntvtoken_connector
+        ;;
+    6)
+        clear
         INFO "系统磁盘挂载情况:"
         show_disk_mount
         INFO "按任意键返回菜单"
@@ -4957,11 +5152,11 @@ function main_other_tools() {
         clear
         main_other_tools
         ;;
-    6)
+    7)
         clear
         main_casaos
         ;;
-    7)
+    8)
         clear
         bash <(curl -sSLf https://xy.ggbond.org/xy/xy_install.sh)
         ;;
@@ -4971,7 +5166,7 @@ function main_other_tools() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-7]'
+        ERROR '请输入正确数字 [0-8]'
         main_other_tools
         ;;
     esac
