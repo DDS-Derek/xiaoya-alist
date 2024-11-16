@@ -236,7 +236,7 @@ function check_aliyunpan_tvtoken() {
     token=$(head -n1 "${1}/myopentoken.txt")
     url=$(head -n1 "${1}/open_tv_token_url.txt")
     response=$(curl -s "${url}" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
-    refresh_token=$(echo "$response" | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+    refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
         echo "${refresh_token}" > "${1}/myopentoken.txt"
         INFO "有效 阿里云盘 TV Token"
@@ -255,7 +255,7 @@ function check_aliyunpan_refreshtoken() {
     header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.54 Safari/537.36"
     referer=https://www.aliyundrive.com/
     response=$(curl -s https://auth.aliyundrive.com/v2/account/token -X POST -H "User-Agent: $header" -H "Content-Type:application/json" -H "Referer: $referer" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
-    refresh_token=$(echo "$response" | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+    refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
         echo "${refresh_token}" > "${1}/mytoken.txt"
         INFO "有效 阿里云盘 Refresh Token"
@@ -273,7 +273,7 @@ function check_aliyunpan_opentoken() {
     token=$(head -n1 "${1}/myopentoken.txt")
     response=$(curl -s "https://api.xhofe.top/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
     code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
-    refresh_token=$(echo "$response" | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+    refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
         echo "${refresh_token}" > "${1}/myopentoken.txt"
         INFO "有效 阿里云盘 Open Token"
