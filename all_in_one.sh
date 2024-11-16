@@ -2000,7 +2000,10 @@ function download_unzip_xiaoya_emby_new_config() {
         if [ -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
             rm -f "${MEDIA_DIR}/EmbyServer.deps.json"
         fi
-        docker run --rm --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+        CURRENT_ULIMIT=$(ulimit -n)
+        ulimit -n 65535
+        docker run --rm --ulimit nofile=65535:65535 --entrypoint cp -v "${MEDIA_DIR}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+        ulimit -n "${CURRENT_ULIMIT}"
         if [ ! -f "${MEDIA_DIR}/EmbyServer.deps.json" ]; then
             ERROR "Emby 版本数据文件复制失败！"
             exit 1
