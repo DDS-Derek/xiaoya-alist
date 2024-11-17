@@ -255,7 +255,10 @@ function check_aliyunpan_tvtoken() {
         token=$(head -n1 "${data_dir}/myopentoken.txt")
     fi
     url=$(head -n1 "${data_dir}/open_tv_token_url.txt")
-    response=$(curl -s "${url}" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
+    if ! response=$(curl -s "${url}" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+        WARN "网络问题，无法检测 阿里云盘 TV Token 有效性"
+        return 0
+    fi
     refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
         echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
@@ -279,7 +282,10 @@ function check_aliyunpan_refreshtoken() {
     fi
     header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.54 Safari/537.36"
     referer=https://www.aliyundrive.com/
-    response=$(curl -s https://auth.aliyundrive.com/v2/account/token -X POST -H "User-Agent: $header" -H "Content-Type:application/json" -H "Referer: $referer" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
+    if ! response=$(curl -s https://auth.aliyundrive.com/v2/account/token -X POST -H "User-Agent: $header" -H "Content-Type:application/json" -H "Referer: $referer" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+        WARN "网络问题，无法检测 阿里云盘 Refresh Token 有效性"
+        return 0
+    fi
     refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
         echo "${refresh_token}" > "${data_dir}/mytoken.txt"
@@ -547,7 +553,7 @@ function qrcode_uc_cookie() {
 function enter_aliyunpan_refreshtoken() {
 
     while true; do
-        INFO "是否使用扫码自动 Token [Y/n]（默认 Y）"
+        INFO "是否使用扫码自动获取 阿里云盘 Token [Y/n]（默认 Y）"
         read -erp "Token:" choose_qrcode_aliyunpan_refreshtoken
         [[ -z "${choose_qrcode_aliyunpan_refreshtoken}" ]] && choose_qrcode_aliyunpan_refreshtoken="y"
         if [[ ${choose_qrcode_aliyunpan_refreshtoken} == [YyNn] ]]; then
@@ -559,11 +565,14 @@ function enter_aliyunpan_refreshtoken() {
     if [[ ${choose_qrcode_aliyunpan_refreshtoken} == [Yy] ]]; then
         qrcode_aliyunpan_refreshtoken "${1}"
     fi
-    while true; do
-        mytokenfilesize=$(cat "${1}"/mytoken.txt)
-        mytokenstringsize=${#mytokenfilesize}
-        if [ "$mytokenstringsize" -le 31 ] || ! check_aliyunpan_refreshtoken "${1}"; then
-            INFO "输入你的阿里云盘 Token（32位长）"
+    mytokenfilesize=$(cat "${1}"/mytoken.txt)
+    mytokenstringsize=${#mytokenfilesize}
+    if [ "$mytokenstringsize" -le 31 ] || ! check_aliyunpan_refreshtoken "${1}"; then
+        if [[ ${choose_qrcode_aliyunpan_refreshtoken} == [Yy] ]]; then
+            WARN "扫码获取 阿里云盘 Token 失败，请手动获取！"
+        fi
+        while true; do
+            INFO "输入你的 阿里云盘 Token（32位长）"
             read -erp "TOKEN:" token
             token_len=${#token}
             if [ "$token_len" -ne 32 ]; then
@@ -575,10 +584,8 @@ function enter_aliyunpan_refreshtoken() {
                     break
                 fi
             fi
-        else
-            break
-        fi
-    done
+        done
+    fi
 
 }
 
@@ -599,7 +606,7 @@ function settings_aliyunpan_refreshtoken() {
 function enter_aliyunpan_opentoken() {
 
     while true; do
-        INFO "是否使用扫码自动 Token [Y/n]（默认 Y）"
+        INFO "是否使用扫码自动获取 阿里云盘 Open Token [Y/n]（默认 Y）"
         read -erp "Token:" choose_qrcode_aliyunpan_opentoken
         [[ -z "${choose_qrcode_aliyunpan_opentoken}" ]] && choose_qrcode_aliyunpan_opentoken="y"
         if [[ ${choose_qrcode_aliyunpan_opentoken} == [YyNn] ]]; then
@@ -611,11 +618,14 @@ function enter_aliyunpan_opentoken() {
     if [[ ${choose_qrcode_aliyunpan_opentoken} == [Yy] ]]; then
         qrcode_aliyunpan_opentoken "${1}"
     fi
-    while true; do
-        myopentokenfilesize=$(cat "${1}"/myopentoken.txt)
-        myopentokenstringsize=${#myopentokenfilesize}
-        if [ "$myopentokenstringsize" -le 279 ] || ! check_aliyunpan_opentoken "${1}"; then
-            INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
+    myopentokenfilesize=$(cat "${1}"/myopentoken.txt)
+    myopentokenstringsize=${#myopentokenfilesize}
+    if [ "$myopentokenstringsize" -le 279 ] || ! check_aliyunpan_opentoken "${1}"; then
+        if [[ ${choose_qrcode_aliyunpan_opentoken} == [Yy] ]]; then
+            WARN "扫码获取 阿里云盘 Open Token 失败，请手动获取！"
+        fi
+        while true; do
+            INFO "输入你的 阿里云盘 Open Token（280位长或者335位长）"
             read -erp "OPENTOKEN:" opentoken
             opentoken_len=${#opentoken}
             if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
@@ -627,10 +637,8 @@ function enter_aliyunpan_opentoken() {
                     break
                 fi
             fi
-        else
-            break
-        fi
-    done
+        done
+    fi
 
 }
 
@@ -656,7 +664,7 @@ function enter_115_cookie() {
 
     touch ${1}/115_cookie.txt
     while true; do
-        INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+        INFO "是否使用扫码自动获取 115 Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_115_cookie
         [[ -z "${choose_qrcode_115_cookie}" ]] && choose_qrcode_115_cookie="y"
         if [[ ${choose_qrcode_115_cookie} == [YyNn] ]]; then
@@ -669,7 +677,9 @@ function enter_115_cookie() {
         qrcode_115_cookie "${1}"
     fi
     if ! check_115_cookie "${1}"; then
-        WARN "扫码获取115 Cookie 失败，请手动获取！"
+        if [[ ${choose_qrcode_115_cookie} == [Yy] ]]; then
+            WARN "扫码获取 115 Cookie 失败，请手动获取！"
+        fi
         while true; do
             INFO "输入你的 115 Cookie"
             read -erp "Cookie:" set_115_cookie
@@ -710,7 +720,7 @@ function enter_quark_cookie() {
 
     touch ${1}/quark_cookie.txt
     while true; do
-        INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+        INFO "是否使用扫码自动获取 夸克 Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_quark_cookie
         [[ -z "${choose_qrcode_quark_cookie}" ]] && choose_qrcode_quark_cookie="y"
         if [[ ${choose_qrcode_quark_cookie} == [YyNn] ]]; then
@@ -723,6 +733,9 @@ function enter_quark_cookie() {
         qrcode_quark_cookie "${1}"
     fi
     if ! check_quark_cookie "${1}"; then
+        if [[ ${choose_qrcode_quark_cookie} == [Yy] ]]; then
+            WARN "扫码获取 夸克 Cookie 失败，请手动获取！"
+        fi
         while true; do
             INFO "输入你的 夸克 Cookie"
             read -erp "Cookie:" quark_cookie
@@ -763,7 +776,7 @@ function enter_uc_cookie() {
 
     touch ${1}/uc_cookie.txt
     while true; do
-        INFO "是否使用扫码自动 Cookie [Y/n]（默认 Y）"
+        INFO "是否使用扫码自动获取 UC Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_uc_cookie
         [[ -z "${choose_qrcode_uc_cookie}" ]] && choose_qrcode_uc_cookie="y"
         if [[ ${choose_qrcode_uc_cookie} == [YyNn] ]]; then
@@ -776,6 +789,9 @@ function enter_uc_cookie() {
         qrcode_uc_cookie "${1}"
     fi
     if ! check_uc_cookie "${1}"; then
+        if [[ ${choose_qrcode_uc_cookie} == [Yy] ]]; then
+            WARN "扫码获取 UC Cookie 失败，请手动获取！"
+        fi
         while true; do
             INFO "输入你的 UC Cookie"
             read -erp "Cookie:" uc_cookie
