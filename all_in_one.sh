@@ -4137,19 +4137,26 @@ function main_xiaoyahelper() {
 
 function install_xiaoya_alist_tvbox() {
 
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
-        INFO "已读取小雅Alist-TVBox配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
-    else
-        INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-        read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
-        touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
-        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
-    fi
+    while true; do
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
+            INFO "已读取小雅Alist-TVBox配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+            read -erp "CONFIG_DIR:" CONFIG_DIR
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        else
+            INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+            read -erp "CONFIG_DIR:" CONFIG_DIR
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+            touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
+        fi
+        if check_path "${CONFIG_DIR}"; then
+            echo "${CONFIG_DIR}" > "${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt"
+            INFO "目录合法性检测通过！"
+            break
+        else
+            ERROR "非合法目录，请重新输入！"
+        fi
+    done
 
     while true; do
         INFO "请输入Alist端口（默认 5344 ）"
