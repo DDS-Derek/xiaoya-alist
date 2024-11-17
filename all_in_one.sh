@@ -81,7 +81,7 @@ function root_need() {
 function get_default_network() {
 
     _default_network=$(cat "${DDSREM_CONFIG_DIR}/default_network.txt")
-    
+
     if [ "${_default_network}" == "host" ]; then
         echo '--net=host'
     else
