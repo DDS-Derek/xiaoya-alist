@@ -100,6 +100,31 @@ function get_default_network() {
 
 }
 
+function check_path() {
+
+    if [ -z "${1}" ]; then
+        return 1
+    fi
+
+    # 目录不能为‘/’
+    if [ "${1}" == "/" ]; then
+        return 1
+    fi
+
+    # 目录结尾不能有空格
+    if [ "${1: -1}" == " " ]; then
+        return 1
+    fi
+
+    # 目录必须以`/`开头，不能包含`//`或`./`或`..`
+    if [[ "${1}" =~ ^/ && ! "${1}" =~ // && ! "${1}" =~ (\./|\.\.) ]]; then
+        return 0
+    else
+        return 1
+    fi
+
+}
+
 function wait_emby_start() {
 
     start_time=$(date +%s)
@@ -948,26 +973,32 @@ function get_config_dir() {
         xiaoya_config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
     fi
 
-    if [ -n "${xiaoya_config_dir}" ]; then
-        xiaoya_config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-        INFO "小雅配置目录通过小雅容器获取"
-        INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${xiaoya_config_dir}
-        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
-    elif [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
-        OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-        INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
-        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
-    else
-        INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
-        read -erp "CONFIG_DIR:" CONFIG_DIR
-        [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
-        touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
-        echo "${CONFIG_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt
-    fi
+    while true; do
+        if [ -n "${xiaoya_config_dir}" ]; then
+            xiaoya_config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            INFO "小雅配置目录通过小雅容器获取"
+            INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
+            read -erp "CONFIG_DIR:" CONFIG_DIR
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${xiaoya_config_dir}
+        elif [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
+            OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
+            INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+            read -erp "CONFIG_DIR:" CONFIG_DIR
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
+        else
+            INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+            read -erp "CONFIG_DIR:" CONFIG_DIR
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+            touch "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt"
+        fi
+        if check_path "${CONFIG_DIR}"; then
+            echo "${CONFIG_DIR}" > "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt"
+            INFO "目录合法性检测通过！"
+            break
+        else
+            ERROR "非合法目录，请重新输入！"
+        fi
+    done
     if [ -d "${CONFIG_DIR}" ]; then
         INFO "读取配置目录中..."
         # 将所有小雅配置文件修正成 linux 格式
@@ -995,19 +1026,26 @@ function get_media_dir() {
         fi
     fi
 
-    if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
-        OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
-        INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
-        read -erp "MEDIA_DIR:" MEDIA_DIR
-        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
-        echo "${MEDIA_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
-    else
-        INFO "请输入媒体库目录（默认 /opt/media ）"
-        read -erp "MEDIA_DIR:" MEDIA_DIR
-        [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
-        touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
-        echo "${MEDIA_DIR}" > ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt
-    fi
+    while true; do
+        if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt ]; then
+            OLD_MEDIA_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt)
+            INFO "已读取媒体库目录：${OLD_MEDIA_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+            read -erp "MEDIA_DIR:" MEDIA_DIR
+            [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
+        else
+            INFO "请输入媒体库目录（默认 /opt/media ）"
+            read -erp "MEDIA_DIR:" MEDIA_DIR
+            [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
+            touch "${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt"
+        fi
+        if check_path "${CONFIG_DIR}"; then
+            echo "${MEDIA_DIR}" > "${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt"
+            INFO "目录合法性检测通过！"
+            break
+        else
+            ERROR "非合法目录，请重新输入！"
+        fi
+    done
 
 }
 
