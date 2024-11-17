@@ -78,6 +78,28 @@ function root_need() {
     fi
 }
 
+function get_default_network() {
+
+    _default_network=$(cat "${DDSREM_CONFIG_DIR}/default_network.txt")
+    
+    if [ "${_default_network}" == "host" ]; then
+        echo '--net=host'
+    else
+        case "${1}" in
+        qrcode)
+            echo '-p 34256:34256'
+            ;;
+        xiaoya-proxy)
+            echo '-p 9988:9988'
+            ;;
+        xiaoya-aliyuntvtoken_connector)
+            echo '-p 34278:34278'
+            ;;
+        esac
+    fi
+
+}
+
 function wait_emby_start() {
 
     start_time=$(date +%s)
@@ -319,10 +341,11 @@ function qrcode_aliyunpan_tvtoken() {
             local_ip="小雅服务器IP"
         fi
         INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             /aliyuntvtoken/alitoken2.py
         INFO "操作全部完成！"
@@ -362,10 +385,11 @@ function qrcode_aliyunpan_refreshtoken() {
             local_ip="小雅服务器IP"
         fi
         INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             "/aliyuntoken/${command_file}"
         INFO "操作全部完成！"
@@ -402,10 +426,11 @@ function qrcode_aliyunpan_opentoken() {
             local_ip="小雅服务器IP"
         fi
         INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             "/aliyunopentoken/${command_file}"
         INFO "操作全部完成！"
@@ -435,10 +460,11 @@ function qrcode_115_cookie() {
             local_ip="小雅服务器IP"
         fi
         INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             /115cookie/115cookie.py
         INFO "操作全部完成！"
@@ -468,10 +494,11 @@ function qrcode_quark_cookie() {
             local_ip="小雅服务器IP"
         fi
         INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用夸克APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             /quark_cookie/quark_cookie.py
         INFO "操作全部完成！"
@@ -501,10 +528,11 @@ function qrcode_uc_cookie() {
             local_ip="小雅服务器IP"
         fi
         INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用UC浏览器APP扫描二维码！"
+        # shellcheck disable=SC2046
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --net=host \
+            $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             /uc_cookie/uc_cookie.py
         INFO "操作全部完成！"
@@ -4489,10 +4517,11 @@ function install_xiaoya_proxy() {
         exit 1
     fi
     docker_pull "ddsderek/xiaoya-proxy:latest"
+    # shellcheck disable=SC2046
     docker run -d \
         --name=xiaoya-proxy \
         --restart=always \
-        --net=host \
+        $(get_default_network "xiaoya-proxy") \
         ${extra_parameters} \
         -e TZ=Asia/Shanghai \
         ddsderek/xiaoya-proxy:latest
@@ -4614,8 +4643,9 @@ function install_xiaoya_aliyuntvtoken_connector() {
 
     docker_pull "ddsderek/xiaoya-glue:aliyuntvtoken_connector"
 
+    # shellcheck disable=SC2046
     docker run -d \
-        --net=host \
+        $(get_default_network "xiaoya-aliyuntvtoken_connector") \
         --name=xiaoya-aliyuntvtoken_connector \
         --restart=always \
         ddsderek/xiaoya-glue:aliyuntvtoken_connector
@@ -5054,6 +5084,8 @@ function main_advanced_configuration() {
         _xiaoya_connectivity_detection="${Red}错误${Font}"
     fi
 
+    _default_network=$(cat "${DDSREM_CONFIG_DIR}/default_network.txt")
+
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
     echo -e "${Blue}高级配置${Font}\n"
     echo -e "1、容器名称设置"
@@ -5062,9 +5094,10 @@ function main_advanced_configuration() {
     echo -e "4、开启/关闭 磁盘容量检测                     当前状态：${_disk_capacity_detection}"
     echo -e "5、开启/关闭 小雅连通性检测                   当前状态：${_xiaoya_connectivity_detection}"
     echo -e "6、Docker镜像源选择"
+    echo -e "7、非可选网络模式容器默认网络模式             当前状态：${Blue}${_default_network}${Font}"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-6]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         clear
@@ -5110,13 +5143,24 @@ function main_advanced_configuration() {
         clear
         choose_image_mirror "main_advanced_configuration"
         ;;
+    7)
+        if [ "${_default_network}" == "host" ]; then
+            echo 'bridge' > ${DDSREM_CONFIG_DIR}/default_network.txt
+        elif [ "${_default_network}" == "bridge" ]; then
+            echo 'host' > ${DDSREM_CONFIG_DIR}/default_network.txt
+        else
+            echo 'host' > ${DDSREM_CONFIG_DIR}/default_network.txt
+        fi
+        clear
+        main_advanced_configuration
+        ;;
     0)
         clear
         main_return
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-6]'
+        ERROR '请输入正确数字 [0-7]'
         main_advanced_configuration
         ;;
     esac
@@ -5329,6 +5373,10 @@ function first_init() {
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt ]; then
         echo 'true' > ${DDSREM_CONFIG_DIR}/xiaoya_connectivity_detection.txt
+    fi
+
+    if [ ! -f "${DDSREM_CONFIG_DIR}/default_network.txt" ]; then
+        echo 'host' > "${DDSREM_CONFIG_DIR}/default_network.txt"
     fi
 
     INFO "设置 Docker 镜像源中..."
