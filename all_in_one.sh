@@ -225,13 +225,18 @@ function check_115_cookie() {
 
 function check_aliyunpan_tvtoken() {
 
-    local token url response refresh_token
-    token=$(head -n1 "${1}/myopentoken.txt")
-    url=$(head -n1 "${1}/open_tv_token_url.txt")
+    local token url response refresh_token data_dir
+    data_dir="${1}"
+    if [ -n "${2}" ]; then
+        token="${2}"
+    else
+        token=$(head -n1 "${data_dir}/myopentoken.txt")
+    fi
+    url=$(head -n1 "${data_dir}/open_tv_token_url.txt")
     response=$(curl -s "${url}" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
     refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
-        echo "${refresh_token}" > "${1}/myopentoken.txt"
+        echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
         INFO "有效 阿里云盘 TV Token"
         return 0
     else
@@ -243,14 +248,19 @@ function check_aliyunpan_tvtoken() {
 
 function check_aliyunpan_refreshtoken() {
 
-    local token header referer response refresh_token
-    token=$(head -n1 "${1}/mytoken.txt")
+    local token header referer response refresh_token data_dir
+    data_dir="${1}"
+    if [ -n "${2}" ]; then
+        token="${2}"
+    else
+        token=$(head -n1 "${data_dir}/mytoken.txt")
+    fi
     header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.54 Safari/537.36"
     referer=https://www.aliyundrive.com/
     response=$(curl -s https://auth.aliyundrive.com/v2/account/token -X POST -H "User-Agent: $header" -H "Content-Type:application/json" -H "Referer: $referer" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
     refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
-        echo "${refresh_token}" > "${1}/mytoken.txt"
+        echo "${refresh_token}" > "${data_dir}/mytoken.txt"
         INFO "有效 阿里云盘 Refresh Token"
         return 0
     else
@@ -262,13 +272,23 @@ function check_aliyunpan_refreshtoken() {
 
 function check_aliyunpan_opentoken() {
 
-    local token code response refresh_token
-    token=$(head -n1 "${1}/myopentoken.txt")
-    response=$(curl -s "https://api.xhofe.top/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}')
+    local token code response refresh_token data_dir
+    data_dir="${1}"
+    if [ -n "${2}" ]; then
+        token="${2}"
+    else
+        token=$(head -n1 "${data_dir}/myopentoken.txt")
+    fi
+    if ! response=$(curl -s "https://api.xhofe.top/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+        if ! response=$(curl -s "https://api-cf.nn.ci/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+            WARN "网络问题，无法检测 阿里云盘 Open Token 有效性"
+            return 0
+        fi
+    fi
     code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
     refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
     if [ -n "${refresh_token}" ]; then
-        echo "${refresh_token}" > "${1}/myopentoken.txt"
+        echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
         INFO "有效 阿里云盘 Open Token"
         return 0
     elif [ "${code}" == "Too Many Requests" ]; then
@@ -518,12 +538,14 @@ function enter_aliyunpan_refreshtoken() {
             INFO "输入你的阿里云盘 Token（32位长）"
             read -erp "TOKEN:" token
             token_len=${#token}
-            if [ "$token_len" -ne 32 ] || ! check_aliyunpan_refreshtoken "${1}"; then
+            if [ "$token_len" -ne 32 ]; then
                 ERROR "长度不对,阿里云盘 Token是32位长"
                 ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             else
                 echo "$token" > "${1}"/mytoken.txt
-                break
+                if check_aliyunpan_refreshtoken "${1}"; then
+                    break
+                fi
             fi
         else
             break
@@ -568,12 +590,14 @@ function enter_aliyunpan_opentoken() {
             INFO "输入你的阿里云盘 Open Token（280位长或者335位长）"
             read -erp "OPENTOKEN:" opentoken
             opentoken_len=${#opentoken}
-            if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]] || ! check_aliyunpan_opentoken "${1}"; then
+            if [[ "$opentoken_len" -ne 280 ]] && [[ "$opentoken_len" -ne 335 ]]; then
                 ERROR "长度不对,阿里云盘 Open Token是280位长或者335位"
-                ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+                ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
             else
                 echo "$opentoken" > "${1}"/myopentoken.txt
-                break
+                if check_aliyunpan_opentoken "${1}"; then
+                    break
+                fi
             fi
         else
             break
