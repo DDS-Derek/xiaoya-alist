@@ -1038,7 +1038,7 @@ function get_media_dir() {
             [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
             touch "${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt"
         fi
-        if check_path "${CONFIG_DIR}"; then
+        if check_path "${MEDIA_DIR}"; then
             echo "${MEDIA_DIR}" > "${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt"
             INFO "目录合法性检测通过！"
             break
