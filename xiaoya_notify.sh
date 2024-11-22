@@ -799,7 +799,49 @@ EOF
         DDSREM_CONFIG_DIR=/etc/DDSRem
     elif [ -f /etc/unraid-version ]; then
         OSNAME='unraid'
-        DDSREM_CONFIG_DIR=/etc/DDSRem
+        DDSREM_CONFIG_DIR=/mnt/user/appdata/DDSRem
+        # 目录迁移
+        if [ ! -d "${DDSREM_CONFIG_DIR}" ]; then
+            mkdir -p "${DDSREM_CONFIG_DIR}"
+        fi
+        local FILES_LIST PATHS_LIST
+        FILES_LIST=(
+            "xiaoya_alist_tvbox_config_dir.txt"
+            "xiaoya_alist_media_dir.txt"
+            "xiaoya_alist_config_dir.txt"
+            "resilio_config_dir.txt"
+            "portainer_config_dir.txt"
+            "onelist_config_dir.txt"
+            "container_run_extra_parameters.txt"
+            "auto_symlink_config_dir.txt"
+            "data_downloader.txt"
+            "disk_capacity_detection.txt"
+            "xiaoya_connectivity_detection.txt"
+            "image_mirror.txt"
+            "image_mirror_user.txt"
+            "default_network.txt"
+        )
+        PATHS_LIST=(
+            "container_name"
+            "data_crep"
+        )
+        for __file in "${FILES_LIST[@]}"; do
+            if [ -f "/etc/DDSRem/${__file}" ]; then
+                INFO "迁移文件 ${__file} 中..."
+                mv "/etc/DDSRem/${__file}" "${DDSREM_CONFIG_DIR}/${__file}"
+            fi
+        done
+        for __path in "${PATHS_LIST[@]}"; do
+            if [ -d "/etc/DDSRem/${__path}" ]; then
+                INFO "迁移文件夹 ${__path} 中..."
+                if [ -d "${DDSREM_CONFIG_DIR}/${__path}" ]; then
+                    # 默认保留 /etc/DDSRem 的配置项
+                    # shellcheck disable=SC2115
+                    rm -rf "${DDSREM_CONFIG_DIR}/${__path}"
+                fi
+                mv "/etc/DDSRem/${__path}" "${DDSREM_CONFIG_DIR}/${__path}"
+            fi
+        done
     elif grep -Eqi "LibreELEC" /etc/issue || grep -Eqi "LibreELEC" /etc/*-release; then
         OSNAME='libreelec'
         DDSREM_CONFIG_DIR=/storage/DDSRem
