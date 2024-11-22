@@ -5093,6 +5093,7 @@ function reset_script_configuration() {
             "xiaoya_connectivity_detection.txt"
             "image_mirror.txt"
             "image_mirror_user.txt"
+            "default_network.txt"
         )
         for file in "${FILES_TO_REMOVE[@]}"; do
             rm -f ${DDSREM_CONFIG_DIR}/$file
