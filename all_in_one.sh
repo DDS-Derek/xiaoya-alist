@@ -5459,6 +5459,10 @@ function first_init() {
         rm -rf ${DDSREM_CONFIG_DIR}/xiaoya_emby_api.txt
     fi
 
+    if [ ! -f "${DDSREM_CONFIG_DIR}/勿删_小雅周边脚本配置目录" ]; then
+        touch "${DDSREM_CONFIG_DIR}/勿删_小雅周边脚本配置目录"
+    fi
+
     if [ -f /tmp/xiaoya_alist ]; then
         rm -rf /tmp/xiaoya_alist
     fi
