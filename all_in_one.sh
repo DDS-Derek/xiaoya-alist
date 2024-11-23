@@ -1674,6 +1674,63 @@ function pull_run_glue() {
 
 }
 
+function pull_run_glue_xh() {
+
+    BUILDER_NAME="xiaoya_builder_$(date +%S%N | cut -c 7-11)"
+
+    if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
+        local_sha=$(docker inspect --format='{{index .RepoDigests 0}}' xiaoyaliu/glue:latest 2> /dev/null | cut -f2 -d:)
+        remote_sha=$(curl -s -m 10 "https://hub.docker.com/v2/repositories/xiaoyaliu/glue/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
+        if [ "$local_sha" != "$remote_sha" ]; then
+            docker rmi xiaoyaliu/glue:latest
+            docker_pull "xiaoyaliu/glue:latest"
+        fi
+    else
+        docker_pull "xiaoyaliu/glue:latest"
+    fi
+
+    if [ -n "${extra_parameters}" ]; then
+        docker run -itd \
+            --security-opt seccomp=unconfined \
+            --name=${BUILDER_NAME} \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            ${extra_parameters} \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}" > /dev/null 2>&1
+    else
+        docker run -itd \
+            --security-opt seccomp=unconfined \
+            --name=${BUILDER_NAME} \
+            --net=host \
+            -v "${MEDIA_DIR}:/media" \
+            -v "${CONFIG_DIR}:/etc/xiaoya" \
+            -e LANG=C.UTF-8 \
+            xiaoyaliu/glue:latest \
+            "${@}" > /dev/null 2>&1
+    fi
+
+    timeout=20
+    start_time=$(date +%s)
+    end_time=$((start_time + timeout))
+    while [ "$(date +%s)" -lt $end_time ]; do
+        status=$(docker inspect -f '{{.State.Status}}' "${BUILDER_NAME}")
+        if [ "$status" = "exited" ]; then
+            break
+        fi
+        sleep 1
+    done
+
+    status=$(docker inspect -f '{{.State.Status}}' "${BUILDER_NAME}")
+    if [ "$status" != "exited" ]; then
+        docker kill ${BUILDER_NAME} > /dev/null 2>&1
+    fi
+    docker rm ${BUILDER_NAME} > /dev/null 2>&1
+
+}
+
 function set_emby_server_infuse_api_key() {
 
     get_docker0_url
@@ -2230,6 +2287,35 @@ function download_unzip_xiaoya_emby_new_config() {
 
     }
 
+    function compare_metadata_size() {
+
+        local REMOTE_METADATA_SIZE LOCAL_METADATA_SIZE
+
+        pull_run_glue_xh xh --headers --follow --timeout=10 -o /media/headers.log "${xiaoya_addr}/d/元数据/${1}"
+        REMOTE_METADATA_SIZE=$(cat ${MEDIA_DIR}/headers.log | grep 'Content-Length' | awk '{print $2}')
+        rm -f ${MEDIA_DIR}/headers.log
+
+        if [ -f "${MEDIA_DIR}/temp/${1}" ] && [ ! -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+            LOCAL_METADATA_SIZE=$(du -b "${MEDIA_DIR}/temp/${1}" | awk '{print $1}')
+        else
+            LOCAL_METADATA_SIZE=0
+        fi
+
+        INFO "${1} REMOTE_METADATA_SIZE: ${REMOTE_METADATA_SIZE}"
+        INFO "${1} LOCAL_METADATA_SIZE: ${LOCAL_METADATA_SIZE}"
+
+        if
+            [ "${REMOTE_METADATA_SIZE}" != "${LOCAL_METADATA_SIZE}" ] &&
+                [ -n "${REMOTE_METADATA_SIZE}" ] &&
+                awk -v remote="${REMOTE_METADATA_SIZE}" -v threshold="2147483648" 'BEGIN { if (remote > threshold) print "1"; else print "0"; }' | grep -q "1"
+        then
+            return 1
+        else
+            return 0
+        fi
+
+    }
+
     get_config_dir
 
     get_media_dir
@@ -2303,10 +2389,18 @@ function download_unzip_xiaoya_emby_new_config() {
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
         rm -rf "${MEDIA_DIR}/temp/config.new.mp4.aria2"
+        if [ -f "${MEDIA_DIR}/temp/config.new.mp4" ]; then
+            INFO "清理不完整 config.new.mp4 中..."
+            rm -rf "${MEDIA_DIR}/temp/config.new.mp4"
+        fi
     fi
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4" ]; then
-        INFO "清理旧 config.new.mp4 中..."
-        rm -rf "${MEDIA_DIR}/temp/config.new.mp4"
+        if compare_metadata_size "config.new.mp4"; then
+            INFO "当前 config.new.mp4 已是最新，无需重新下载！"
+        else
+            INFO "清理旧 config.new.mp4 中..."
+            rm -rf "${MEDIA_DIR}/temp/config.new.mp4"
+        fi
     fi
 
     INFO "开始下载解压..."
