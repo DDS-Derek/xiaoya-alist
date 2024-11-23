@@ -1700,7 +1700,11 @@ function unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}"/xiaoya
     mkdir -p "${MEDIA_DIR}"/config
     chmod 755 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown root "${MEDIA_DIR}"
+    else
+        chown root:root "${MEDIA_DIR}"
+    fi
 
     INFO "开始解压..."
 
@@ -1728,7 +1732,11 @@ function unzip_xiaoya_emby() {
     INFO "磁盘容量：${free_size_G}G"
 
     chmod 777 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown root "${MEDIA_DIR}"
+    else
+        chown root:root "${MEDIA_DIR}"
+    fi
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ..."
 
@@ -1743,9 +1751,12 @@ function unzip_xiaoya_emby() {
         extra_parameters="--workdir=/media"
 
         if [ -d "${MEDIA_DIR}/config" ]; then
+            INFO "清理旧配置文件中..."
+            INFO "这可能需要一定时间，请耐心等待！"
             rm -rf ${MEDIA_DIR}/config
         fi
         mkdir -p "${MEDIA_DIR}"/config
+        chmod -R 777 "${MEDIA_DIR}"/config
 
         config_size=$(du -k ${MEDIA_DIR}/temp/config.mp4 | cut -f1)
         if [[ "$config_size" -le 3200000 ]]; then
@@ -1757,7 +1768,8 @@ function unzip_xiaoya_emby() {
         fi
 
         INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/config
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"/config
     elif [ "${1}" == "all.mp4" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
@@ -1897,7 +1909,11 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
     INFO "磁盘容量：${free_size_G}G"
 
     chmod 777 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown root "${MEDIA_DIR}"
+    else
+        chown root:root "${MEDIA_DIR}"
+    fi
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
 
@@ -1962,7 +1978,11 @@ function download_xiaoya_emby() {
     test_xiaoya_status
 
     mkdir -p "${MEDIA_DIR}"/temp
-    chown 0:0 "${MEDIA_DIR}"/temp
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown 0 "${MEDIA_DIR}"/temp
+    else
+        chown 0:0 "${MEDIA_DIR}"/temp
+    fi
     chmod 777 "${MEDIA_DIR}"/temp
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
     free_size=$((free_size))
@@ -1996,7 +2016,11 @@ function download_xiaoya_emby() {
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown 0 "${MEDIA_DIR}"/temp/"${1}"
+    else
+        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+    fi
 
     INFO "下载完成！"
 
@@ -2011,7 +2035,11 @@ function download_wget_xiaoya_emby() {
     test_xiaoya_status
 
     mkdir -p "${MEDIA_DIR}"/temp
-    chown 0:0 "${MEDIA_DIR}"/temp
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown 0 "${MEDIA_DIR}"/temp
+    else
+        chown 0:0 "${MEDIA_DIR}"/temp
+    fi
     chmod 777 "${MEDIA_DIR}"/temp
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
     free_size=$((free_size))
@@ -2038,7 +2066,11 @@ function download_wget_xiaoya_emby() {
 
     INFO "设置目录权限..."
     chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown 0 "${MEDIA_DIR}"/temp/"${1}"
+    else
+        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+    fi
 
     INFO "下载完成！"
 
@@ -2060,7 +2092,11 @@ function download_unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     chmod 755 "${MEDIA_DIR}"
-    chown root:root "${MEDIA_DIR}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown root "${MEDIA_DIR}"
+    else
+        chown root:root "${MEDIA_DIR}"
+    fi
 
     INFO "开始下载解压..."
 
@@ -2092,7 +2128,11 @@ function download_wget_unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     mkdir -p "${MEDIA_DIR}/temp"
-    chown 0:0 "${MEDIA_DIR}"
+    if [[ "${OSNAME}" = "macos" ]]; then
+        chown 0 "${MEDIA_DIR}"
+    else
+        chown 0:0 "${MEDIA_DIR}"
+    fi
     chmod 777 "${MEDIA_DIR}"
 
     local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
@@ -2252,9 +2292,12 @@ function download_unzip_xiaoya_emby_new_config() {
 
     test_xiaoya_status
 
+    INFO "清理旧配置文件中..."
+    INFO "这可能需要一定时间，请耐心等待！"
     rm -rf "${MEDIA_DIR}/config"
 
     mkdir -p "${MEDIA_DIR}/config"
+    chmod -R 777 "${MEDIA_DIR}"/config
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
         rm -rf "${MEDIA_DIR}/temp/config.new.mp4.aria2"
