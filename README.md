@@ -248,6 +248,8 @@ Docker镜像源选择 -> 9 6
 - [`strm`文件生成](https://xiaoyaliu.notion.site/strm-2c8d136ceb37445fb6c0222eafb966ce): 小雅官方提供的一键生成`strm`文件脚本
 - [monlor/docker-xiaoya](https://github.com/monlor/docker-xiaoya): Docker Compose 方式一键部署小雅全家桶
 - [907739769/xiaoya-sync](https://github.com/907739769/xiaoya-sync): Java 编写的小雅元数据爬虫
+- [sjtuross/StrmAssistant](https://github.com/sjtuross/StrmAssistant): Strm Assistant for Emby
+- [suixing8/xiaoya-alist-search](https://github.com/suixing8/xiaoya-alist-search): 不安装Emby的情况下，在iOS Fileball上使用全局搜索和直接观看
 - [AI老G 脚本推荐](https://b23.tv/3Zo0IvD)
   - 小雅全家桶安装脚本（支持AI老G版小雅Alist安装，Jellyfin安装，快速Emby安装）:
     ```shell
