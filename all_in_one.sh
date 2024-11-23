@@ -1240,16 +1240,18 @@ function install_xiaoya_alist() {
     folderidfilesize=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
     folderidstringsize=${#folderidfilesize}
     if [ "$folderidstringsize" -le 39 ]; then
-        INFO "输入你的阿里云盘转存目录folder id"
-        read -erp "FOLDERID:" folderid
-        folder_id_len=${#folderid}
-        if [ "$folder_id_len" -ne 40 ]; then
-            ERROR "长度不对,阿里云盘 folder id是40位长"
-            ERROR "安装停止，请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-            exit 1
-        else
-            echo "$folderid" > "${CONFIG_DIR}"/temp_transfer_folder_id.txt
-        fi
+        while true; do
+            INFO "输入你的阿里云盘转存目录 folder id"
+            read -erp "FOLDERID:" folderid
+            folder_id_len=${#folderid}
+            if [ "$folder_id_len" -ne 40 ]; then
+                ERROR "长度不对，阿里云盘 folder id 是40位长"
+                ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+            else
+                echo "$folderid" > "${CONFIG_DIR}"/temp_transfer_folder_id.txt
+                break
+            fi
+        done
     fi
 
     settings_pikpak_account "${CONFIG_DIR}"
