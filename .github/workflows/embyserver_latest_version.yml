@@ -17,18 +17,32 @@ jobs:
         uses: actions/checkout@v4
 
       -
-        name: Get Version Amilys
+        name: Get Latest Version Amilys
         run: |
             docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:latest /system/EmbyServer.deps.json /data
             LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
             sed -i "1,40s|amilys_embyserver_latest_version=.*|amilys_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
 
       -
-        name: Get Version Emby
+        name: Get Latest Version Emby
         run: |
             docker run --entrypoint cp -v ${PWD}/emby:/data emby/embyserver:latest /system/EmbyServer.deps.json /data
             LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
             sed -i "1,40s|emby_embyserver_latest_version=.*|emby_embyserver_latest_version=${LATEST_VERSION}|" all_in_one.sh
+
+      -
+        name: Get Beta Version Amilys
+        run: |
+            docker run --entrypoint cp -v ${PWD}/emby:/data amilys/embyserver:beta /system/EmbyServer.deps.json /data
+            LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+            sed -i "1,40s|amilys_embyserver_beta_version=.*|amilys_embyserver_beta_version=${LATEST_VERSION}|" all_in_one.sh
+
+      -
+        name: Get Beta Version Emby
+        run: |
+            docker run --entrypoint cp -v ${PWD}/emby:/data emby/embyserver:beta /system/EmbyServer.deps.json /data
+            LATEST_VERSION=$(grep "EmbyServer" emby/EmbyServer.deps.json | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+            sed -i "1,40s|emby_embyserver_beta_version=.*|emby_embyserver_beta_version=${LATEST_VERSION}|" all_in_one.sh
 
       - 
         uses: stefanzweifel/git-auto-commit-action@v5
