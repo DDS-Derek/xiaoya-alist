@@ -125,6 +125,51 @@ function check_path() {
 
 }
 
+function get_path() {
+
+    case "${OSNAME}" in
+    synology)
+        path_lib=/volume1/docker
+        ;;
+    unraid)
+        path_lib=/mnt/user/appdata
+        ;;
+    fnos)
+        if [ -d "/vol1/1000" ]; then
+            path_lib=/vol1/1000
+        fi
+        ;;
+    *)
+        if auto_path="$(df -h | awk '$2 ~ /G/ && $2+0 > 200 {print $6}' | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | head -n 1)" > /dev/null 2>&1; then
+            if check_path "${auto_path}"; then
+                path_lib="${auto_path}"
+            fi
+        fi
+        ;;
+    esac
+
+    if [ -z "${path_lib}" ]; then
+        case "${1}" in
+        xiaoya_alist_config_dir)
+            echo '/etc/xiaoya'
+            ;;
+        xiaoya_alist_media_dir)
+            echo '/opt/media'
+            ;;
+        esac
+    else
+        case "${1}" in
+        xiaoya_alist_config_dir)
+            echo "${path_lib}/xiaoya"
+            ;;
+        xiaoya_alist_media_dir)
+            echo "${path_lib}/xiaoya_emby"
+            ;;
+        esac
+    fi
+
+}
+
 function wait_emby_start() {
 
     start_time=$(date +%s)
@@ -969,14 +1014,25 @@ function settings_ali2115() {
 
 function get_config_dir() {
 
+    local xiaoya_config_dir DEFAULT_CONFIG_DIR
+
     if docker container inspect "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" > /dev/null 2>&1; then
         xiaoya_config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
     fi
 
     while true; do
         if [ -n "${xiaoya_config_dir}" ]; then
+            if [ ! -f "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt" ] || [ -z "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" ]; then
+                echo "${xiaoya_config_dir}" > "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt"
+            fi
+            if [ "${xiaoya_config_dir}" == "$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)" ]; then
+                INFO "小雅容器挂载目录与当前保存的小雅配置目录路径一致"
+                INFO "小雅配置目录通过小雅容器获取"
+            else
+                WARN "小雅容器挂载目录与当前保存的小雅配置目录路径不一致"
+                WARN "默认使用当前保存的小雅配置目录路径"
+            fi
             xiaoya_config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-            INFO "小雅配置目录通过小雅容器获取"
             INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
             read -erp "CONFIG_DIR:" CONFIG_DIR
             [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${xiaoya_config_dir}
@@ -986,9 +1042,10 @@ function get_config_dir() {
             read -erp "CONFIG_DIR:" CONFIG_DIR
             [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         else
-            INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+            DEFAULT_CONFIG_DIR="$(get_path "xiaoya_alist_config_dir")"
+            INFO "请输入配置文件目录（默认 ${DEFAULT_CONFIG_DIR} ）"
             read -erp "CONFIG_DIR:" CONFIG_DIR
-            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="${DEFAULT_CONFIG_DIR}"
             touch "${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt"
         fi
         if check_path "${CONFIG_DIR}"; then
@@ -1015,6 +1072,8 @@ function get_config_dir() {
 
 function get_media_dir() {
 
+    local media_dir DEFAULT_MEDIA_DIR
+
     if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
         XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
         if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
@@ -1033,9 +1092,10 @@ function get_media_dir() {
             read -erp "MEDIA_DIR:" MEDIA_DIR
             [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR=${OLD_MEDIA_DIR}
         else
-            INFO "请输入媒体库目录（默认 /opt/media ）"
+            DEFAULT_MEDIA_DIR="$(get_path "xiaoya_alist_media_dir")"
+            INFO "请输入媒体库目录（默认 ${DEFAULT_MEDIA_DIR} ）"
             read -erp "MEDIA_DIR:" MEDIA_DIR
-            [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="/opt/media"
+            [[ -z "${MEDIA_DIR}" ]] && MEDIA_DIR="${DEFAULT_MEDIA_DIR}"
             touch "${DDSREM_CONFIG_DIR}/xiaoya_alist_media_dir.txt"
         fi
         if check_path "${MEDIA_DIR}"; then
@@ -4137,6 +4197,7 @@ function main_xiaoyahelper() {
 
 function install_xiaoya_alist_tvbox() {
 
+    local DEFAULT_CONFIG_DIR
     while true; do
         if [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt)
@@ -4144,9 +4205,10 @@ function install_xiaoya_alist_tvbox() {
             read -erp "CONFIG_DIR:" CONFIG_DIR
             [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         else
-            INFO "请输入配置文件目录（默认 /etc/xiaoya ）"
+            DEFAULT_CONFIG_DIR="$(get_path "xiaoya_alist_config_dir")"
+            INFO "请输入配置文件目录（默认 ${DEFAULT_CONFIG_DIR} ）"
             read -erp "CONFIG_DIR:" CONFIG_DIR
-            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="/etc/xiaoya"
+            [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR="${DEFAULT_CONFIG_DIR}"
             touch ${DDSREM_CONFIG_DIR}/xiaoya_alist_tvbox_config_dir.txt
         fi
         if check_path "${CONFIG_DIR}"; then
