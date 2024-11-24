@@ -4060,20 +4060,25 @@ function main_xiaoya_all_emby() {
         download_unzip_xiaoya_all_emby
         install_emby_xiaoya_all_emby
         XIAOYA_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-        if [ ! -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
-            install_resilio
-        else
+        if [ -s "${XIAOYA_CONFIG_DIR}/emby_config.txt" ]; then
             # shellcheck disable=SC1091
             source "${XIAOYA_CONFIG_DIR}/emby_config.txt"
-            # shellcheck disable=SC2154
-            if [ "${resilio}" == "yes" ]; then
-                install_resilio
-            elif [ "${resilio}" == "no" ]; then
-                INFO "跳过 Resilio-Sync 安装"
-            else
-                WARN "resilio 配置错误！默认安装 Resilio-Sync"
-                install_resilio
+            if [ -n "${resilio}" ]; then
+                WARN "Resilio-Sync 已弃用，默认使用 小雅元数据定时爬虫"
             fi
+        fi
+        while true; do
+            INFO "是否安装 小雅元数据定时爬虫 [Y/n]（默认 Y）"
+            read -erp "INSTALL:" xiaoya_emd_install
+            [[ -z "${xiaoya_emd_install}" ]] && xiaoya_emd_install="y"
+            if [[ ${xiaoya_emd_install} == [YyNn] ]]; then
+                break
+            else
+                ERROR "非法输入，请输入 [Y/n]"
+            fi
+        done
+        if [[ ${xiaoya_emd_install} == [Yy] ]]; then
+            install_xiaoya_emd
         fi
         INFO "Emby 全家桶安装完成！ "
         INFO "浏览器访问 Emby 服务：${Sky_Blue}http://ip:2345${Font}, 默认用户密码: ${Sky_Blue}xiaoya/1234${Font}"
