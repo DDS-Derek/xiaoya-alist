@@ -3132,6 +3132,54 @@ function install_emby_xiaoya_all_emby() {
 
 function oneclick_upgrade_emby() {
 
+    function check_emby_version() {
+
+        if [ "${1}" == "${2}" ]; then
+            return 0
+        fi
+
+        if [ "$(echo -e "${1}\n${2}" | sort -V | head -n1)" == "${1}" ]; then
+            return 1
+        else
+            return 0
+        fi
+
+    }
+
+    function get_emby_version() {
+
+        local emby_name emby_image_name emby_config_dir CURRENT_ULIMIT
+        emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
+        emby_image_name="$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")"
+        emby_config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "${emby_name}" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/config$" | awk -F: '{print $1}')"
+        if [ -z "${emby_image_name}" ]; then
+            WARN "获取 Emby 镜像标签失败，请确保您已安装 Emby！"
+            return 1
+        fi
+        if [ -z "${emby_config_dir}" ] || ! check_path "${emby_config_dir}"; then
+            WARN "Emby 配置目录获取失败，使用 /tmp 目录替代！"
+            emby_config_dir=/tmp
+        fi
+        if [ -f "${emby_config_dir}/EmbyServer.deps.json" ]; then
+            rm -f "${emby_config_dir}/EmbyServer.deps.json"
+        fi
+        CURRENT_ULIMIT=$(ulimit -n)
+        ulimit -n 65535
+        docker run --rm --ulimit nofile=65535:65535 --entrypoint cp -v "${emby_config_dir}:/data" "${emby_image_name}" /system/EmbyServer.deps.json /data
+        ulimit -n "${CURRENT_ULIMIT}"
+        if [ ! -f "${emby_config_dir}/EmbyServer.deps.json" ]; then
+            WARN "Emby 版本数据文件复制失败！"
+            return 1
+        fi
+        emby_version=$(grep "EmbyServer" "${emby_config_dir}/EmbyServer.deps.json" | head -n 1 | sed -n 's|.*EmbyServer/\(.*\)":.*|\1|p')
+        rm -f "${emby_config_dir}/EmbyServer.deps.json"
+        if [ -z "${emby_version}" ]; then
+            WARN "当前 Emby 版本获取失败！"
+            return 1
+        fi
+
+    }
+
     local emby_name
     emby_name=$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)
     if docker inspect ddsderek/runlike:latest > /dev/null 2>&1; then
@@ -3148,6 +3196,13 @@ function oneclick_upgrade_emby() {
     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp ddsderek/runlike "${emby_name}" > "/tmp/container_update_${emby_name}"
     old_image=$(docker container inspect -f '{{.Config.Image}}' "${emby_name}")
     old_image_name="$(echo "${old_image}" | cut -d':' -f1)"
+    INFO "获取 Emby 版本中..."
+    if get_emby_version; then
+        INFO "当前 Emby 版本：${emby_version}"
+        check_emby_version_status=true
+    else
+        check_emby_version_status=false
+    fi
     while true; do
         if [ "${old_image_name}" == "amilys/embyserver" ] || [ "${old_image_name}" == "amilys/embyserver_arm64v8" ]; then
             cpu_arch=$(uname -m)
@@ -3162,24 +3217,32 @@ function oneclick_upgrade_emby() {
                 case ${CHOOSE_IMAGE_VERSION} in
                 1)
                     IMAGE_VERSION=4.8.8.0
-                    break
+                    choose_emby_version="${IMAGE_VERSION}"
                     ;;
                 2)
                     IMAGE_VERSION=4.8.9.0
-                    break
+                    choose_emby_version="${IMAGE_VERSION}"
                     ;;
                 3)
                     IMAGE_VERSION=latest
-                    break
+                    choose_emby_version="${amilys_embyserver_latest_version}"
                     ;;
                 4)
                     IMAGE_VERSION=beta
-                    break
+                    choose_emby_version="${amilys_embyserver_beta_version}"
                     ;;
                 *)
                     ERROR "输入无效，请重新选择"
+                    check_emby_version_status=false
                     ;;
                 esac
+                if [ "${check_emby_version_status}" == true ]; then
+                    if check_emby_version "${choose_emby_version}" "${emby_version}"; then
+                        break
+                    else
+                        ERROR "您选择升级的 Emby 版本低于当前安装 Emby 版本，Emby 版本无法降级，请重新选择"
+                    fi
+                fi
             fi
         elif [ "${old_image_name}" == "lovechen/embyserver" ]; then
             WARN "lovechen/embyserver 镜像无法更新！"
@@ -3191,24 +3254,32 @@ function oneclick_upgrade_emby() {
             case ${CHOOSE_IMAGE_VERSION} in
             1)
                 IMAGE_VERSION=4.8.8.0
-                break
+                choose_emby_version="${IMAGE_VERSION}"
                 ;;
             2)
                 IMAGE_VERSION=4.8.9.0
-                break
+                choose_emby_version="${IMAGE_VERSION}"
                 ;;
             3)
                 IMAGE_VERSION=latest
-                break
+                choose_emby_version="${emby_embyserver_latest_version}"
                 ;;
             4)
                 IMAGE_VERSION=beta
-                break
+                choose_emby_version="${emby_embyserver_beta_version}"
                 ;;
             *)
                 ERROR "输入无效，请重新选择"
+                check_emby_version_status=false
                 ;;
             esac
+            if [ "${check_emby_version_status}" == true ]; then
+                if check_emby_version "${choose_emby_version}" "${emby_version}"; then
+                    break
+                else
+                    ERROR "您选择升级的 Emby 版本低于当前安装 Emby 版本，Emby 版本无法降级，请重新选择"
+                fi
+            fi
         fi
     done
     run_image="$(echo "${old_image}" | cut -d':' -f1):${IMAGE_VERSION}"
