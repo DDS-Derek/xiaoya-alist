@@ -2,7 +2,8 @@ FROM xiaoyaliu/glue:python
 
 COPY --chmod=755 . /
 
-RUN pip install --no-cache --upgrade pip && \
+RUN apk add --no-cache zbar && \
+    pip install --no-cache --upgrade pip && \
     pip install --no-cache -r /115cookie/requirements.txt && \
     pip install --no-cache -r /aliyuntvtoken/requirements.txt && \
     pip install --no-cache -r /aliyuntoken/requirements.txt && \
