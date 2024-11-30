@@ -1,4 +1,2 @@
 flask
 pillow
-pyzbar
-requests
