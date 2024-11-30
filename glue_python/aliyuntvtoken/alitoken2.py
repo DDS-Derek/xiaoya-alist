@@ -156,6 +156,7 @@ if __name__ == '__main__':
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
         qr.add_data(qr_link)
         qr.make(fit=True)
+        logging.info('请打开阿里云盘扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
         auth_code = check_qrcode_status(sid)['auth_code']
         get_token(auth_code)

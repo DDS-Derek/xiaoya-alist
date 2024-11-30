@@ -1,5 +1,8 @@
 #!/usr/local/bin/python3
 
+__author__ = "ChenyangGao <https://chenyanggao.github.io>"
+__license__ = "GPLv3 <https://www.gnu.org/licenses/gpl-3.0.txt>"
+
 from flask import Flask, render_template, jsonify
 import threading
 import time
@@ -208,6 +211,7 @@ if __name__ == '__main__':
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
         qr.add_data(qrcode_token_url(qrcode_token["uid"]))
         qr.make(fit=True)
+        logging.info('请打开 115网盘 扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
         while last_status != 1 and last_status != 2:
             time.sleep(1)

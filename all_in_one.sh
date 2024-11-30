@@ -400,15 +400,16 @@ function check_aliyunpan_opentoken() {
 
 }
 
-function qrcode_aliyunpan_tvtoken() {
+function qrcode_mode_choose() {
 
-    clear_qrcode_container
-    cpu_arch=$(uname -m)
-    case $cpu_arch in
-    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
-        INFO "阿里云盘 TV Token 配置"
+    function qrcode_web() {
+
+        if ! check_port "34256"; then
+            ERROR "34256 端口被占用，请关闭占用此端口的程序！"
+            exit 1
+        fi
+
         local local_ip
-        pull_glue_python_ddsrem
         if [[ "${OSNAME}" = "macos" ]]; then
             local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
         else
@@ -424,7 +425,45 @@ function qrcode_aliyunpan_tvtoken() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            /aliyuntvtoken/alitoken2.py --qrcode_mode=web
+            "${2}" --qrcode_mode=web
+
+    }
+
+    if [ "${2}" == "/aliyuntoken/aliyuntoken_vercel.py" ]; then
+        WARN "当前模式只能浏览器扫码！"
+        qrcode_web "${1}" "${2}"
+    fi
+
+    while true; do
+        INFO "请选择扫码模式 [ 1: 命令行扫码 | 2: 浏览器扫码 ]（默认 2）"
+        read -erp "QRCODE_MODE:" QRCODE_MODE
+        [[ -z "${QRCODE_MODE}" ]] && QRCODE_MODE="2"
+        if [[ ${QRCODE_MODE} == [1] ]]; then
+            docker run -i --rm \
+                -v "${1}:/data" \
+                -e LANG=C.UTF-8 \
+                ddsderek/xiaoya-glue:python \
+                "${2}" --qrcode_mode=shell
+            return 0
+        elif [[ ${QRCODE_MODE} == [2] ]]; then
+            qrcode_web "${1}" "${2}"
+            return 0
+        else
+            ERROR "输入无效，请重新选择"
+        fi
+    done
+
+}
+
+function qrcode_aliyunpan_tvtoken() {
+
+    clear_qrcode_container
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "阿里云盘 TV Token 配置"
+        pull_glue_python_ddsrem
+        qrcode_mode_choose "${1}" "/aliyuntvtoken/alitoken2.py"
         INFO "操作全部完成！"
         ;;
     *)
@@ -441,7 +480,7 @@ function qrcode_aliyunpan_refreshtoken() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Refresh Token 配置"
-        local local_ip command_file
+        local command_file
         pull_glue_python_ddsrem
         if curl -Is https://api.xhofe.top/alist/ali/qr | head -n 1 | grep -q '200'; then
             command_file="aliyuntoken.py"
@@ -453,22 +492,7 @@ function qrcode_aliyunpan_refreshtoken() {
             command_file="aliyuntoken_vercel.py"
             INFO "使用 aliyuntoken.vercel.app 地址"
         fi
-        if [[ "${OSNAME}" = "macos" ]]; then
-            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-        else
-            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-        fi
-        if [ -z "${local_ip}" ]; then
-            local_ip="小雅服务器IP"
-        fi
-        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
-        # shellcheck disable=SC2046
-        docker run -i --rm \
-            -v "${1}:/data" \
-            -e LANG=C.UTF-8 \
-            $(get_default_network "qrcode") \
-            ddsderek/xiaoya-glue:python \
-            "/aliyuntoken/${command_file}" --qrcode_mode=web
+        qrcode_mode_choose "${1}" "/aliyuntoken/${command_file}"
         INFO "操作全部完成！"
         ;;
     *)
@@ -485,7 +509,7 @@ function qrcode_aliyunpan_opentoken() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 Open Token 配置"
-        local local_ip command_file
+        local command_file
         pull_glue_python_ddsrem
         if curl -Is https://api.xhofe.top/alist/ali_open/qr | head -n 1 | grep -q '200'; then
             command_file="aliyunopentoken.py"
@@ -494,22 +518,7 @@ function qrcode_aliyunpan_opentoken() {
             command_file="aliyunopentoken_nn.ci.py"
             INFO "使用 api-cf.nn.ci 地址"
         fi
-        if [[ "${OSNAME}" = "macos" ]]; then
-            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-        else
-            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-        fi
-        if [ -z "${local_ip}" ]; then
-            local_ip="小雅服务器IP"
-        fi
-        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
-        # shellcheck disable=SC2046
-        docker run -i --rm \
-            -v "${1}:/data" \
-            -e LANG=C.UTF-8 \
-            $(get_default_network "qrcode") \
-            ddsderek/xiaoya-glue:python \
-            "/aliyunopentoken/${command_file}" --qrcode_mode=web
+        qrcode_mode_choose "${1}" "/aliyunopentoken/${command_file}"
         INFO "操作全部完成！"
         ;;
     *)
@@ -526,24 +535,8 @@ function qrcode_115_cookie() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "115 Cookie 扫码获取"
-        local local_ip
         pull_glue_python_ddsrem
-        if [[ "${OSNAME}" = "macos" ]]; then
-            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-        else
-            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-        fi
-        if [ -z "${local_ip}" ]; then
-            local_ip="小雅服务器IP"
-        fi
-        INFO "请浏览器访问 http://${local_ip}:34256 并使用阿里云盘APP扫描二维码！"
-        # shellcheck disable=SC2046
-        docker run -i --rm \
-            -v "${1}:/data" \
-            -e LANG=C.UTF-8 \
-            $(get_default_network "qrcode") \
-            ddsderek/xiaoya-glue:python \
-            /115cookie/115cookie.py --qrcode_mode=web
+        qrcode_mode_choose "${1}" "/115cookie/115cookie.py"
         INFO "操作全部完成！"
         ;;
     *)
@@ -560,24 +553,8 @@ function qrcode_quark_cookie() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "夸克 Cookie 扫码获取"
-        local local_ip
         pull_glue_python_ddsrem
-        if [[ "${OSNAME}" = "macos" ]]; then
-            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-        else
-            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-        fi
-        if [ -z "${local_ip}" ]; then
-            local_ip="小雅服务器IP"
-        fi
-        INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用夸克APP扫描二维码！"
-        # shellcheck disable=SC2046
-        docker run -i --rm \
-            -v "${1}:/data" \
-            -e LANG=C.UTF-8 \
-            $(get_default_network "qrcode") \
-            ddsderek/xiaoya-glue:python \
-            /quark_cookie/quark_cookie.py --qrcode_mode=web
+        qrcode_mode_choose "${1}" "/quark_cookie/quark_cookie.py"
         INFO "操作全部完成！"
         ;;
     *)
@@ -594,24 +571,8 @@ function qrcode_uc_cookie() {
     case $cpu_arch in
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "UC Cookie 扫码获取"
-        local local_ip
         pull_glue_python_ddsrem
-        if [[ "${OSNAME}" = "macos" ]]; then
-            local_ip=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
-        else
-            local_ip=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
-        fi
-        if [ -z "${local_ip}" ]; then
-            local_ip="小雅服务器IP"
-        fi
-        INFO "请稍等片刻直到 Flask 启动后浏览器访问 http://${local_ip}:34256 并使用UC浏览器APP扫描二维码！"
-        # shellcheck disable=SC2046
-        docker run -i --rm \
-            -v "${1}:/data" \
-            -e LANG=C.UTF-8 \
-            $(get_default_network "qrcode") \
-            ddsderek/xiaoya-glue:python \
-            /uc_cookie/uc_cookie.py --qrcode_mode=web
+        qrcode_mode_choose "${1}" "/uc_cookie/uc_cookie.py"
         INFO "操作全部完成！"
         ;;
     *)

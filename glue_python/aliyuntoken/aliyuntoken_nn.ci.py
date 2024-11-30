@@ -108,6 +108,7 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=34256)
     elif args.qrcode_mode == 'shell':
         threading.Thread(target=poll_qrcode_status, args=(data, False)).start()
+        logging.info('请打开阿里云盘扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
         while last_status != 1:
             time.sleep(1)
