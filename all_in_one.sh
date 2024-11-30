@@ -424,7 +424,7 @@ function qrcode_aliyunpan_tvtoken() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            /aliyuntvtoken/alitoken2.py
+            /aliyuntvtoken/alitoken2.py --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)
@@ -468,7 +468,7 @@ function qrcode_aliyunpan_refreshtoken() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            "/aliyuntoken/${command_file}"
+            "/aliyuntoken/${command_file}" --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)
@@ -509,7 +509,7 @@ function qrcode_aliyunpan_opentoken() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            "/aliyunopentoken/${command_file}"
+            "/aliyunopentoken/${command_file}" --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)
@@ -543,7 +543,7 @@ function qrcode_115_cookie() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            /115cookie/115cookie.py
+            /115cookie/115cookie.py --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)
@@ -577,7 +577,7 @@ function qrcode_quark_cookie() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            /quark_cookie/quark_cookie.py
+            /quark_cookie/quark_cookie.py --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)
@@ -611,7 +611,7 @@ function qrcode_uc_cookie() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            /uc_cookie/uc_cookie.py
+            /uc_cookie/uc_cookie.py --qrcode_mode=web
         INFO "操作全部完成！"
         ;;
     *)

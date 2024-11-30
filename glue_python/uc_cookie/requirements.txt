@@ -1,2 +1,4 @@
 flask
 qrcode
+requests
+argparse

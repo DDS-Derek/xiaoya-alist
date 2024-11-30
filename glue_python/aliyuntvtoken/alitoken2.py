@@ -13,6 +13,9 @@ import hashlib
 import time
 import base64
 import random
+import argparse
+import qrcode
+import sys
 
 
 logging.basicConfig(level=logging.INFO)
@@ -70,24 +73,17 @@ def generate_key(t, unique_id, wifimac):
     return hashlib.md5(hashed_key.encode('utf-8')).hexdigest()
 
 
-@app.route('/')
-def main_page():
-    return render_template('qrcode.html')
-
-
-@app.route('/get_qrcode', methods=['GET'])
-def get_qrcode():
+def get_qrcode_url():
     data = requests.post('http://api.extscreen.com/aliyundrive/qrcode', data={
         'scopes': ','.join(["user:base", "file:all:read", "file:all:write"]),
         "width": 500,
         "height": 500,
     }, headers={**get_params(timestamp, unique_id, wifimac), **headers}).json()['data']
     qr_link = "https://www.aliyundrive.com/o/oauth/authorize?sid=" + data['sid']
-    return jsonify({'qr_link': qr_link, 'sid': data['sid']})
+    return {'qr_link': qr_link, 'sid': data['sid']}
 
 
-@app.route('/check_qrcode/<sid>', methods=['GET'])
-def check_qrcode(sid):
+def check_qrcode_status(sid):
     status = 'NotLoggedIn'
     auth_code = None
     while status != 'LoginSuccess':
@@ -96,12 +92,10 @@ def check_qrcode(sid):
         status = result['status']
         if status == 'LoginSuccess':
             auth_code = result['authCode']
-    return jsonify({'auth_code': auth_code})
+    return {'auth_code': auth_code}
 
 
-@app.route('/get_tokens', methods=['POST'])
-def get_tokens():
-    code = request.json.get('auth_code')
+def get_token(code):
     token_data = requests.post('http://api.extscreen.com/aliyundrive/v3/token', data={
         'code': code,
     }, headers={**get_params(timestamp, unique_id, wifimac), **headers}).json()['data']
@@ -110,12 +104,37 @@ def get_tokens():
     token_data = decrypt(ciphertext, iv, timestamp, unique_id, wifimac)
     parsed_json = json.loads(token_data)
     refresh_token = parsed_json['refresh_token']
-    with open("/data/myopentoken.txt", "w") as file:
+    if sys.platform.startswith('win32'):
+        file_path = ""
+    else:
+        file_path = "/data/"
+    with open(f"{file_path}myopentoken.txt", "w") as file:
         file.write(refresh_token)
     logging.info('myopentoken.txt 文件更新成功！')
-    with open("/data/open_tv_token_url.txt", "w") as file:
+    with open(f"{file_path}open_tv_token_url.txt", "w") as file:
         file.write("https://www.voicehub.top/api/v1/oauth/alipan/token")
     logging.info('open_tv_token_url.txt 文件更新成功！')
+
+
+@app.route('/')
+def main_page():
+    return render_template('qrcode.html')
+
+
+@app.route('/get_qrcode', methods=['GET'])
+def get_qrcode():
+    return jsonify(get_qrcode_url())
+
+
+@app.route('/check_qrcode/<sid>', methods=['GET'])
+def check_qrcode(sid):
+    return jsonify(check_qrcode_status(sid))
+
+
+@app.route('/get_tokens', methods=['POST'])
+def get_tokens():
+    auth_code = request.json.get('auth_code')
+    get_token(auth_code)
     return jsonify({'status': 'completed'})
 
 
@@ -125,4 +144,21 @@ def shutdown():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=34256)
+    parser = argparse.ArgumentParser(description='AliyunPan TV Token')
+    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    args = parser.parse_args()
+    if args.qrcode_mode == 'web':
+        app.run(host='0.0.0.0', port=34256)
+    elif args.qrcode_mode == 'shell':
+        date = get_qrcode_url()
+        qr_link = date['qr_link']
+        sid = date['sid']
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
+        qr.add_data(qr_link)
+        qr.make(fit=True)
+        qr.print_ascii(invert=True, tty=sys.stdout.isatty())
+        auth_code = check_qrcode_status(sid)['auth_code']
+        get_token(auth_code)
+    else:
+        logging.error('未知的扫码模式')
+        os._exit(1)

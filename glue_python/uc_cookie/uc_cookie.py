@@ -8,6 +8,7 @@ import os
 import threading
 import sys
 import qrcode
+import argparse
 import random
 from flask import Flask, send_file, render_template, jsonify
 
@@ -28,7 +29,7 @@ def cookiejar_to_string(cookiejar):
     return cookie_string.strip('; ')
 
 
-def poll_qrcode_status(token):
+def poll_qrcode_status(token, log_print):
     global last_status
     while True:
         __t = int(time.time() * 1000)
@@ -61,8 +62,9 @@ def poll_qrcode_status(token):
                 last_status = 2
                 break
             elif re_data['status'] == 50004001:
-                logging.info('等待用户扫码...')
-                time.sleep(2)
+                if log_print:
+                    logging.info('等待用户扫码...')
+                    time.sleep(2)
 
 
 @app.route("/")
@@ -95,6 +97,9 @@ def shutdown():
 if __name__ == '__main__':
     if os.path.isfile(qrcode_dir):
         os.remove(qrcode_dir)
+    parser = argparse.ArgumentParser(description='UC Cookie')
+    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    args = parser.parse_args()
     logging.info('二维码生成中...')
     __t = int(time.time() * 1000)
     data = {
@@ -111,5 +116,22 @@ if __name__ == '__main__':
         img = qr.make_image(fill_color="black", back_color="white")
         img.save(qrcode_dir)
         logging.info('二维码生成完成！')
-    threading.Thread(target=poll_qrcode_status, args=(token,)).start()
-    app.run(host='0.0.0.0', port=34256)
+    else:
+        logging.error('二维码生成失败，退出进程')
+        os._exit(1)
+    if args.qrcode_mode == 'web':
+        threading.Thread(target=poll_qrcode_status, args=(token,True,)).start()
+        app.run(host='0.0.0.0', port=34256)
+    elif args.qrcode_mode == 'shell':
+        threading.Thread(target=poll_qrcode_status, args=(token,False,)).start()
+        qr.print_ascii(invert=True, tty=sys.stdout.isatty())
+        while last_status != 1 and last_status != 2:
+            time.sleep(1)
+        if os.path.isfile(qrcode_dir):
+            os.remove(qrcode_dir)
+        os._exit(0)
+    else:
+        logging.error('未知的扫码模式')
+        if os.path.isfile(qrcode_dir):
+            os.remove(qrcode_dir)
+        os._exit(1)

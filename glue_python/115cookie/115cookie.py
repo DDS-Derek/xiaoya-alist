@@ -6,6 +6,9 @@ import time
 import os
 import base64
 import logging
+import argparse
+import qrcode
+import sys
 from PIL import Image
 from io import BytesIO
 from enum import Enum
@@ -128,12 +131,18 @@ def post_qrcode_result(uid, app="web"):
     return loads(urlopen(Request(api, data=urlencode(payload).encode("utf-8"), method="POST")).read())
 
 
-def get_qrcode(uid):
+def get_qrcode(uid: str, /) -> str:
     """获取二维码图片（注意不是链接）
     :return: 一个文件对象，可以读取
     """
-    url = "https://qrcodeapi.115.com/api/1.0/mac/1.0/qrcode?uid=%s" % uid
-    return urlopen(url)
+    return urlopen("https://qrcodeapi.115.com/api/1.0/web/1.0/qrcode?uid=" + uid)
+
+
+def qrcode_token_url(uid: str, /) -> str:
+    """获取二维码图片的扫码链接
+    :return: 扫码链接 
+    """
+    return "http://115.com/scan/dg-" + uid
 
 
 def poll_qrcode_status(qrcode_token):
@@ -146,8 +155,12 @@ def poll_qrcode_status(qrcode_token):
             resp = post_qrcode_result(qrcode_token["uid"], "alipaymini")
             cookie_data = resp['data']['cookie']
             cookie_str = "; ".join("%s=%s" % t for t in cookie_data.items())
-            with open('/data/115_cookie.txt', 'w') as f:
-                f.write(cookie_str)
+            if sys.platform.startswith('win32'):
+                with open('115_cookie.txt', 'w') as f:
+                    f.write(cookie_str)
+            else:
+                with open('/data/115_cookie.txt', 'w') as f:
+                    f.write(cookie_str)
             logging.info('扫码成功, cookie 已写入文件！')
             last_status = 1
         elif status in [-1, -2]:
@@ -184,4 +197,21 @@ def shutdown():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=34256)
+    parser = argparse.ArgumentParser(description='115 Cookie')
+    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    args = parser.parse_args()
+    if args.qrcode_mode == 'web':
+        app.run(host='0.0.0.0', port=34256)
+    elif args.qrcode_mode == 'shell':
+        qrcode_token = get_qrcode_token()["data"]
+        threading.Thread(target=poll_qrcode_status, args=(qrcode_token,)).start()
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
+        qr.add_data(qrcode_token_url(qrcode_token["uid"]))
+        qr.make(fit=True)
+        qr.print_ascii(invert=True, tty=sys.stdout.isatty())
+        while last_status != 1 and last_status != 2:
+            time.sleep(1)
+        os._exit(0)
+    else:
+        logging.error('未知的扫码模式')
+        os._exit(1)

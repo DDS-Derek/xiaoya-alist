@@ -7,10 +7,9 @@ import logging
 import os
 import threading
 import sys
-from PIL import Image
-from io import BytesIO
+import qrcode
+import argparse
 from flask import Flask, send_file, render_template, jsonify
-from urllib.parse import urlparse
 
 
 app = Flask(__name__)
@@ -56,7 +55,7 @@ headers_2 = {
 }
 
 
-def poll_qrcode_status(data):
+def poll_qrcode_status(data, log_print):
     global last_status
     while True:
         re = requests.get(f"https://api.xhofe.top/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status", headers=headers)
@@ -79,10 +78,12 @@ def poll_qrcode_status(data):
                     last_status = 1
                     break
             else:
-                logging.info('等待用户扫码...')
+                if log_print:
+                    logging.info('等待用户扫码...')
                 time.sleep(2)
         else:
-            logging.info('等待用户扫码...')
+            if log_print:
+                logging.info('等待用户扫码...')
             time.sleep(2)
 
 
@@ -116,29 +117,47 @@ def shutdown():
 if __name__ == '__main__':
     if os.path.isfile(qrcode_dir):
         os.remove(qrcode_dir)
+    parser = argparse.ArgumentParser(description='AliyunPan Open Token')
+    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    args = parser.parse_args()
     logging.info('二维码生成中...')
+    re_count = 0
     while True:
         re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.content)
-            qrCodeUrl = re_data['qrCodeUrl']
-            # sid = re_data['sid']
-            re = requests.get(qrCodeUrl, headers=headers)
-            if re.status_code == 200:
-                image_stream = BytesIO(re.content)
-                image = Image.open(image_stream)
-                image.save(qrcode_dir)
-                path = urlparse(qrCodeUrl).path.split('/')
-                components = path
-                value_after_qrcode = components[components.index('qrcode') + 1]
-                if os.path.isfile(qrcode_dir):
-                    logging.info('二维码生成完成！')
-                    break
-                else:
-                    time.sleep(1)
+            sid = re_data['sid']
+            qrCodeUrl = f"https://www.aliyundrive.com/o/oauth/authorize?sid={sid}"
+            qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
+            qr.add_data(qrCodeUrl)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            img.save(qrcode_dir)
+            if os.path.isfile(qrcode_dir):
+                logging.info('二维码生成完成！')
+                break
         else:
             if json.loads(re.text)['code'] == 'Too Many Requests':
                 logging.warning("Too Many Requests 请一小时后重试！")
                 os._exit(0)
-    threading.Thread(target=poll_qrcode_status, args=(value_after_qrcode,)).start()
-    app.run(host='0.0.0.0', port=34256)
+        time.sleep(1)
+        re_count += 1
+        if re_count == 3:
+            logging.error('二维码生成失败，退出进程')
+            os._exit(1)
+    if args.qrcode_mode == 'web':
+        threading.Thread(target=poll_qrcode_status, args=(sid, True)).start()
+        app.run(host='0.0.0.0', port=34256)
+    elif args.qrcode_mode == 'shell':
+        threading.Thread(target=poll_qrcode_status, args=(sid, False)).start()
+        qr.print_ascii(invert=True, tty=sys.stdout.isatty())
+        while last_status != 1:
+            time.sleep(1)
+        if os.path.isfile(qrcode_dir):
+            os.remove(qrcode_dir)
+        os._exit(0)
+    else:
+        logging.error('未知的扫码模式')
+        if os.path.isfile(qrcode_dir):
+            os.remove(qrcode_dir)
+        os._exit(1)

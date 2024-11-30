@@ -1,2 +1,4 @@
 flask
-pillow
+requests
+qrcode
+argparse
