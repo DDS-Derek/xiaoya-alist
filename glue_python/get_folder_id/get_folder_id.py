@@ -1,6 +1,8 @@
 from aligo import Aligo
 
-ali = Aligo(refresh_token='316bb9995a2b4ac79632040687a08be2')
+with open('/data/mytoken.txt', 'r') as file:
+    refresh_token = file.readline().strip()
+ali = Aligo(refresh_token=refresh_token)
 
 # 这里默认使用资源盘
 v2_user = ali.v2_user_get()
