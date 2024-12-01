@@ -986,7 +986,7 @@ function get_aliyunpan_folder_id() {
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:python \
-            bash get_folder_id/get_folder_id.sh
+            bash /get_folder_id/get_folder_id.sh
         ;;
     *)
         WARN "目前阿里云盘 folder id 自动获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
