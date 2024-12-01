@@ -974,6 +974,27 @@ function settings_ali2115() {
 
 }
 
+function get_aliyunpan_folder_id() {
+
+    clear_qrcode_container
+    cpu_arch=$(uname -m)
+    case $cpu_arch in
+    "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
+        INFO "阿里云盘 folder id 自动获取"
+        pull_glue_python_ddsrem
+        docker run -i --rm \
+            -v "${1}:/data" \
+            -e LANG=C.UTF-8 \
+            ddsderek/xiaoya-glue:python \
+            bash get_folder_id/get_folder_id.sh
+        ;;
+    *)
+        WARN "目前阿里云盘 folder id 自动获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
+        ;;
+    esac
+
+}
+
 function get_config_dir() {
 
     local xiaoya_config_dir DEFAULT_CONFIG_DIR
@@ -1202,8 +1223,12 @@ function install_xiaoya_alist() {
     folderidstringsize=${#folderidfilesize}
     if [ "$folderidstringsize" -le 39 ]; then
         while true; do
-            INFO "输入你的阿里云盘转存目录 folder id"
+            INFO "输入你的阿里云盘转存目录 folder id（留空自动获取）"
             read -erp "FOLDERID:" folderid
+            if [ -z "${folderid}" ]; then
+                get_aliyunpan_folder_id "${CONFIG_DIR}"
+                folderid=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
+            fi
             folder_id_len=${#folderid}
             if [ "$folder_id_len" -ne 40 ]; then
                 ERROR "长度不对，阿里云盘 folder id 是40位长"
