@@ -28,7 +28,6 @@ else
     exit 1
 fi
 
-
 echo "${folderid}" > /data/temp_transfer_folder_id.txt
 echo "r" > /data/folder_type.txt
 
@@ -37,4 +36,3 @@ refresh_token=$(sed 's/:\s*/:/g' /root/.aligo/aligo.json | sed -n 's/.*"refresh_
 INFO "自动刷新 refresh_token：${refresh_token}"
 
 echo "${refresh_token}" > /data/mytoken.txt
-
