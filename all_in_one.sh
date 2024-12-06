@@ -982,7 +982,7 @@ function get_aliyunpan_folder_id() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 folder id 自动获取"
         pull_glue_python_ddsrem
-        docker run -i --rm \
+        docker run -it --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:python \
