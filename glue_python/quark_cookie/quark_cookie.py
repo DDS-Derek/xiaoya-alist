@@ -16,6 +16,7 @@ from flask import Flask, send_file, render_template, jsonify
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 last_status = 0
+stop_event = threading.Event()
 if sys.platform.startswith('win32'):
     qrcode_dir = 'qrcode.png'
 else:
@@ -29,9 +30,9 @@ def cookiejar_to_string(cookiejar):
     return cookie_string.strip('; ')
 
 
-def poll_qrcode_status(log_print):
+def poll_qrcode_status(stop, log_print):
     global last_status
-    while True:
+    while not stop.is_set():
         re = requests.get(f'https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken?client_id=532&v=1.2&token={token}&request_id={uuid.uuid4()}')
         if re.status_code == 200:
             re_data = json.loads(re.text)
@@ -106,20 +107,31 @@ if __name__ == '__main__':
     else:
         logging.error('二维码生成失败，退出进程')
         os._exit(1)
-    if args.qrcode_mode == 'web':
-        threading.Thread(target=poll_qrcode_status, args=(True,)).start()
-        app.run(host='0.0.0.0', port=34256)
-    elif args.qrcode_mode == 'shell':
-        threading.Thread(target=poll_qrcode_status, args=(False,)).start()
-        logging.info('请打开 夸克 APP 扫描此二维码！')
-        qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-        while last_status != 1 and last_status != 2:
-            time.sleep(1)
+    try:
+        if args.qrcode_mode == 'web':
+            wait_status = threading.Thread(target=poll_qrcode_status, args=(stop_event,True,))
+            wait_status.start()
+            app.run(host='0.0.0.0', port=34256)
+        elif args.qrcode_mode == 'shell':
+            wait_status = threading.Thread(target=poll_qrcode_status, args=(stop_event,False,))
+            wait_status.start()
+            logging.info('请打开 夸克 APP 扫描此二维码！')
+            qr.print_ascii(invert=True, tty=sys.stdout.isatty())
+            while last_status != 1 and last_status != 2:
+                time.sleep(1)
+            if os.path.isfile(qrcode_dir):
+                os.remove(qrcode_dir)
+            if last_status == 2:
+                os._exit(1)
+            os._exit(0)
+        else:
+            logging.error('未知的扫码模式')
+            if os.path.isfile(qrcode_dir):
+                os.remove(qrcode_dir)
+            os._exit(1)
+    except KeyboardInterrupt:
         if os.path.isfile(qrcode_dir):
             os.remove(qrcode_dir)
+        stop_event.set()
+        wait_status.join()
         os._exit(0)
-    else:
-        logging.error('未知的扫码模式')
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
-        os._exit(1)

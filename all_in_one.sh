@@ -429,11 +429,6 @@ function qrcode_mode_choose() {
 
     }
 
-    if [ "${2}" == "/aliyuntoken/aliyuntoken_vercel.py" ]; then
-        WARN "当前模式只能浏览器扫码！"
-        qrcode_web "${1}" "${2}"
-    fi
-
     while true; do
         INFO "请选择扫码模式 [ 1: 命令行扫码 | 2: 浏览器扫码 ]（默认 2）"
         read -erp "QRCODE_MODE:" QRCODE_MODE
