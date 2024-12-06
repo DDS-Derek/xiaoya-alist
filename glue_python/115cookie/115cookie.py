@@ -148,14 +148,14 @@ def qrcode_token_url(uid: str, /) -> str:
     return "http://115.com/scan/dg-" + uid
 
 
-def poll_qrcode_status(qrcode_token):
+def poll_qrcode_status(qrcode_token, qrcode_app):
     global last_status
     while True:
         time.sleep(1)
         resp = get_qrcode_status(qrcode_token)
         status = resp["data"].get("status")
         if status == 2:
-            resp = post_qrcode_result(qrcode_token["uid"], "alipaymini")
+            resp = post_qrcode_result(qrcode_token["uid"], qrcode_app)
             cookie_data = resp['data']['cookie']
             cookie_str = "; ".join("%s=%s" % t for t in cookie_data.items())
             if sys.platform.startswith('win32'):
@@ -173,6 +173,7 @@ def poll_qrcode_status(qrcode_token):
 
 @app.route('/')
 def index():
+    print(args.qrcode_app)
     qrcode_token = get_qrcode_token()["data"]
     uid = qrcode_token["uid"]
     qrcode_image_io = get_qrcode(uid)
@@ -180,7 +181,7 @@ def index():
     buffered = BytesIO()
     qrcode_image.save(buffered, format="PNG")
     qrcode_image_b64_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-    threading.Thread(target=poll_qrcode_status, args=(qrcode_token,)).start()
+    threading.Thread(target=poll_qrcode_status, args=(qrcode_token, args.qrcode_app)).start()
     return render_template('index.html', qrcode_image_b64_str=qrcode_image_b64_str)
 
 
@@ -201,13 +202,14 @@ def shutdown():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='115 Cookie')
-    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
+    parser.add_argument('--qrcode_app', type=str, default='alipaymini', help='扫码绑定设备')
     args = parser.parse_args()
     if args.qrcode_mode == 'web':
         app.run(host='0.0.0.0', port=34256)
     elif args.qrcode_mode == 'shell':
         qrcode_token = get_qrcode_token()["data"]
-        threading.Thread(target=poll_qrcode_status, args=(qrcode_token,)).start()
+        threading.Thread(target=poll_qrcode_status, args=(qrcode_token, args.qrcode_app,)).start()
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
         qr.add_data(qrcode_token_url(qrcode_token["uid"]))
         qr.make(fit=True)

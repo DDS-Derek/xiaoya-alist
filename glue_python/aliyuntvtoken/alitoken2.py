@@ -145,7 +145,7 @@ def shutdown():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='AliyunPan TV Token')
-    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     if args.qrcode_mode == 'web':
         app.run(host='0.0.0.0', port=34256)

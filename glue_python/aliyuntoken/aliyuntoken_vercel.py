@@ -81,7 +81,7 @@ if __name__ == '__main__':
     if os.path.isfile(qrcode_dir):
         os.remove(qrcode_dir)
     parser = argparse.ArgumentParser(description='AliyunPan Refresh Token')
-    parser.add_argument('--qrcode_mode', type=str, help='扫码模式')
+    parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     logging.info('二维码生成中...')
     re_count = 0
