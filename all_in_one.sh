@@ -997,7 +997,9 @@ function get_aliyunpan_folder_id() {
 
 function settings_aliyunpan_folder_id() {
 
-    if [ ! -f "${1}/temp_transfer_folder_id.txt" ]; then
+    folderidfilesize=$(cat "${1}"/temp_transfer_folder_id.txt)
+    folderidstringsize=${#folderidfilesize}
+    if [ ! -f "${1}/temp_transfer_folder_id.txt" ] || [ "$folderidstringsize" -le 39 ]; then
         while true; do
             INFO "是否自动获取 阿里云盘转存目录 folder id [Y/n]（默认 Y）"
             read -erp "Token:" auto_get_folder_id
