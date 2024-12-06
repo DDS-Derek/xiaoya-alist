@@ -1788,7 +1788,7 @@ function __unzip_all_metadata() {
         else
             extra_parameters="--workdir=/media/xiaoya"
         fi
-        pull_run_glue 7z x -aoa -mmt=16 "temp/${file}"
+        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${file}"
     done
 
     end_time1=$(date +%s)
