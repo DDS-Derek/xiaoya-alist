@@ -173,7 +173,6 @@ def poll_qrcode_status(qrcode_token, qrcode_app):
 
 @app.route('/')
 def index():
-    print(args.qrcode_app)
     qrcode_token = get_qrcode_token()["data"]
     uid = qrcode_token["uid"]
     qrcode_image_io = get_qrcode(uid)
