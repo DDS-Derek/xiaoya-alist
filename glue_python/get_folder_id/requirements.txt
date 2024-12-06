@@ -1,1 +1,3 @@
 aligo
+argparse
+requests

@@ -986,12 +986,49 @@ function get_aliyunpan_folder_id() {
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
             ddsderek/xiaoya-glue:python \
-            bash /get_folder_id/get_folder_id.sh
+            /get_folder_id/get_folder_id.py --data_path='/data' --drive_mode=r
         ;;
     *)
         WARN "目前阿里云盘 folder id 自动获取只支持amd64和arm64架构，你的架构是：$cpu_arch"
         ;;
     esac
+
+}
+
+function settings_aliyunpan_folder_id() {
+
+    if [ ! -f "${1}/temp_transfer_folder_id.txt" ]; then
+        while true; do
+            INFO "是否自动获取 阿里云盘转存目录 folder id [Y/n]（默认 Y）"
+            read -erp "Token:" auto_get_folder_id
+            [[ -z "${auto_get_folder_id}" ]] && auto_get_folder_id="y"
+            if [[ ${auto_get_folder_id} == [YyNn] ]]; then
+                break
+            else
+                ERROR "非法输入，请输入 [Y/n]"
+            fi
+        done
+        if [[ ${auto_get_folder_id} == [Yy] ]]; then
+            get_aliyunpan_folder_id "${1}"
+        fi
+
+        folderidfilesize=$(cat "${1}"/temp_transfer_folder_id.txt)
+        folderidstringsize=${#folderidfilesize}
+        if [ "$folderidstringsize" -le 39 ]; then
+            while true; do
+                INFO "输入你的阿里云盘转存目录 folder id"
+                read -erp "FOLDERID:" folderid
+                folder_id_len=${#folderid}
+                if [ "$folder_id_len" -ne 40 ]; then
+                    ERROR "长度不对，阿里云盘 folder id 是40位长"
+                    ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
+                else
+                    echo "$folderid" > "${1}"/temp_transfer_folder_id.txt
+                    break
+                fi
+            done
+        fi
+    fi
 
 }
 
@@ -1219,26 +1256,7 @@ function install_xiaoya_alist() {
         settings_aliyunpan_opentoken "${CONFIG_DIR}"
     fi
 
-    folderidfilesize=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
-    folderidstringsize=${#folderidfilesize}
-    if [ "$folderidstringsize" -le 39 ]; then
-        while true; do
-            INFO "输入你的阿里云盘转存目录 folder id（留空自动获取）"
-            read -erp "FOLDERID:" folderid
-            if [ -z "${folderid}" ]; then
-                get_aliyunpan_folder_id "${CONFIG_DIR}"
-                folderid=$(cat "${CONFIG_DIR}"/temp_transfer_folder_id.txt)
-            fi
-            folder_id_len=${#folderid}
-            if [ "$folder_id_len" -ne 40 ]; then
-                ERROR "长度不对，阿里云盘 folder id 是40位长"
-                ERROR "请参考指南配置文件: https://xiaoyaliu.notion.site/xiaoya-docker-69404af849504fa5bcf9f2dd5ecaa75f"
-            else
-                echo "$folderid" > "${CONFIG_DIR}"/temp_transfer_folder_id.txt
-                break
-            fi
-        done
-    fi
+    settings_aliyunpan_folder_id "${CONFIG_DIR}"
 
     settings_pikpak_account "${CONFIG_DIR}"
 
