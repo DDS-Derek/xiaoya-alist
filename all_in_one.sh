@@ -5692,7 +5692,7 @@ function main_return() {
                     fi
                 done
                 if [[ ${INSTALL_TVTOKEN} == [Yy] ]]; then
-                    install_xiaoya_aliyuntvtoken_connector
+                    install_xiaoya_aliyuntvtoken_connector "${config_dir}"
                     INFO "开始更新小雅容器..."
                     container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 else
