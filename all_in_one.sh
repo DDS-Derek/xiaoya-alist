@@ -5680,8 +5680,26 @@ function main_return() {
         config_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)" | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/data$" | awk -F: '{print $1}')"
         if [ -n "${config_dir}" ]; then
             qrcode_aliyunpan_tvtoken "${config_dir}"
-            INFO "开始更新小雅容器..."
-            container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+            if ! docker container inspect xiaoya-aliyuntvtoken_connector > /dev/null 2>&1; then
+                while true; do
+                    INFO "是否自建阿里云盘 TV Token 令牌刷新接口 [Y/n]（默认 Y）"
+                    read -erp "INSTALL_TVTOKEN:" INSTALL_TVTOKEN
+                    [[ -z "${INSTALL_TVTOKEN}" ]] && INSTALL_TVTOKEN="Y"
+                    if [[ ${INSTALL_TVTOKEN} == [YyNn] ]]; then
+                        break
+                    else
+                        ERROR "非法输入，请输入 [Y/n]"
+                    fi
+                done
+                if [[ ${INSTALL_TVTOKEN} == [Yy] ]]; then
+                    install_xiaoya_aliyuntvtoken_connector
+                    INFO "开始更新小雅容器..."
+                    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
+                else
+                    WARN "请手动配置 ${CONFIG_DIR}/open_tv_token_url.txt 文件，内容为 TV Token 令牌刷新接口地址"
+                    WARN "配置完成请手动重启小雅容器！"
+                fi
+            fi
         else
             ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
             exit 1
