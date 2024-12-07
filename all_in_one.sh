@@ -5699,6 +5699,9 @@ function main_return() {
                     WARN "请手动配置 ${CONFIG_DIR}/open_tv_token_url.txt 文件，内容为 TV Token 令牌刷新接口地址"
                     WARN "配置完成请手动重启小雅容器！"
                 fi
+            else
+                INFO "开始更新小雅容器..."
+                container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
             fi
         else
             ERROR "小雅配置文件目录获取失败咯！请检查小雅容器是否已创建！"
