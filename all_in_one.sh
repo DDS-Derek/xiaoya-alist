@@ -1658,6 +1658,7 @@ function pull_run_glue() {
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             ${extra_parameters} \
+            --privileged=true \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
@@ -1669,6 +1670,7 @@ function pull_run_glue() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            --privileged=true \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
