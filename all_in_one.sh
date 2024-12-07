@@ -425,9 +425,37 @@ function qrcode_mode_choose() {
             -e LANG=C.UTF-8 \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
-            "${2}" --qrcode_mode=web
+            "${2}" --qrcode_mode=web ${extra_parameters}
 
     }
+
+    if [ "${2}" == "/115cookie/115cookie.py" ]; then
+        while true; do
+            qrcode_apps=('alipaymini' 'web' 'ios' 'android' 'windows' 'mac' 'linux' 'wechatmini')
+            find_qrcode_app=false
+            interface=
+            for i in "${!qrcode_apps[@]}"; do
+                interface="${interface}$((i + 1))、${qrcode_apps[$i]}\n"
+            done
+            INFO "请选择扫码模式（默认 1）"
+            echo -e "${interface}\c"
+            read -erp "QRCODE_APP:" QRCODE_APP_NUM
+            [[ -z "${QRCODE_APP_NUM}" ]] && QRCODE_APP_NUM="1"
+            for i in "${!qrcode_apps[@]}"; do
+                if [[ "$((i + 1))" == "${QRCODE_APP_NUM}" ]]; then
+                    qrcode_app="${qrcode_apps[$i]}"
+                    find_qrcode_app=true
+                    break
+                fi
+            done
+            if [ "${find_qrcode_app}" == true ]; then
+                break
+            else
+                ERROR "输入无效，请重新选择"
+            fi
+        done
+        extra_parameters="--qrcode_app=${qrcode_app}"
+    fi
 
     while true; do
         INFO "请选择扫码模式 [ 1: 命令行扫码 | 2: 浏览器扫码 ]（默认 2）"
@@ -438,7 +466,7 @@ function qrcode_mode_choose() {
                 -v "${1}:/data" \
                 -e LANG=C.UTF-8 \
                 ddsderek/xiaoya-glue:python \
-                "${2}" --qrcode_mode=shell
+                "${2}" --qrcode_mode=shell ${extra_parameters}
             return 0
         elif [[ ${QRCODE_MODE} == [2] ]]; then
             qrcode_web "${1}" "${2}"
