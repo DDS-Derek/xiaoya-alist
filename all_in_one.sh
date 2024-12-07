@@ -437,7 +437,7 @@ function qrcode_mode_choose() {
             for i in "${!qrcode_apps[@]}"; do
                 interface="${interface}$((i + 1))、${qrcode_apps[$i]}\n"
             done
-            INFO "请选择扫码模式（默认 1）"
+            INFO "请选择扫码绑定的设备（默认 1）"
             echo -e "${interface}\c"
             read -erp "QRCODE_APP:" QRCODE_APP_NUM
             [[ -z "${QRCODE_APP_NUM}" ]] && QRCODE_APP_NUM="1"
@@ -5693,8 +5693,6 @@ function main_return() {
                 done
                 if [[ ${INSTALL_TVTOKEN} == [Yy] ]]; then
                     install_xiaoya_aliyuntvtoken_connector "${config_dir}"
-                    INFO "开始更新小雅容器..."
-                    container_update "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_alist_name.txt)"
                 else
                     WARN "请手动配置 ${CONFIG_DIR}/open_tv_token_url.txt 文件，内容为 TV Token 令牌刷新接口地址"
                     WARN "配置完成请手动重启小雅容器！"
