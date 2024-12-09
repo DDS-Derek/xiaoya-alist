@@ -273,7 +273,21 @@ get_docker_info() {
 }
 
 get_Xiaoya() {
-    get_docker_info | grep "xiaoyaliu/alist\|haroldli/xiaoya-tvbox\|ailg/alist" | awk '{print $1}'
+    o_xiaoya_name=$(get_docker_info | grep "xiaoyaliu/alist" | awk '{print $1}')
+    if [ "$o_xiaoya_name"x != x ]; then
+        echo ${o_xiaoya_name}
+        return
+    fi
+    t_xiaoya_name=$(get_docker_info | grep "haroldli/xiaoya-tvbox" | awk '{print $1}')
+    if [ "$t_xiaoya_name"x != x ]; then
+        echo ${t_xiaoya_name}
+        return
+    fi
+    g_xiaoya_name=$(get_docker_info | grep "ailg/alist" | awk '{print $1}')
+    if [ "$g_xiaoya_name"x != x ]; then
+        echo ${g_xiaoya_name}
+        return
+    fi
 }
 
 # 签到是抄小雅的
