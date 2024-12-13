@@ -43,6 +43,10 @@ def poll_qrcode_status(data, log_print):
                     logging.info('扫码成功, opentoken 已写入文件！')
                     last_status = 1
                     break
+                else:
+                    if json.loads(re.text)['code'] == 'Too Many Requests':
+                        logging.warning("Too Many Requests 请一小时后重试！")
+                        break
             else:
                 if log_print:
                     logging.info('等待用户扫码...')
