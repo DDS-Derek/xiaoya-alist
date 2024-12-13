@@ -371,31 +371,77 @@ function check_aliyunpan_refreshtoken() {
 
 function check_aliyunpan_opentoken() {
 
-    local token code response refresh_token data_dir
+    function cache_result() {
+
+        local file_path cache_path last_modified current_time difference current_hash
+        file_path="${1}"
+        cache_path="${2}"
+        if command -v md5sum > /dev/null 2>&1; then
+            current_hash=$(md5sum "$file_path" | awk '{ print $1 }')
+        else
+            current_hash=$(head -n 1 "$file_path")
+        fi
+        if [ -f "$cache_path" ] && [ "$(head -n 1 "$cache_path")" == "$current_hash" ]; then
+            last_modified=$(date -r "$cache_path" +%s)
+            current_time=$(date +%s)
+            difference=$(( (current_time - last_modified) / 60 ))
+            if [ "$difference" -lt 60 ]; then
+                # 文件未更改且操作在60分钟内已执行，跳过此次执行
+                return 1
+            fi
+        fi
+        echo "$current_hash" > "$cache_path"
+        return 0
+
+    }
+
+    function cache_update() {
+
+        if [ "${3}" == true ]; then
+            md5sum "${1}" | awk '{ print $1 }' > "${2}"
+        else
+            rm -f "${2}"
+        fi
+
+    }
+
+    local token code response refresh_token data_dir url_host
     data_dir="${1}"
     if [ -n "${2}" ]; then
         token="${2}"
     else
         token=$(head -n1 "${data_dir}/myopentoken.txt")
     fi
-    if ! response=$(curl -s "https://api.xhofe.top/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
-        if ! response=$(curl -s "https://api-cf.nn.ci/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+    if cache_result "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt"; then
+        if curl -Is https://api.xhofe.top/alist/ali_open/qr | head -n 1 | grep -q '200'; then
+            url_host="api.xhofe.top"
+        else
+            url_host="api-cf.nn.ci"
+        fi
+        if ! response=$(curl -s "https://${url_host}/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
             WARN "网络问题，无法检测 阿里云盘 Open Token 有效性"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
             return 0
         fi
-    fi
-    code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
-    refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
-    if [ -n "${refresh_token}" ]; then
-        echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
-        INFO "有效 阿里云盘 Open Token"
-        return 0
-    elif [ "${code}" == "Too Many Requests" ]; then
-        WARN "已被限流，无法检测 阿里云盘 Open Token 有效性"
-        return 0
+        code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
+        refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+        if [ -n "${refresh_token}" ]; then
+            echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
+            INFO "有效 阿里云盘 Open Token"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "true"
+            return 0
+        elif [ "${code}" == "Too Many Requests" ]; then
+            WARN "已被限流，无法检测 阿里云盘 Open Token 有效性"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
+            return 0
+        else
+            ERROR "无效 阿里云盘 Open Token"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
+            return 1
+        fi
     else
-        ERROR "无效 阿里云盘 Open Token"
-        return 1
+        INFO "有效 阿里云盘 Open Token（缓存结果）"
+        return 0
     fi
 
 }
@@ -5748,8 +5794,12 @@ function first_init() {
         echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
     fi
 
-    if [ ! -d ${DDSREM_CONFIG_DIR}/data_crep ]; then
-        mkdir -p ${DDSREM_CONFIG_DIR}/data_crep
+    if [ ! -d "${DDSREM_CONFIG_DIR}/data_crep" ]; then
+        mkdir -p "${DDSREM_CONFIG_DIR}/data_crep"
+    fi
+
+    if [ ! -d "${DDSREM_CONFIG_DIR}/cache_data" ]; then
+        mkdir -p "${DDSREM_CONFIG_DIR}/cache_data"
     fi
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
