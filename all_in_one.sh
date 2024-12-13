@@ -384,7 +384,7 @@ function check_aliyunpan_opentoken() {
         if [ -f "$cache_path" ] && [ "$(head -n 1 "$cache_path")" == "$current_hash" ]; then
             last_modified=$(date -r "$cache_path" +%s)
             current_time=$(date +%s)
-            difference=$(( (current_time - last_modified) / 60 ))
+            difference=$(((current_time - last_modified) / 60))
             if [ "$difference" -lt 60 ]; then
                 # 文件未更改且操作在60分钟内已执行，跳过此次执行
                 return 1
