@@ -1889,6 +1889,69 @@ function __unzip_all_metadata() {
 
 }
 
+function __download_metadata() {
+
+    function metadata_downloader() {
+
+        local __data_downloader
+
+        INFO "开始下载 ${1} ..."
+        INFO "下载路径：${MEDIA_DIR}/temp/${1}"
+
+        __data_downloader=$(cat "${DDSREM_CONFIG_DIR}/data_downloader.txt")
+
+        INFO "使用下载器：${__data_downloader}"
+
+        extra_parameters="--workdir=/media/temp"
+
+        if [ "${__data_downloader}" == "wget" ]; then
+            if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
+                ERROR "${1} 下载失败！"
+                exit 1
+            fi
+        else
+            if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
+                if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+                    ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
+                    exit 1
+                else
+                    INFO "${1} 下载成功！"
+                fi
+            else
+                ERROR "${1} 下载失败！"
+                exit 1
+            fi
+        fi
+
+    }
+
+    if [ "${1}" == "all_metadata" ]; then
+        local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
+        for file in "${files[@]}"; do
+            metadata_downloader "${file}"
+        done
+
+        INFO "设置目录权限..."
+        chmod -R 777 "${MEDIA_DIR}"/temp
+        if [[ "${OSNAME}" = "macos" ]]; then
+            chown -R 0 "${MEDIA_DIR}"/temp
+        else
+            chown -R 0:0 "${MEDIA_DIR}"/temp
+        fi
+    else
+        metadata_downloader "${1}"
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/temp/"${1}"
+        if [[ "${OSNAME}" = "macos" ]]; then
+            chown 0 "${MEDIA_DIR}"/temp/"${1}"
+        else
+            chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
+        fi
+    fi
+
+}
+
 function unzip_xiaoya_all_emby() {
 
     get_config_dir
@@ -2172,86 +2235,13 @@ function download_xiaoya_emby() {
 
     if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
         INFO "清理旧 ${1} 中..."
-        rm -f ${MEDIA_DIR}/temp/${1}
+        rm -f "${MEDIA_DIR}/temp/${1}"
         if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
+            rm -rf "${MEDIA_DIR}/temp/${1}.aria2"
         fi
     fi
 
-    INFO "开始下载 ${1} ..."
-    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
-
-    extra_parameters="--workdir=/media/temp"
-
-    if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
-        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "${1} 下载成功！"
-        fi
-    else
-        ERROR "${1} 下载失败！"
-        exit 1
-    fi
-
-    INFO "设置目录权限..."
-    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp/"${1}"
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
-    fi
-
-    INFO "下载完成！"
-
-}
-
-function download_wget_xiaoya_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    test_xiaoya_status
-
-    mkdir -p "${MEDIA_DIR}"/temp
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp
-    fi
-    chmod 777 "${MEDIA_DIR}"/temp
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
-
-    if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
-        INFO "清理旧 ${1} 中..."
-        rm -f ${MEDIA_DIR}/temp/${1}
-        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
-        fi
-    fi
-
-    INFO "开始下载 ${1} ..."
-    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
-
-    extra_parameters="--workdir=/media/temp"
-
-    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
-        ERROR "${1} 下载失败！"
-        exit 1
-    fi
-
-    INFO "设置目录权限..."
-    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp/"${1}"
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
-    fi
+    __download_metadata "${1}"
 
     INFO "下载完成！"
 
@@ -2265,52 +2255,6 @@ function download_unzip_xiaoya_all_emby() {
 
     test_xiaoya_status
 
-    mkdir -p "${MEDIA_DIR}/temp"
-    rm -rf "${MEDIA_DIR}/config"
-
-    test_disk_capacity
-
-    mkdir -p "${MEDIA_DIR}/xiaoya"
-    mkdir -p "${MEDIA_DIR}/config"
-    chmod 755 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
-
-    INFO "开始下载解压..."
-
-    local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
-    for file in "${files[@]}"; do
-        extra_parameters="--workdir=/media/temp"
-        if ! pull_run_glue aria2c -o "${file}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${file}"; then
-            ERROR "${file} 下载失败！"
-            exit 1
-        fi
-    done
-
-    __unzip_all_metadata
-
-    set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
-
-    INFO "下载解压完成！"
-
-}
-
-function download_wget_unzip_xiaoya_all_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    test_xiaoya_status
-
-    mkdir -p "${MEDIA_DIR}/temp"
     rm -rf "${MEDIA_DIR}/config"
 
     test_disk_capacity
@@ -2334,13 +2278,7 @@ function download_wget_unzip_xiaoya_all_emby() {
 
     INFO "开始下载解压..."
 
-    for file in "${files[@]}"; do
-        extra_parameters="--workdir=/media/temp"
-        if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${file}"; then
-            ERROR "${file} 下载失败！"
-            exit 1
-        fi
-    done
+    __download_metadata "all_metadata"
 
     __unzip_all_metadata
 
@@ -2350,8 +2288,7 @@ function download_wget_unzip_xiaoya_all_emby() {
     INFO "这可能需要一定时间，请耐心等待！"
     chmod -R 777 "${MEDIA_DIR}"
 
-    host=$(echo $xiaoya_addr | cut -f1,2 -d:)
-    INFO "刮削数据已经下载解压完成，请登入${host}:2345，用户名:xiaoya   密码:1234"
+    INFO "刮削数据已经下载解压完成！"
 
 }
 
@@ -2489,25 +2426,7 @@ function download_unzip_xiaoya_emby_new_config() {
 
     INFO "开始下载解压..."
 
-    extra_parameters="--workdir=/media/temp"
-    if [ "$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)" == "wget" ]; then
-        if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.new.mp4"; then
-            ERROR "config.new.mp4 下载失败！"
-            exit 1
-        fi
-    else
-        if pull_run_glue aria2c -o "config.new.mp4" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/config.new.mp4"; then
-            if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
-                ERROR "存在 ${MEDIA_DIR}/temp/config.new.mp4.aria2 文件，下载不完整！"
-                exit 1
-            else
-                INFO "config.new.mp4 下载成功！"
-            fi
-        else
-            ERROR "config.new.mp4 下载失败！"
-            exit 1
-        fi
-    fi
+    __download_metadata "config.new.mp4"
 
     start_time1=$(date +%s)
 
@@ -2557,11 +2476,7 @@ function main_download_unzip_xiaoya_emby() {
             case "$num" in
             1)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_unzip_xiaoya_all_emby
-                else
-                    download_unzip_xiaoya_all_emby
-                fi
+                download_unzip_xiaoya_all_emby
                 ;;
             2)
                 clear
@@ -2569,11 +2484,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             3)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "all.mp4"
-                else
-                    download_xiaoya_emby "all.mp4"
-                fi
+                download_xiaoya_emby "all.mp4"
                 ;;
             4)
                 clear
@@ -2585,11 +2496,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             6)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "config.mp4"
-                else
-                    download_xiaoya_emby "config.mp4"
-                fi
+                download_xiaoya_emby "config.mp4"
                 ;;
             7)
                 clear
@@ -2597,11 +2504,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             8)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "pikpak.mp4"
-                else
-                    download_xiaoya_emby "pikpak.mp4"
-                fi
+                download_xiaoya_emby "pikpak.mp4"
                 ;;
             9)
                 clear
@@ -2609,11 +2512,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             10)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "115.mp4"
-                else
-                    download_xiaoya_emby "115.mp4"
-                fi
+                download_xiaoya_emby "115.mp4"
                 ;;
             11)
                 clear
