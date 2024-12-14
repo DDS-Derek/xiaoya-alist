@@ -1874,12 +1874,22 @@ function __unzip_metadata() {
         if ! check_metadata_size "${1}"; then
             exit 1
         fi
-        if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
-            extra_parameters="--workdir=/media"
+        if [[ "${OSNAME}" = "macos" ]]; then
+            if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+                cd "${MEDIA_DIR}" || return 1
+            else
+                cd "${MEDIA_DIR}/xiaoya" || return 1
+            fi
+            INFO "当前解压工作目录：$(pwd)"
+            7z x -aoa -mmt=16 "${MEDIA_DIR}/temp/${1}"
         else
-            extra_parameters="--workdir=/media/xiaoya"
+            if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+                extra_parameters="--workdir=/media"
+            else
+                extra_parameters="--workdir=/media/xiaoya"
+            fi
+            pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}"
         fi
-        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}"
 
     }
 
@@ -2053,8 +2063,14 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
         if ! check_metadata_size "${1}"; then
             exit 1
         fi
-        extra_parameters="--workdir=/media/xiaoya"
-        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}" "${2}/*" -o/media/xiaoya
+        if [[ "${OSNAME}" = "macos" ]]; then
+            cd "${MEDIA_DIR}/xiaoya" || return 1
+            INFO "当前解压工作目录：$(pwd)"
+            7z x -aoa -mmt=16 "${MEDIA_DIR}/temp/${1}" "${2}/*" -o"${MEDIA_DIR}/xiaoya"
+        else
+            extra_parameters="--workdir=/media/xiaoya"
+            pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}" "${2}/*" -o/media/xiaoya
+        fi
 
     }
 
