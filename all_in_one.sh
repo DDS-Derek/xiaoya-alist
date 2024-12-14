@@ -30,7 +30,7 @@ amilys_embyserver_beta_version=4.9.0.32
 emby_embyserver_beta_version=4.9.0.33
 # ——————————————————————————————————————————————————————————————————————————————————
 
-Sky_Blue="\e[36m"
+Sky_Blue="\033[36m"
 Blue="\033[34m"
 Green="\033[32m"
 Red="\033[31m"
@@ -5761,6 +5761,7 @@ if [ "$(uname -s)" == "Darwin" ]; then
         if ! sudo bash /tmp/xiaoya_install.sh $@; then
             exit 1
         fi
+        exit 0
     fi
 fi
 if [ ! -d "/tmp/xiaoya_alist_tmp" ]; then
