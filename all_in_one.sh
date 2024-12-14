@@ -5609,6 +5609,9 @@ function main_return() {
 
 function first_init() {
 
+    INFO "获取系统信息中..."
+    get_os
+
     INFO "获取 IP 地址中..."
     CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
     if [ -n "${CITY}" ]; then
@@ -5721,7 +5724,6 @@ function root_need() {
 clear
 INFO "初始化中，请稍等...."
 root_need
-INFO "获取系统信息中..."
 if [ "$(uname -s)" == "Darwin" ]; then
     if ! command -v brew; then
         WARN "brew 未安装，脚本尝试自动安装..."
@@ -5758,7 +5760,6 @@ if [ "$(uname -s)" == "Darwin" ]; then
         sudo bash /tmp/xiaoya_install.sh $@
     fi
 fi
-get_os
 if [ ! -d "/tmp/xiaoya_alist_tmp" ]; then
     mkdir -p /tmp/xiaoya_alist_tmp
 fi
