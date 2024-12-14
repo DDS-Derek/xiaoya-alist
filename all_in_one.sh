@@ -5677,7 +5677,11 @@ function first_init() {
     fi
 
     if [ ! -f "${DDSREM_CONFIG_DIR}/default_network.txt" ]; then
-        echo 'host' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        if [[ "${OSNAME}" = "macos" ]]; then
+            echo 'bridge' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        else
+            echo 'host' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        fi
     fi
 
     INFO "设置 Docker 镜像源中..."
