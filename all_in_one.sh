@@ -5756,8 +5756,11 @@ if [ "$(uname -s)" == "Darwin" ]; then
             fi
         fi
         INFO "脚本获取成功！"
+        sed -i '' '/^root_need$/d' /tmp/xiaoya_install.sh
         # shellcheck disable=SC2068
-        sudo bash /tmp/xiaoya_install.sh $@
+        if ! sudo bash /tmp/xiaoya_install.sh $@; then
+            exit 1
+        fi
     fi
 fi
 if [ ! -d "/tmp/xiaoya_alist_tmp" ]; then
