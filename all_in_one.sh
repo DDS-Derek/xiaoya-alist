@@ -1711,6 +1711,15 @@ function test_disk_capacity() {
 
 }
 
+function show_disk_capacity() {
+
+    free_size=$(df -P "${1}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+}
+
 function pull_run_glue() {
 
     if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
@@ -2010,10 +2019,7 @@ function unzip_xiaoya_emby() {
 
     get_media_dir
 
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+    show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
     if [[ "${OSNAME}" = "macos" ]]; then
@@ -2131,10 +2137,7 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
 
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+    show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
     if [[ "${OSNAME}" = "macos" ]]; then
@@ -2189,10 +2192,8 @@ function download_xiaoya_emby() {
         chown 0:0 "${MEDIA_DIR}"/temp
     fi
     chmod 777 "${MEDIA_DIR}"/temp
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+
+    show_disk_capacity "${MEDIA_DIR}"
 
     if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
         INFO "清理旧 ${1} 中..."
@@ -2380,6 +2381,8 @@ function download_unzip_xiaoya_emby_new_config() {
             rm -rf "${MEDIA_DIR}/temp/config.new.mp4"
         fi
     fi
+
+    show_disk_capacity "${MEDIA_DIR}"
 
     INFO "开始下载解压..."
 
