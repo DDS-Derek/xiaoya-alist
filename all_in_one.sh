@@ -1865,22 +1865,42 @@ function check_metadata_size() {
 
 }
 
-function __unzip_all_metadata() {
+function __unzip_metadata() {
 
-    start_time1=$(date +%s)
+    function metadata_unziper() {
 
-    local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
-    for file in "${files[@]}"; do
-        if ! check_metadata_size "${file}"; then
+        if ! check_metadata_size "${1}"; then
             exit 1
         fi
-        if [ "${file}" == "config.mp4" ]; then
+        if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
             extra_parameters="--workdir=/media"
         else
             extra_parameters="--workdir=/media/xiaoya"
         fi
-        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${file}"
-    done
+        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}"
+
+    }
+
+    start_time1=$(date +%s)
+
+    if [ "${1}" == "all_metadata" ]; then
+        local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
+        for file in "${files[@]}"; do
+            metadata_unziper "${file}"
+        done
+        INFO "设置目录权限..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"
+    elif [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+        metadata_unziper "${1}"
+        INFO "设置目录权限..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"/config
+    else
+        metadata_unziper "${1}"
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    fi
 
     end_time1=$(date +%s)
     total_time1=$((end_time1 - start_time1))
@@ -1976,13 +1996,9 @@ function unzip_xiaoya_all_emby() {
 
     INFO "开始解压..."
 
-    __unzip_all_metadata
+    __unzip_metadata "all_metadata"
 
     set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
 
     INFO "解压完成！"
 
@@ -2013,11 +2029,7 @@ function unzip_xiaoya_emby() {
         exit 1
     fi
 
-    start_time1=$(date +%s)
-
     if [ "${1}" == "config.mp4" ]; then
-        extra_parameters="--workdir=/media"
-
         if [ -d "${MEDIA_DIR}/config" ]; then
             INFO "清理旧配置文件中..."
             INFO "这可能需要一定时间，请耐心等待！"
@@ -2025,63 +2037,27 @@ function unzip_xiaoya_emby() {
         fi
         mkdir -p "${MEDIA_DIR}"/config
         chmod -R 777 "${MEDIA_DIR}"/config
-
-        if ! check_metadata_size "config.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
-
-        INFO "设置目录权限..."
-        INFO "这可能需要一定时间，请耐心等待！"
-        chmod -R 777 "${MEDIA_DIR}"/config
-    elif [ "${1}" == "all.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
+        __unzip_metadata "${1}"
+    else
         mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "all.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    elif [ "${1}" == "pikpak.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "pikpak.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    elif [ "${1}" == "115.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "115.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/115.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        __unzip_metadata "${1}"
     fi
-
-    end_time1=$(date +%s)
-    total_time1=$((end_time1 - start_time1))
-    total_time1=$((total_time1 / 60))
-    INFO "解压执行时间：$total_time1 分钟"
 
     INFO "解压完成！"
 
 }
 
 function unzip_appoint_xiaoya_emby_jellyfin() {
+
+    function metadata_unziper() {
+
+        if ! check_metadata_size "${1}"; then
+            exit 1
+        fi
+        extra_parameters="--workdir=/media/xiaoya"
+        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}" "${2}/*" -o/media/xiaoya
+
+    }
 
     get_config_dir
 
@@ -2177,32 +2153,17 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
     start_time1=$(date +%s)
 
     if [ "${1}" == "all.mp4" ] || [ "${1}" == "all_jf.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
         mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "all.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} ${UNZIP_FOLD}/* -o/media/xiaoya
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        metadata_unziper "${1}" "${UNZIP_FOLD}"
     elif [ "${1}" == "115.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
         mkdir -p "${MEDIA_DIR}"/xiaoya/115
-
-        if ! check_metadata_size "115.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} 115/${UNZIP_FOLD}/* -o/media/xiaoya
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        metadata_unziper "${1}" "115/${UNZIP_FOLD}"
     else
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
+
+    INFO "设置目录权限..."
+    chmod 777 "${MEDIA_DIR}"/xiaoya
 
     end_time1=$(date +%s)
     total_time1=$((end_time1 - start_time1))
@@ -2280,13 +2241,9 @@ function download_unzip_xiaoya_all_emby() {
 
     __download_metadata "all_metadata"
 
-    __unzip_all_metadata
+    __unzip_metadata "all_metadata"
 
     set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
 
     INFO "刮削数据已经下载解压完成！"
 
@@ -2428,17 +2385,7 @@ function download_unzip_xiaoya_emby_new_config() {
 
     __download_metadata "config.new.mp4"
 
-    start_time1=$(date +%s)
-
-    if ! check_metadata_size "config.new.mp4"; then
-        exit 1
-    fi
-    extra_parameters="--workdir=/media"
-    pull_run_glue 7z x -aoa -mmt=16 temp/config.new.mp4
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}/config"
+    __unzip_metadata "config.new.mp4"
 
     docker start "${emby_name}"
     sleep 5
