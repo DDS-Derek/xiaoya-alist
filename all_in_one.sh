@@ -462,6 +462,7 @@ function qrcode_mode_choose() {
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
+            --privileged=true \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             "${2}" --qrcode_mode=web ${extra_parameters}
@@ -504,6 +505,7 @@ function qrcode_mode_choose() {
             docker run -i --rm \
                 -v "${1}:/data" \
                 -e LANG=C.UTF-8 \
+                --privileged=true \
                 ddsderek/xiaoya-glue:python \
                 "${2}" --qrcode_mode=shell ${extra_parameters}
             return 0
@@ -1047,6 +1049,7 @@ function get_aliyunpan_folder_id() {
         docker run -it --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
+            --privileged=true \
             ddsderek/xiaoya-glue:python \
             /get_folder_id/get_folder_id.py --data_path='/data' --drive_mode=r
         ;;
@@ -1777,6 +1780,7 @@ function pull_run_glue_xh() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            --privileged=true \
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
@@ -1788,6 +1792,7 @@ function pull_run_glue_xh() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            --privileged=true \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
