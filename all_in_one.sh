@@ -140,6 +140,11 @@ function get_path() {
             path_lib=/vol1/1000
         fi
         ;;
+    macos)
+        if [ -n "${RUN_USER}" ]; then
+            path_lib="/Users/${RUN_USER}/Documents"
+        fi
+        ;;
     *)
         if auto_path="$(df -h | awk '$2 ~ /G/ && $2+0 > 200 {print $6}' | grep -E -v "Avail|loop|boot|overlay|tmpfs|proc" | head -n 1)" > /dev/null 2>&1; then
             if check_path "${auto_path}"; then
@@ -5652,6 +5657,11 @@ function first_init() {
     INFO "获取系统信息中..."
     get_os
 
+    if [ -f /tmp/run_xiaoya_install_user.txt ]; then
+        INFO "运行脚本的用户：$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
+        RUN_USER="$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
+    fi
+
     INFO "获取 IP 地址中..."
     CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
     if [ -n "${CITY}" ]; then
@@ -5795,6 +5805,9 @@ if [ "$(uname -s)" == "Darwin" ]; then
         if [ -f /tmp/xiaoya_install.sh ]; then
             rm -rf /tmp/xiaoya_install.sh
         fi
+        if [ -f /tmp/run_xiaoya_install_user.txt ]; then
+            rm -rf /tmp/run_xiaoya_install_user.txt
+        fi
         if ! curl -sL https://ddsrem.com/xiaoya/all_in_one.sh -o /tmp/xiaoya_install.sh; then
             if ! curl -sL https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/all_in_one.sh -o /tmp/xiaoya_install.sh; then
                 if ! curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/all_in_one.sh -o /tmp/xiaoya_install.sh; then
@@ -5805,6 +5818,7 @@ if [ "$(uname -s)" == "Darwin" ]; then
         fi
         INFO "脚本获取成功！"
         sed -i '' '/^root_need$/d' /tmp/xiaoya_install.sh
+        who | sed -n "2,1p" | awk '{print $1}' > /tmp/run_xiaoya_install_user.txt
         # shellcheck disable=SC2068
         if ! sudo bash /tmp/xiaoya_install.sh $@; then
             exit 1
