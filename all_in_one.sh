@@ -533,6 +533,7 @@ function qrcode_mode_choose() {
         read -erp "QRCODE_MODE:" QRCODE_MODE
         [[ -z "${QRCODE_MODE}" ]] && QRCODE_MODE="2"
         if [[ ${QRCODE_MODE} == [1] ]]; then
+            # shellcheck disable=SC2046
             docker run -i --rm \
                 -v "${1}:/data" \
                 -e LANG=C.UTF-8 \
@@ -1077,6 +1078,7 @@ function get_aliyunpan_folder_id() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 folder id 自动获取"
         pull_glue_python_ddsrem
+        # shellcheck disable=SC2046
         docker run -it --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
@@ -1764,6 +1766,7 @@ function pull_run_glue() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -it \
             --security-opt seccomp=unconfined \
             --rm \
@@ -1777,6 +1780,7 @@ function pull_run_glue() {
             xiaoyaliu/glue:latest \
             "${@}"
     else
+        # shellcheck disable=SC2046
         docker run -it \
             --security-opt seccomp=unconfined \
             --rm \
@@ -1808,6 +1812,7 @@ function pull_run_glue_xh() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
@@ -1820,6 +1825,7 @@ function pull_run_glue_xh() {
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
