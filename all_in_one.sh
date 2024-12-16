@@ -72,40 +72,6 @@ pikpakshare_list_base64="6auY5riF55S15b2xL+WQiOmbhjEgICAgICAgICAgVk5SbE5MQVJMbXl
 pan115share_list_base64="57qq5b2V54mHIHN3NjJmcmczd3A2IDIyODgzMzE1NDExNTM2NjI1NjQgbjlmNQo0S1JlbXV4IHN3NnB3Nzkzd2ZwIDI2Mjg0NzgyMDk3ODcyNjQzMTUgdzgxNgrnlLXlvbExMDgwUCBzdzY4ZnV1M25udyAxOTI2OTY4MTA1NzIyODIzMDMxIHBiNTcK55S16KeG5YmnIHN3NjhlODEzbm53IDI2NTkwNjMxNzgxMTcyNTAzNzQgbjllMArlkIjpm4YxIHN3enlpd3czd245IDI1MjQ4MTE1NTc1MDA4NTIyNzQgdzFlMArlkIjpm4YyIHN3enlpd3Ezd245IDI2Mzc4OTAyNTgzNzg5MjI3NzcgeDcxNgrlkIjpm4YzIHN3enlpd2Izd245IDI2Mzc4OTYzNjAyMjcyMTU3NDkgcWZlOArliqjnlLvnlLXlvbEgc3d6NmdtbDNmd28gMjc4Mzc1MzU5ODE2NzY3ODE3NiA4ODg4Cuasp+e+jueUteW9sSBzdzY4d3o5M25jYiAyNjU2MjMyMDYwNDAwMzY1NzY4IDY2NjYK576O5YmnIHN3NnBsdDIzbmNiIDI2Mjk4MzAxODUzMjk1NTM3OTYgNjY2NgrljYPpg6jmipbpn7Pnn63liaflkIjpm4Ygc3d6cWg2NzNoNHkgMjg0NDM4ODU0NTQ4Nzk2MTIxMSA1Mjk2CuaKlumfs+efreWJp+WQiOmbhjEuNzdUIHN3eng3NmYzd2ZhIDI5NTUyMjA1NzY3MzcwMDk5NTggbjcyNArml6DmjZ/pn7PkuZAgc3c2dTQweDN3cDYgMjc0ODI0ODM2NTg2NjE1NTczNCB0NTQzCuasp+e+juWJpyBzd3pubTM3M3cxcCAyNzc1NTY3MTE2Njk2MjQ1NDEyIHBlMzUK6Z+z5LmQMjLkuIfpppYgc3d6bXFjcjNmczYgIDI3ODMzMDQ0MDM1ODU1OTY1NjYgeGQ2Nwrpn7PkuZAyMuS4h+mmli9ERFMrSGlSZXMgc3c2NTh1cTM2eDIgMjU2NTY3MjQwMzc2NjAwMTQzNSBtZDk4Cumfs+S5kDIy5LiH6aaWL+avjeW4puezu+WIlyBzdzY1OHVxMzZ4MiAyNTY1NDE2NDc5NzA5MTE3ODQzIG1kOTgK6Z+z5LmQMjLkuIfpppYv57Si5bC857K+6YCJIHN3NjU4dXEzNngyIDI1NjU5MTczNzk1MTUwMzkxNzYgbWQ5OArpn7PkuZAyMuS4h+mmli/lkITnsbvpo47moLwgc3c2NTh1cTM2eDIgMjU2NTQ2NjU4Njk1MzQ2NDg1NyBtZDk4Cumfs+S5kDIy5LiH6aaWL+WNjuivrTI3MDAw6aaW5peg5o2fIHN3NjU4dWIzNngyIDI1NjUyNzQwNTU3ODMzOTg3MzQgcTdlMArml6Xpn6nnlLXlvbEgc3d6ZzhkZDN3eWUgMjkzMjI3Mjg1NzEzNDEzNzEwNyBtNWIzCuaXpemfqeWJpyBzd3pqeGNwM3dmYSAyOTUxODcwNjYzMTk4MzUxNjg2IG9mODk="
 quarkshare_list_base64="55S15b2xL+WQiOmbhi/nvo7lm73nlLXlvbHlrabpmaLnmb7lubTnmb7lrrblvbHniYcgIDQwNWNjNWJjNjIyNSAgMzk5YmU1YTMyNDVhNGQxMWE3ODEzMzk0ZjNmOGRjZmIK57uP5YW45b2x6KeG44CQ57O75YiX5aSn54mH5oC75ZCI6ZuG44CRICBiOTQ1ZGQxZmMxZGYgIGFmZGFmNjE4Y2U4ZDQyODdiNjYzYjJmMGVlYzg5NzlmCuWKqOa8qy/liqjmvKvnlLXlvbHlkIjpm4YgYjk0NWRkMWZjMWRmIGI5YTdjYThiODg3NTQwOTA4ZGI2ZDFlNmNlMTQ2ZDYwCuWKqOa8qy/lm73lhoXlpJbnu4/lhbjliqjnlLvliqjmvKvlpKflhaggNmI3OTUyMTgzNDJkIDIzZDk1MTI3MWQ0NjQ2OTdiZTIzMmRiYjc0NmIyMjdlCuWKqOa8qy/lm73mvKvmm7TmlrDkuK0gMTdlOGU5YTFhNjU3IDYzMDUwM2JhM2RjZjRiYjVhZTQ4NWQ2ZWEzN2RjM2Y4CuWKqOa8qy/lt7Llroznu5Plm73mvKsgNmI3OTUyMTgzNDJkIGY2YWI2ZGMwMjEwYTQyYmVhMmRjMmJmZWEzOGMyYmU0CuWKqOa8qy/lt7Llroznu5Pml6XmvKsgNmI3OTUyMTgzNDJkIGQyNjU5NTZlMjQxZTQ5ZGJiYjdiZjVlNzE2MzBiMTkzCuWKqOa8qy/lt7Llroznu5Pnvo7mvKsgNmI3OTUyMTgzNDJkIGM0ZDQyOWRmYzY0NDQ3Mzc4NmJkYjIyYWE2NzQyMTkwCuWwj+WTgeebuOWjsC8yMDI05b635LqR56S+IGVjZTUyZDYzYjY5OCBkYWUyZjM2ZDM2ZDA0NzNiODlmZjg0ZGFhODFiODMwMwrlsI/lk4Hnm7jlo7Av5bCP5ZOB5aSn5ZCI6ZuGIGU4MjcyNjRlYTQ1MyA2MDljNWViOGIzMjQ0ZGMyOTU4YmMxM2YxNmQ0NTRlZArlsI/lk4Hnm7jlo7Av5bCP5ZOB57qv5Lqr5ZCI6ZuGIGQ4YjRhNTg0ZmQxYSBhNTI5OTM0OWQzNjk0MjA2OGFkYzg4Yjk1MmM3YzQ2MQrnlLXlvbEv5ZCI6ZuGL+S7pUFCQ0TlvIDlpLTlkIjpm4YgYTYzMjk2Nzc2MGNmIDdkYTRmZDJkYzA4ZjRmYTU4NTJmOTk3MjE1NTkyNTE3CueUteW9sS/lkIjpm4Yv5LulRUZHSOW8gOWktOWQiOmbhiAyZjU5YmI1ZDk2YjkgN2I3MTczN2UzY2Q4NDNjNWE5MzdhYzk3YTUzNTQyZGQK55S15b2xL+WQiOmbhi/ku6VJSktM5byA5aS05ZCI6ZuGIDUwODI4YzM2OGRlZiAwOTY5NTBlM2QxMDI0MmIxOTY2Yjc3NzgxMTE1YTA3YQrnlLXlvbEv5ZCI6ZuGL+S7pU1OT1DlvIDlpLTlkIjpm4YgZTA3ZTI2YWVjYzA4IGEyYjMwNTMxNjMxYzQ2ZGNiMzlmMzIwNjk3ODk4Mjk1CueUteW9sS/lkIjpm4Yv5LulUVJTVOW8gOWktOWQiOmbhiAwNTM2YTM4YTM1NmUgMWQxNzVkYjMwZWFhNDU0ZTlkYmM1ZWFhMDllMWU0NTQK55S15b2xL+WQiOmbhi/ku6VVVldY5byA5aS05ZCI6ZuGIGUyNzNlZjY5NzQwMyA2ZGJkYTZlODE3ZWI0MTQ1YmEyZGQ2ODFlNTdhYTY3NQrnlLXlvbEv5ZCI6ZuGL+S7pVla5byA5aS05ZCI6ZuGIGM4YWM2Yzg4ZTVkOCA0OGM0NzllMjRiYWU0ZWMzYTRhOWQ1NmZjYjA2ZmNmNArnlLXlvbEv5ZCI6ZuGL+S7peaVsOWtl+W8gOWktOWQiOmbhiA0OWFiNzVkNTJlMDAgY2VjMDcwMmRiMjZiNDdjNWFiZDQyY2E3OWFiYjY1ZTEK55S15b2xL+WvvOa8lCBlZDA4NDRjN2QwNDYgOTA5OTI1NGIxY2VlNGIzOWFjYzZmYzcxZmZmNzcwMzkK55S15b2xL+WvvOa8lC/ljJfph47mraYgZmFiMWVkYjllNWViIGQ3YmJmZmM0NWVmNjQxMDg4ZmU0YjIwMjkxMDhiY2FjCueUteW9sS/lr7zmvJQv5rSq6YeR5a6dIGJlMjYxYzhhN2ViOCBlMWRiOWQ3ODQ4MjI0MmMyOTczZDFjYzIzMDYwY2MxZQrnlLXlvbEv5oGQ5oCW54mHMTAw6YOoIDZjMDY2NmVkMjhkZSA2NjIxOGU3MzEwMTE0OWRmOTczODczYmRjMWY0NjUwMwrnlLXlvbEv5ryU5ZGYL+WImOW+t+WNjiAxNzY0YzJjODE2MDMgYWJhZTJmN2U2MWY1NDk4MDg1MTY3ZTA3ZWY4ZGVjMzQK55S15b2xL+a8lOWRmC/lkajmmJ/pqbAgNjBkY2E1ODAwOWFmIDdkYTUwMmQyNGY0NzRiNjBhZmNjMzQyZmQ1YWMwZGUzCueUteW9sS/mvJTlkZgv5ZGo5ram5Y+RIGU1ODNmYWM0NTU5MiA4MmMwNDljMTQwNTA0ZDRhYTMxY2JmZTE2NDVjYjlkOArnlLXlvbEv5ryU5ZGYL+W8oOWbveiNoyBkMzAwMGYxNDk0MmUgOGMzNWZjYmI0ZTg1NGU1MGIzODVkZjcwMjYwNGQzODIK55S15b2xL+a8lOWRmC/miJDpvpkgZTViNjRkZmIxYzgzIDYwN2I4NzlkYTI1YzQ0NjQ4M2JjN2Y4OTUwY2Q3MzNmCueUteW9sS/mvJTlkZgv5p2O5Li954+NIDQ3MzM3MGU2NTdjMCBjMzlhNTY2MDA5MmU0YmJhYWM3Y2FkM2NmMDY0ZTIzYwrnlLXlvbEv5ryU5ZGYL+adjuWwj+m+mSBiOTQ1ZGQxZmMxZGYgMTcyN2IxNjQ1MTE0NDMxYjgxYTMyZjRkMDZlNDA4MGIK55S15b2xL+a8lOWRmC/mnY7ov57mnbAgYmZjMGE2MTUwYWZjIDZlZWIwMzZjN2Q3YTQ1ODBhYjk1YzE2NWJiZWU3NGMzCueUteW9sS/mvJTlkZgv5rKI6IW+IGI5NDVkZDFmYzFkZiBiODkyYjY5NTNkMjM0ZDRlYWI4NzczNTE5NzI3NWViMQrnlLXlvbEv5ryU5ZGYL+iIkua3hyA4NGU1M2RkMzc4ZjIgYzU5Yzc4MzU4NGU3NGQ3MDk0Yjk4YTY0OTg0OTI4NzYK55S15b2xL+a8lOWRmC/pgrHmt5HotJ4gYzRiMDQwM2MwZGZhIGE5MjBlMDY1NTVmYjRkNTA5NzU3MGNhMWI0MTBiZDAyCueUteW9sS/nsr7pgInpq5jnlLvotKjpq5jliIbnlLXlvbEgOGYxYjRiN2RjNjllIGQyZTVlOTE2NzRmOTQzNTJiMzMxMGFiODZiOGMyMzhlCueUteW9sS/pgrXmsI/lkIjpm4YgNTYxMmZlMWFkYjRhIGVkNDRkMDMzZTNmYzRjNWVhMmQ4YTVjODk1MWRmMGQ5CueUteW9sS/pn6nlm71S57qnIDU0MzJiZWFlNGYxYSA1MTI0ZjQ3ODlkYWY0NTAwOWJkMTMzYWY1MDk5ODEwMgrnlLXlvbEv6auY5YiG5Y2O6K+t55S15b2xMzAw6YOoIGI5NDVkZDFmYzFkZiAyMTk4ZGFiNDNmYzY0YWRiYWY5YTZkNGI1YjEzZWZhYgrnlLXop4bliacvMjAyNOaXpemfqeWJpyA0NWQzNDEzMDE2MGYgZTczODBkM2M3YmM0NDllNmFhNWZhMjMwNjNiMmNkZjMK55S16KeG5YmnLzIwMjTmrKfnvo7liacgZjlmNTQyMGNhYjBkIGZkNjIyZDEyZjUzOTQ5ZWZiNWZlZGUwMmRlMDhlNjQ5CueUteinhuWJpy9UVkLjgIFBVFbkuprop4YgMDg1MjEyZGYzODVkIDE3MmI3ZWNjYzM4NDRhZTRhMTE0NTFkNmExNDVmZmUwCueUteinhuWJpy/lt7Llroznu5Mv5pWw5a2X5byA5aS0IGNkNGM1YWM3ZTgzMCBkZmEwMWNiMTg5NTg0MDhjYTBkYTcyYjEzOTMxOWFmMwrnlLXop4bliacv5bey5a6M57uTL+ixhueTo+ivhOWIhjkuMOS7peS4iuWbveS6p+WJpyBkMTljNGViZTFmZjcgN2I0Mjk0M2Q0ZjIwNDJhYmI5MDdjOTlkZGJiMzU0MGQK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41BQkNEIGUxYjJiYThiNmQ2YyBjODkyNDY3YjBjYzI0YWFiYWNiZWM3MWEwYjZmNGQzYwrnlLXop4bliacv5bey5a6M57uTL+mmluWtl+avjUVGR0ggMTY2ZmEwYTdjYTZmIGZmNTcwODNkODkyMzRlZDM4OTMyZGMwNjA5N2QxMTVkCueUteinhuWJpy/lt7Llroznu5Mv6aaW5a2X5q+NSUpLTCAzN2E5MmMwYjdmMTAgNTg1OTA3YWJhMGVmNDY0YmEwMGEwZjIwYjQ3ZmExMTYK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41OTU9QIGZiMzM4NmU0MmFmMiAzNmUyZjgxZmY0MTQ0YTljOGMxNDk4OGVkODlhODYwZArnlLXop4bliacv5bey5a6M57uTL+mmluWtl+avjVFSU1QgNDZjZTIxNGY0ZWQ3IDNiNGY5ZTBjNjc1OTQ5Yzk5MjY5NDc2ZTVmOWMwN2E4CueUteinhuWJpy/lt7Llroznu5Mv6aaW5a2X5q+NVVZXWCBmZTQ2ODFkN2ZiNDMgYmNiY2ZkMzhkMjU0NGY1Zjk1MWVjZmU0MzA0ODMyMDMK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41ZWiA4ZDY1ZTg4NWIwNTkgMDM2ZmQ5ODk1YzRiNGE0N2E1OWIxNzA0NjcxNTgxNmYK55S16KeG5YmnL+e7j+WFuOaXpemfqeWJp+WQiOmbhiBmMGRiZjU1MzU4NzQgNzY0MjI0YjQxYWZlNGY2ZmJlYTUwYjg4YTNhNmI1MmMK6Z+z5LmQL+S5pummmemfs+S5kOS4lue6quWFuOiXjyBkMmRmYTMyNjQ3ZjYgMTY3YWU5ZWRkM2ZlNDY2MmEyY2UzNzc1NTllMzVmNTgK6Z+z5LmQL+WPpOWFuOmfs+S5kOeyvumAieWQiOmbhiAyYjQ5NzgyMTNiMjkgNjkwMzhmZjA5MDA1NGExZWI4ODAzMTJiZTQ3NzUzOTIK6Z+z5LmQL+Wkp+iHqueEtumfs+S5kOezu+WIl+WQiOmbhiA2NTFlNWZhOTMwNTcgOWM5ZjMzMzY3ODNlNDhhZjlmNDdjNWVjZDk5OGU5MTQK6Z+z5LmQL+e6r+mfs+S5kOWQiOmbhiAxMjg0ODM4MWRjZTEgYWUyY2FlYjc4NDZkNGY4NTg0NjdkMmI2MjZkNzhjYTMK6Z+z5LmQL+i9pui9veaXoOaNn+eOr+e7lemfs+aViOmfs+S5kOWQiOmbhiA4MDVkNzZhMDgwNjMgNTkzZjk4MTA0ZjE5NDMwMmEyN2FlOTFiYTdjZDE4ZGIK6Z+z5LmQL+mch+aSvOW/g+eBteeahOWPsuivl+mfs+S5kOWQiOmbhiBkMWEwYjcwNDZiMjAgMjk0YTUzYTNjOWU4NGVmMGEwYWNjMDQxOTVjMDI1ZDg="
 
-function touch_chmod() {
-
-    touch "${1}"
-    chmod 777 "${1}"
-    auto_chown "${1}"
-
-}
-
-function auto_chown() {
-
-    if [ -n "${2}" ]; then
-        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
-            chown "${2}" "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
-        else
-            chown "${2}" 0:0 "${1}"
-        fi
-    else
-        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
-            chown "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
-        else
-            chown 0:0 "${1}"
-        fi
-    fi
-
-}
-
-function auto_privileged() {
-
-    if [[ "${OSNAME}" = "macos" ]]; then
-        echo "--privileged=true"
-    fi
-
-}
-
 function get_default_network() {
 
     _default_network=$(cat "${DDSREM_CONFIG_DIR}/default_network.txt")
@@ -124,31 +90,6 @@ function get_default_network() {
             echo '-p 34278:34278'
             ;;
         esac
-    fi
-
-}
-
-function check_path() {
-
-    if [ -z "${1}" ]; then
-        return 1
-    fi
-
-    # 目录不能为‘/’
-    if [ "${1}" == "/" ]; then
-        return 1
-    fi
-
-    # 目录结尾不能有空格
-    if [ "${1: -1}" == " " ]; then
-        return 1
-    fi
-
-    # 目录必须以`/`开头，不能包含`//`或`./`或`..`
-    if [[ "${1}" =~ ^/ && ! "${1}" =~ // && ! "${1}" =~ (\./|\.\.) ]]; then
-        return 0
-    else
-        return 1
     fi
 
 }
@@ -2320,20 +2261,6 @@ function download_unzip_xiaoya_all_emby() {
 
 function download_unzip_xiaoya_emby_new_config() {
 
-    function compare_version() {
-
-        if [ "${1}" == "4.8.9.0" ]; then
-            return 0
-        fi
-
-        if [ "$(echo -e "${1}\n4.8.9.0" | sort -V | head -n1)" == "${1}" ]; then
-            return 1
-        else
-            return 0
-        fi
-
-    }
-
     function compare_metadata_size() {
 
         local REMOTE_METADATA_SIZE LOCAL_METADATA_SIZE
@@ -2411,7 +2338,7 @@ function download_unzip_xiaoya_emby_new_config() {
             ERROR "当前 Emby 版本获取失败！"
             exit 1
         fi
-        if ! compare_version "${emby_version}"; then
+        if version_lt "${emby_version}" "4.8.9.0"; then
             INFO "您的 Emby 版本过低，开始进入升级流程，请升级到 4.8.9.0 或更高版本！"
             oneclick_upgrade_emby
         fi
