@@ -1386,6 +1386,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${pikpakshare_list_choose} == [Yy] ]]; then
             echo "${pikpakshare_list_base64}" | base64 --decode > "${CONFIG_DIR}/pikpakshare_list.txt"
+            auto_chown "${CONFIG_DIR}/pikpakshare_list.txt"
         fi
     fi
 
@@ -1404,6 +1405,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${quarkshare_list_choose} == [Yy] ]]; then
             echo "${quarkshare_list_base64}" | base64 --decode > "${CONFIG_DIR}/quarkshare_list.txt"
+            auto_chown "${CONFIG_DIR}/quarkshare_list.txt"
         fi
     fi
 
@@ -1424,6 +1426,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${pan115share_list_choose} == [Yy] ]]; then
             echo "${pan115share_list_base64}" | base64 --decode > "${CONFIG_DIR}/115share_list.txt"
+            auto_chown "${CONFIG_DIR}/115share_list.txt"
         fi
     fi
 
@@ -1464,6 +1467,7 @@ function install_xiaoya_alist() {
     fi
     if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
         echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
+        auto_chown "${CONFIG_DIR}/docker_address.txt"
     fi
     docker_command=("docker run" "-itd")
     if [[ ${NET_MODE} == [Yy] ]]; then
@@ -1873,9 +1877,11 @@ function set_emby_server_infuse_api_key() {
     get_docker0_url
 
     echo "http://$docker0:6908" > "${CONFIG_DIR}"/emby_server.txt
+    auto_chown "${CONFIG_DIR}/emby_server.txt"
 
     if [ ! -f "${CONFIG_DIR}"/infuse_api_key.txt ]; then
         echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
+        auto_chown "${CONFIG_DIR}/infuse_api_key.txt"
     fi
 
 }
