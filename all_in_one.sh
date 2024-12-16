@@ -76,6 +76,25 @@ function touch_chmod() {
 
     touch "${1}"
     chmod 777 "${1}"
+    auto_chown "${1}"
+
+}
+
+function auto_chown() {
+
+    if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
+        chown "${2}" "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
+    else
+        chown "${2}" 0:0 "${1}"
+    fi
+
+}
+
+function auto_privileged() {
+
+    if [[ "${OSNAME}" = "macos" ]]; then
+        echo "--privileged=true"
+    fi
 
 }
 
@@ -474,7 +493,7 @@ function qrcode_mode_choose() {
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --privileged=true \
+            $(auto_privileged) \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             "${2}" --qrcode_mode=web ${extra_parameters}
@@ -517,7 +536,7 @@ function qrcode_mode_choose() {
             docker run -i --rm \
                 -v "${1}:/data" \
                 -e LANG=C.UTF-8 \
-                --privileged=true \
+                $(auto_privileged) \
                 ddsderek/xiaoya-glue:python \
                 "${2}" --qrcode_mode=shell ${extra_parameters}
             return 0
@@ -1061,7 +1080,7 @@ function get_aliyunpan_folder_id() {
         docker run -it --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
-            --privileged=true \
+            $(auto_privileged) \
             ddsderek/xiaoya-glue:python \
             /get_folder_id/get_folder_id.py --data_path='/data' --drive_mode=r
         ;;
@@ -1165,6 +1184,9 @@ function get_config_dir() {
         fi
         # 设置权限
         find ${CONFIG_DIR} -maxdepth 1 -type f -exec chmod 777 {} \;
+        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
+            find ${CONFIG_DIR} -maxdepth 1 -type f -exec chown "${GLOBAL_PUID}":"${GLOBAL_PGID}" {} \;
+        fi
     fi
 
 }
@@ -1749,7 +1771,7 @@ function pull_run_glue() {
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             ${extra_parameters} \
-            --privileged=true \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
@@ -1761,7 +1783,7 @@ function pull_run_glue() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            --privileged=true \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
@@ -1792,7 +1814,7 @@ function pull_run_glue_xh() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            --privileged=true \
+            $(auto_privileged) \
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
@@ -1804,7 +1826,7 @@ function pull_run_glue_xh() {
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            --privileged=true \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
@@ -1990,21 +2012,13 @@ function __download_metadata() {
 
         INFO "设置目录权限..."
         chmod -R 777 "${MEDIA_DIR}"/temp
-        if [[ "${OSNAME}" = "macos" ]]; then
-            chown -R 0 "${MEDIA_DIR}"/temp
-        else
-            chown -R 0:0 "${MEDIA_DIR}"/temp
-        fi
+        auto_chown "${MEDIA_DIR}/temp" "-R"
     else
         metadata_downloader "${1}"
 
         INFO "设置目录权限..."
         chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-        if [[ "${OSNAME}" = "macos" ]]; then
-            chown 0 "${MEDIA_DIR}"/temp/"${1}"
-        else
-            chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
-        fi
+        auto_chown "${MEDIA_DIR}/temp/${1}"
     fi
 
 }
@@ -2025,11 +2039,7 @@ function unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}"/xiaoya
     mkdir -p "${MEDIA_DIR}"/config
     chmod 755 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
 
     INFO "开始解压..."
 
@@ -2050,11 +2060,7 @@ function unzip_xiaoya_emby() {
     show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ..."
 
@@ -2178,11 +2184,7 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
     show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
 
@@ -2224,11 +2226,7 @@ function download_xiaoya_emby() {
     test_xiaoya_status
 
     mkdir -p "${MEDIA_DIR}"/temp
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp
-    fi
+    auto_chown "${MEDIA_DIR}/temp"
     chmod 777 "${MEDIA_DIR}"/temp
 
     show_disk_capacity "${MEDIA_DIR}"
@@ -2262,11 +2260,7 @@ function download_unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     mkdir -p "${MEDIA_DIR}/temp"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"
-    else
-        chown 0:0 "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
     chmod 777 "${MEDIA_DIR}"
 
     local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
@@ -5660,6 +5654,8 @@ function first_init() {
     if [ -f /tmp/run_xiaoya_install_user.txt ]; then
         INFO "运行脚本的用户：$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
         RUN_USER="$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
+        GLOBAL_PUID="$(id -u "${RUN_USER}")"
+        GLOBAL_PGID="$(id -g "${RUN_USER}")"
     fi
 
     INFO "获取 IP 地址中..."
