@@ -82,10 +82,18 @@ function touch_chmod() {
 
 function auto_chown() {
 
-    if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
-        chown "${2}" "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
+    if [ -n "${2}" ]; then
+        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
+            chown "${2}" "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
+        else
+            chown "${2}" 0:0 "${1}"
+        fi
     else
-        chown "${2}" 0:0 "${1}"
+        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
+            chown "${GLOBAL_PUID}":"${GLOBAL_PGID}" "${1}"
+        else
+            chown 0:0 "${1}"
+        fi
     fi
 
 }
@@ -1334,6 +1342,7 @@ function install_xiaoya_alist() {
 
     if [ ! -d "${CONFIG_DIR}" ]; then
         mkdir -p "${CONFIG_DIR}"
+        auto_chown "${CONFIG_DIR}"
     else
         if [ -d "${CONFIG_DIR}"/mytoken.txt ]; then
             rm -rf "${CONFIG_DIR}"/mytoken.txt
@@ -1342,6 +1351,7 @@ function install_xiaoya_alist() {
 
     if [ ! -d "${CONFIG_DIR}/data" ]; then
         mkdir -p "${CONFIG_DIR}/data"
+        auto_chown "${CONFIG_DIR}/data"
     fi
 
     files=("mytoken.txt" "myopentoken.txt" "temp_transfer_folder_id.txt")
@@ -1722,6 +1732,7 @@ function test_disk_capacity() {
 
     if [ ! -d "${MEDIA_DIR}" ]; then
         mkdir -p "${MEDIA_DIR}"
+        auto_chown "${MEDIA_DIR}"
     fi
 
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
@@ -1923,12 +1934,14 @@ function __unzip_metadata() {
             if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
                 if [ ! -d "${MEDIA_DIR}" ]; then
                     mkdir -p "${MEDIA_DIR}"
+                    auto_chown "${MEDIA_DIR}"
                     chmod 777 "${MEDIA_DIR}"
                 fi
                 cd "${MEDIA_DIR}" || return 1
             else
                 if [ ! -d "${MEDIA_DIR}/xiaoya" ]; then
                     mkdir -p "${MEDIA_DIR}/xiaoya"
+                    auto_chown "${MEDIA_DIR}/xiaoya"
                     chmod 777 "${MEDIA_DIR}/xiaoya"
                 fi
                 cd "${MEDIA_DIR}/xiaoya" || return 1
@@ -2046,6 +2059,9 @@ function unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}"/config
     chmod 755 "${MEDIA_DIR}"
     auto_chown "${MEDIA_DIR}"
+    auto_chown "${MEDIA_DIR}/xiaoya"
+    auto_chown "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/temp"
 
     INFO "开始解压..."
 
@@ -2082,10 +2098,12 @@ function unzip_xiaoya_emby() {
             rm -rf ${MEDIA_DIR}/config
         fi
         mkdir -p "${MEDIA_DIR}"/config
+        auto_chown "${MEDIA_DIR}/config"
         chmod -R 777 "${MEDIA_DIR}"/config
         __unzip_metadata "${1}"
     else
         mkdir -p "${MEDIA_DIR}"/xiaoya
+        auto_chown "${MEDIA_DIR}/xiaoya"
         __unzip_metadata "${1}"
     fi
 
@@ -2103,6 +2121,7 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
         if [[ "${OSNAME}" = "macos" ]]; then
             if [ ! -d "${MEDIA_DIR}/xiaoya" ]; then
                 mkdir -p "${MEDIA_DIR}/xiaoya"
+                auto_chown "${MEDIA_DIR}/xiaoya"
                 chmod 777 "${MEDIA_DIR}/xiaoya"
             fi
             cd "${MEDIA_DIR}/xiaoya" || return 1
@@ -2203,9 +2222,11 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
 
     if [ "${1}" == "all.mp4" ] || [ "${1}" == "all_jf.mp4" ]; then
         mkdir -p "${MEDIA_DIR}"/xiaoya
+        auto_chown "${MEDIA_DIR}/xiaoya"
         metadata_unziper "${1}" "${UNZIP_FOLD}"
     elif [ "${1}" == "115.mp4" ]; then
         mkdir -p "${MEDIA_DIR}"/xiaoya/115
+        auto_chown "${MEDIA_DIR}/xiaoya/115"
         metadata_unziper "${1}" "115/${UNZIP_FOLD}"
     else
         ERROR "此文件暂时不支持解压指定元数据！"
@@ -2267,6 +2288,9 @@ function download_unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}/config"
     mkdir -p "${MEDIA_DIR}/temp"
     auto_chown "${MEDIA_DIR}"
+    auto_chown "${MEDIA_DIR}/xiaoya"
+    auto_chown "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/temp"
     chmod 777 "${MEDIA_DIR}"
 
     local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
@@ -2402,6 +2426,7 @@ function download_unzip_xiaoya_emby_new_config() {
     rm -rf "${MEDIA_DIR}/config"
 
     mkdir -p "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/config"
     chmod -R 777 "${MEDIA_DIR}"/config
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
