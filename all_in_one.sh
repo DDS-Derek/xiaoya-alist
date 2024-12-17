@@ -3814,6 +3814,93 @@ function judgment_xiaoya_notify_status() {
 
 }
 
+function xiaoya_emd_pathlib() {
+
+    if [ "${1}" == "install" ]; then
+        PATHLIB_DIR="${2}/pathlib.txt"
+        if [ ! -f "${PATHLIB_DIR}" ]; then
+            echo -e "115/\n每日更新/\n电影/2023/\n纪录片（已刮削）/\n综艺/\n音乐/\n" > "${PATHLIB_DIR}"
+        fi
+    elif [ "${1}" == "once" ]; then
+        PATHLIB_DIR="${2}/once_pathlib.txt"
+        touch_chmod "${2}/once_pathlib.txt"
+    fi
+    sedsh '/^[[:space:]]*$/d' "${PATHLIB_DIR}"
+    while true; do
+        clear
+        emd_all_paths=('115/' 'PikPak/' '动漫/' '每日更新/' '电影/' '电影/2023/' '电视剧/' '纪录片/' '纪录片（已刮削）/' '综艺/' '音乐/' '📺画质演示测试（4K，8K，HDR，Dolby）/')
+        interface=
+        file_array=()
+        while IFS= read -r line; do
+            file_array+=("$line")
+        done < "${PATHLIB_DIR}"
+        for i in "${file_array[@]}"; do
+            skip=false
+            for j in "${emd_all_paths[@]}"; do
+                if [ "$i" == "$j" ]; then
+                    skip=true
+                    break
+                fi
+            done
+            if [[ "$skip" = false ]]; then
+                emd_all_paths+=("$i")
+            fi
+        done
+        for i in "${!emd_all_paths[@]}"; do
+            local CONTENT
+            if grep -q "^${emd_all_paths[$i]}$" "${PATHLIB_DIR}"; then
+                CONTENT="${Green}已选中${Font}"
+            else
+                CONTENT="${Red}未选中${Font}"
+            fi
+            if ((i + 1 <= 12)); then
+                interface+="$((i + 1))、${emd_all_paths[$i]}（${CONTENT}）\n"
+            else
+                interface+="$((i + 1))、${emd_all_paths[$i]}（${Sky_Blue}用户自定义${Font}）（${CONTENT}）\n"
+            fi
+        done
+        echo -e "——————————————————————————————————————————————————————————————————————————————————"
+        echo -e "${Blue}爬取目录选择${Font}\n"
+        echo -e "${Sky_Blue}红色代表未选中，绿色代表已选中，输入对应选项数字可勾选或取消勾选"
+        echo -e "支持输入多个数字，支持自定义爬取路径和现有选项一起输入，自定义爬取路径需要用''包裹"
+        echo -e "示例：1 6 9 10 11 '电影/豆瓣 top 1000部/' '每日更新/动漫/'${Font}\n"
+        echo -e "${interface}\c"
+        echo -e "0、保存退出"
+        echo -e "——————————————————————————————————————————————————————————————————————————————————"
+        read -erp "请输入数字或路径:" user_paths
+        if [ -n "${user_paths}" ]; then
+            if [ "${user_paths}" == 0 ]; then
+                clear
+                break
+            fi
+            eval "user_path_array=($user_paths)"
+            # shellcheck disable=SC2154
+            for j in "${!user_path_array[@]}"; do
+                if [[ "${user_path_array[$j]}" -eq "${user_path_array[$j]}" ]] 2>/dev/null; then
+                    for i in "${!emd_all_paths[@]}"; do
+                        if [[ "$((i + 1))" == "${user_path_array[$j]}" ]]; then
+                            if grep -q "^${emd_all_paths[$i]}$" "${PATHLIB_DIR}"; then
+                                sedsh "\#${emd_all_paths[$i]}#d" "${PATHLIB_DIR}"
+                            else
+                                echo "${emd_all_paths[$i]}" >> "${PATHLIB_DIR}"
+                            fi
+                            break
+                        fi
+                    done
+                else
+                    if grep -q "^${user_path_array[$j]}$" "${PATHLIB_DIR}"; then
+                        sedsh "\#${user_path_array[$j]}#d" "${PATHLIB_DIR}"
+                    else
+                        echo "${user_path_array[$j]}" >> "${PATHLIB_DIR}"
+                    fi
+                fi
+            done
+            sedsh '/^[[:space:]]*$/d' "${PATHLIB_DIR}"
+        fi
+    done
+
+}
+
 function install_xiaoya_emd() {
 
     get_media_dir
@@ -3830,6 +3917,8 @@ function install_xiaoya_emd() {
         fi
     done
     cycle=$((sync_interval * 60 * 60))
+
+    xiaoya_emd_pathlib "install" "${MEDIA_DIR}/xiaoya"
 
     while true; do
         INFO "是否开启重启容器自动更新到最新程序 [Y/n]（默认 n 不开启）"
@@ -3872,12 +3961,16 @@ function install_xiaoya_emd() {
     if [ "${container_run_extra_parameters}" == "true" ]; then
         local RETURN_DATA
         RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
+        # 兼容新版本参数
+        if [ "${RETURN_DATA}" == "--media /media" ]; then
+            RETURN_DATA="--media /media --paths /media/pathlib.txt"
+        fi
         if [ "${RETURN_DATA}" == "None" ]; then
-            INFO "请输入运行参数（默认 --media /media ）"
+            INFO "请输入运行参数（默认 --media /media --paths /media/pathlib.txt ）"
             WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
             WARN "警告！！！ 默认请勿修改 /media 路径！！！"
             read -erp "Extra parameters:" extra_parameters
-            [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
+            [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media --paths /media/pathlib.txt"
         else
             INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
@@ -3886,7 +3979,7 @@ function install_xiaoya_emd() {
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
     else
-        extra_parameters="--media /media"
+        extra_parameters="--media /media --paths /media/pathlib.txt"
     fi
     script_extra_parameters="$(data_crep "write" "install_xiaoya_emd")"
 
@@ -3928,11 +4021,16 @@ function install_xiaoya_emd() {
 
 function update_xiaoya_emd() {
 
-    for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
-        sleep 1
-    done
-    container_update xiaoya-emd
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh; then
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
+            sleep 1
+        done
+        container_update xiaoya-emd
+    else
+        ERROR "当前版本小雅元数据定时爬虫不支持直接升级，请手动卸载重新安装！"
+        return 1
+    fi
 
 }
 
@@ -3951,6 +4049,50 @@ function unisntall_xiaoya_emd() {
 
 }
 
+function once_xiaoya_emd() {
+
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh; then
+        xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+        if [ -z "${xiaoya_emd_dir}" ]; then
+            get_media_dir
+            xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+        fi
+        INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+        sleep 2
+        xiaoya_emd_pathlib "once" "${xiaoya_emd_dir}"
+        cat << EOF > "${xiaoya_emd_dir}/once_run.sh"
+cd /app || exit 1
+if [ -d /tmp/db ]; then
+    rm -rf /tmp/db
+fi
+mkdir -p /tmp/db
+if [ -f /media/solid.lock ]; then
+    echo -e "${ERROR} 当前已有爬虫进程在运行，请稍后再试！"
+    exit 1
+else
+    touch /media/solid.lock
+    echo -e "${INFO} 开始下载同步！"
+    echo -e "${INFO} python3 solid.py --media /media --paths /media/once_pathlib.txt --location /tmp/db"
+    python3 solid.py --media /media --paths /media/once_pathlib.txt --location /tmp/db
+    echo -e "${INFO} 运行完成！"
+    rm -f /media/solid.lock
+    exit 0
+fi
+EOF
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将开始爬取指定元数据${Blue} $i ${Font}\r"
+            sleep 1
+        done
+        docker exec -it xiaoya-emd bash /media/once_run.sh
+        docker exec -it xiaoya-emd rm -f /media/once_run.sh
+        docker exec -it xiaoya-emd rm -f /media/once_pathlib.txt
+    else
+        ERROR "当前版本小雅元数据定时爬虫不支持立刻爬取指定目录，请手动卸载重新安装！"
+        return 1
+    fi
+
+}
+
 function main_xiaoya_emd() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -3960,9 +4102,10 @@ function main_xiaoya_emd() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
+    echo -e "4、立刻爬取指定目录"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-3]:" num
+    read -erp "请输入数字 [0-4]:" num
     case "$num" in
     1)
         clear
@@ -3979,13 +4122,18 @@ function main_xiaoya_emd() {
         unisntall_xiaoya_emd
         return_menu "main_xiaoya_emd"
         ;;
+    4)
+        clear
+        once_xiaoya_emd
+        return_menu "main_xiaoya_emd"
+        ;;
     0)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-3]'
+        ERROR '请输入正确数字 [0-4]'
         main_xiaoya_emd
         ;;
     esac

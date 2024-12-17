@@ -99,6 +99,7 @@ bash -c "$(curl --insecure -fsSL https://raw.githubusercontent.com/DDS-Derek/xia
 单独 创建/删除 同步定时更新任务 -> 2 7
 图形化编辑 emby_config.txt -> 2 8
 一键升级Emby容器（可选择镜像版本） -> 2 10
+小雅爬虫 立刻爬取指定目录 -> 2 9 4
 ————————————————————————————Jellyfin手动全家桶配置——————————————————————————————————
 
 注意：目前官方 Jellyfin 安装方案已经长久未维护！
