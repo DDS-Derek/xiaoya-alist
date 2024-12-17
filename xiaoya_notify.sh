@@ -38,6 +38,14 @@ function WARN() {
     echo -e "${Time} ${WARN} ${1}"
 }
 
+function auto_privileged() {
+
+    if [[ "${OSNAME}" = "macos" ]]; then
+        echo "--privileged=true"
+    fi
+
+}
+
 function container_update() {
 
     local run_image remove_image IMAGE_MIRROR pull_image
@@ -46,10 +54,10 @@ function container_update() {
         remote_sha=$(curl -s -m 10 "https://hub.docker.com/v2/repositories/ddsderek/runlike/tags/latest" | grep -o '"digest":"[^"]*' | grep -o '[^"]*$' | tail -n1 | cut -f2 -d:)
         if [ "$local_sha" != "$remote_sha" ]; then
             docker rmi ddsderek/runlike:latest
-            docker_pull "ddsderek/runlike:latest"
+            docker pull "ddsderek/runlike:latest"
         fi
     else
-        docker_pull "ddsderek/runlike:latest"
+        docker pull "ddsderek/runlike:latest"
     fi
     INFO "获取 ${1} 容器信息中..."
     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp ddsderek/runlike "${@}" > "/tmp/container_update_${*}"
@@ -133,6 +141,7 @@ function pull_run_glue() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -i \
             --security-opt seccomp=unconfined \
             --rm \
@@ -140,16 +149,19 @@ function pull_run_glue() {
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}"
     else
+        # shellcheck disable=SC2046
         docker run -i \
             --security-opt seccomp=unconfined \
             --rm \
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}"
@@ -183,6 +195,7 @@ function pull_run_glue_xh() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
@@ -190,16 +203,19 @@ function pull_run_glue_xh() {
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
@@ -236,7 +252,11 @@ function get_docker0_url() {
         INFO "docker0 的 IP 地址是：$docker0"
     else
         WARN "无法获取 docker0 的 IP 地址！"
-        docker0=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        if [[ "${OSNAME}" = "macos" ]]; then
+            docker0=$(ifconfig "$(route -n get default | grep interface | awk -F ':' '{print$2}' | awk '{$1=$1};1')" | grep 'inet ' | awk '{print$2}')
+        else
+            docker0=$(ip address | grep inet | grep -v 172.17 | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed 's/addr://' | head -n1 | cut -f1 -d"/")
+        fi
         INFO "尝试使用本地IP：${docker0}"
     fi
 
@@ -354,7 +374,7 @@ function update_media() {
         fi
 
         INFO "设置目录权限..."
-        chmod 777 -R "${MEDIA_DIR}"/xiaoya
+        chmod -R 777 "${MEDIA_DIR}"/xiaoya
     elif [ "${1}" == "pikpak.mp4" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
@@ -370,7 +390,7 @@ function update_media() {
         fi
 
         INFO "设置目录权限..."
-        chmod 777 -R "${MEDIA_DIR}"/xiaoya
+        chmod -R 777 "${MEDIA_DIR}"/xiaoya
     elif [ "${1}" == "115.mp4" ]; then
         extra_parameters="--workdir=/media/xiaoya"
 
@@ -386,7 +406,7 @@ function update_media() {
         fi
 
         INFO "设置目录权限..."
-        chmod 777 -R "${MEDIA_DIR}"/xiaoya
+        chmod -R 777 "${MEDIA_DIR}"/xiaoya
     fi
 
     if docker container inspect "${RESILIO_NAME}" > /dev/null 2>&1; then
@@ -427,6 +447,7 @@ function sync_emby_config() {
         --security-opt seccomp=unconfined \
         --rm \
         --net=host \
+        $(auto_privileged) \
         -v $MEDIA_DIR/config/data:/emby/config/data \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest"
@@ -434,6 +455,7 @@ function sync_emby_config() {
         --security-opt seccomp=unconfined \
         --rm \
         --net=host \
+        $(auto_privileged) \
         -v $MEDIA_DIR/config/data:/emby/config/data \
         -v /tmp/emby_user.sql:/tmp/emby_user.sql \
         -v /tmp/emby_library_mediaconfig.sql:/tmp/emby_library_mediaconfig.sql \
@@ -443,6 +465,7 @@ function sync_emby_config() {
         --security-opt seccomp=unconfined \
         --rm \
         --net=host \
+        $(auto_privileged) \
         -v $MEDIA_DIR/temp/config/data:/emby/config/data \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest"
@@ -450,6 +473,7 @@ function sync_emby_config() {
         --security-opt seccomp=unconfined \
         --rm \
         --net=host \
+        $(auto_privileged) \
         -v /tmp/emby.response:/tmp/emby.response \
         -e LANG=C.UTF-8 \
         xiaoyaliu/glue:latest"
