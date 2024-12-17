@@ -3898,6 +3898,7 @@ function install_xiaoya_emd() {
 
     docker_pull "ddsderek/xiaoya-emd:${IMAGE_VERSION}"
 
+    # shellcheck disable=SC2046
     docker run -d \
         --name=xiaoya-emd \
         --restart=always \
@@ -3907,6 +3908,7 @@ function install_xiaoya_emd() {
         -e "RESTART_AUTO_UPDATE=${RESTART_AUTO_UPDATE}" \
         -e TZ=Asia/Shanghai \
         ${run_extra_parameters} \
+        $(auto_privileged) \
         ddsderek/xiaoya-emd:${IMAGE_VERSION} \
         ${script_extra_parameters}
 
