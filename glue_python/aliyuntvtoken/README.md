@@ -6,5 +6,5 @@
   - http://api.extscreen.com/aliyundrive/v3/token
 - openapi.alipan.com
   - https://openapi.alipan.com/oauth/qrcode/{sid}/status
-- www.voicehub.top
-  - https://www.voicehub.top/api/v1/oauth/alipan/token
+- alipan-tv-token.pages.dev
+  - https://alipan-tv-token.pages.dev/refresh
