@@ -2524,6 +2524,7 @@ function install_emby_embyserver() {
     esac
     docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2531,7 +2532,7 @@ function install_emby_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
-            --privileged=true \
+            $(auto_privileged) \
             ${extra_parameters} \
             -e UID=0 \
             -e GID=0 \
@@ -2539,6 +2540,7 @@ function install_emby_embyserver() {
             --restart=always \
             "${image_name}:${IMAGE_VERSION}"
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2546,7 +2548,7 @@ function install_emby_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
-            --privileged=true \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
@@ -2574,6 +2576,7 @@ function install_amilys_embyserver() {
     esac
     docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2582,12 +2585,14 @@ function install_amilys_embyserver() {
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
             "${image_name}:${IMAGE_VERSION}"
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2595,6 +2600,7 @@ function install_amilys_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
@@ -2627,6 +2633,7 @@ function install_lovechen_embyserver() {
 
     docker_pull "lovechen/embyserver:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2635,12 +2642,14 @@ function install_lovechen_embyserver() {
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
             lovechen/embyserver:${IMAGE_VERSION}
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2648,6 +2657,7 @@ function install_lovechen_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
