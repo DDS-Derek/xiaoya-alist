@@ -4021,7 +4021,7 @@ function install_xiaoya_emd() {
 
 function update_xiaoya_emd() {
 
-    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh; then
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
         for i in $(seq -w 3 -1 0); do
             echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
             sleep 1
@@ -4029,7 +4029,7 @@ function update_xiaoya_emd() {
         container_update xiaoya-emd
     else
         ERROR "当前版本小雅元数据定时爬虫不支持直接升级，请手动卸载重新安装！"
-        return 1
+        exit 1
     fi
 
 }
@@ -4051,7 +4051,7 @@ function unisntall_xiaoya_emd() {
 
 function once_xiaoya_emd() {
 
-    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh; then
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
         xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
         if [ -z "${xiaoya_emd_dir}" ]; then
             get_media_dir
@@ -4088,7 +4088,7 @@ EOF
         docker exec -it xiaoya-emd rm -f /media/once_pathlib.txt
     else
         ERROR "当前版本小雅元数据定时爬虫不支持立刻爬取指定目录，请手动卸载重新安装！"
-        return 1
+        exit 1
     fi
 
 }
@@ -4103,9 +4103,10 @@ function main_xiaoya_emd() {
     echo -e "2、更新"
     echo -e "3、卸载"
     echo -e "4、立刻爬取指定目录"
+    echo -e "5、容器定时爬取目录单独配置"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-4]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         clear
@@ -4127,13 +4128,30 @@ function main_xiaoya_emd() {
         once_xiaoya_emd
         return_menu "main_xiaoya_emd"
         ;;
+    5)
+        clear
+        if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+            xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+            if [ -z "${xiaoya_emd_dir}" ]; then
+                get_media_dir
+                xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+            fi
+            INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+            sleep 2
+            xiaoya_emd_pathlib "install" "${xiaoya_emd_dir}"
+        else
+            ERROR "当前版本小雅元数据定时爬虫不支持单独配置容器定时爬取目录，请手动卸载重新安装！"
+            exit 1
+        fi
+        return_menu "main_xiaoya_emd"
+        ;;
     0)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-4]'
+        ERROR '请输入正确数字 [0-5]'
         main_xiaoya_emd
         ;;
     esac
