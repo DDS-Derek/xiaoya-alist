@@ -3876,7 +3876,7 @@ function xiaoya_emd_pathlib() {
             eval "user_path_array=($user_paths)"
             # shellcheck disable=SC2154
             for j in "${!user_path_array[@]}"; do
-                if [[ "${user_path_array[$j]}" -eq "${user_path_array[$j]}" ]] 2>/dev/null; then
+                if [[ "${user_path_array[$j]}" -eq "${user_path_array[$j]}" ]] 2> /dev/null; then
                     for i in "${!emd_all_paths[@]}"; do
                         if [[ "$((i + 1))" == "${user_path_array[$j]}" ]]; then
                             if grep -q "^${emd_all_paths[$i]}$" "${PATHLIB_DIR}"; then
