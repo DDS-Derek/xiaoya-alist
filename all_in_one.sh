@@ -4042,7 +4042,7 @@ function main_xiaoya_all_emby() {
 4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）
 5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")
 6、立即同步小雅Emby config目录
-7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)
+7、创建/删除 同步定时更新任务（${Red}已弃用${Font}）       当前状态：$(judgment_xiaoya_notify_status)
 8、图形化编辑 emby_config.txt
 9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)
 10、一键升级Emby容器（可选择镜像版本）
