@@ -35,8 +35,12 @@ function ERROR() {
 function WARN() {
     echo -e "${WARN} ${1}"
 }
-if [[ $EUID -ne 0 ]]; then
+if [[ $EUID -ne 0 ]] && [ "$(uname -s)" != "Darwin" ]; then
     ERROR '此脚本必须以 root 身份运行！'
+    exit 1
+fi
+if [ $EUID == 0 ] && [ "$(uname -s)" == "Darwin" ]; then
+    ERROR 'MacOS 运行脚本必须使用非 root 身份运行，脚本会自动提权！'
     exit 1
 fi
 if [ -f /tmp/xiaoya_install.sh ]; then

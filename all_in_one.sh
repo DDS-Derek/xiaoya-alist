@@ -21,16 +21,16 @@ export PATH
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 #
-DATE_VERSION="v1.8.0-2024_11_23_17_53"
+DATE_VERSION="v1.8.1-2024_12_16_19_04"
 #
 # ——————————————————————————————————————————————————————————————————————————————————
 amilys_embyserver_latest_version=4.8.10.0
 emby_embyserver_latest_version=4.8.10.0
 amilys_embyserver_beta_version=4.9.0.32
-emby_embyserver_beta_version=4.9.0.32
+emby_embyserver_beta_version=4.9.0.33
 # ——————————————————————————————————————————————————————————————————————————————————
 
-Sky_Blue="\e[36m"
+Sky_Blue="\033[36m"
 Blue="\033[34m"
 Green="\033[32m"
 Red="\033[31m"
@@ -72,13 +72,6 @@ pikpakshare_list_base64="6auY5riF55S15b2xL+WQiOmbhjEgICAgICAgICAgVk5SbE5MQVJMbXl
 pan115share_list_base64="57qq5b2V54mHIHN3NjJmcmczd3A2IDIyODgzMzE1NDExNTM2NjI1NjQgbjlmNQo0S1JlbXV4IHN3NnB3Nzkzd2ZwIDI2Mjg0NzgyMDk3ODcyNjQzMTUgdzgxNgrnlLXlvbExMDgwUCBzdzY4ZnV1M25udyAxOTI2OTY4MTA1NzIyODIzMDMxIHBiNTcK55S16KeG5YmnIHN3NjhlODEzbm53IDI2NTkwNjMxNzgxMTcyNTAzNzQgbjllMArlkIjpm4YxIHN3enlpd3czd245IDI1MjQ4MTE1NTc1MDA4NTIyNzQgdzFlMArlkIjpm4YyIHN3enlpd3Ezd245IDI2Mzc4OTAyNTgzNzg5MjI3NzcgeDcxNgrlkIjpm4YzIHN3enlpd2Izd245IDI2Mzc4OTYzNjAyMjcyMTU3NDkgcWZlOArliqjnlLvnlLXlvbEgc3d6NmdtbDNmd28gMjc4Mzc1MzU5ODE2NzY3ODE3NiA4ODg4Cuasp+e+jueUteW9sSBzdzY4d3o5M25jYiAyNjU2MjMyMDYwNDAwMzY1NzY4IDY2NjYK576O5YmnIHN3NnBsdDIzbmNiIDI2Mjk4MzAxODUzMjk1NTM3OTYgNjY2NgrljYPpg6jmipbpn7Pnn63liaflkIjpm4Ygc3d6cWg2NzNoNHkgMjg0NDM4ODU0NTQ4Nzk2MTIxMSA1Mjk2CuaKlumfs+efreWJp+WQiOmbhjEuNzdUIHN3eng3NmYzd2ZhIDI5NTUyMjA1NzY3MzcwMDk5NTggbjcyNArml6DmjZ/pn7PkuZAgc3c2dTQweDN3cDYgMjc0ODI0ODM2NTg2NjE1NTczNCB0NTQzCuasp+e+juWJpyBzd3pubTM3M3cxcCAyNzc1NTY3MTE2Njk2MjQ1NDEyIHBlMzUK6Z+z5LmQMjLkuIfpppYgc3d6bXFjcjNmczYgIDI3ODMzMDQ0MDM1ODU1OTY1NjYgeGQ2Nwrpn7PkuZAyMuS4h+mmli9ERFMrSGlSZXMgc3c2NTh1cTM2eDIgMjU2NTY3MjQwMzc2NjAwMTQzNSBtZDk4Cumfs+S5kDIy5LiH6aaWL+avjeW4puezu+WIlyBzdzY1OHVxMzZ4MiAyNTY1NDE2NDc5NzA5MTE3ODQzIG1kOTgK6Z+z5LmQMjLkuIfpppYv57Si5bC857K+6YCJIHN3NjU4dXEzNngyIDI1NjU5MTczNzk1MTUwMzkxNzYgbWQ5OArpn7PkuZAyMuS4h+mmli/lkITnsbvpo47moLwgc3c2NTh1cTM2eDIgMjU2NTQ2NjU4Njk1MzQ2NDg1NyBtZDk4Cumfs+S5kDIy5LiH6aaWL+WNjuivrTI3MDAw6aaW5peg5o2fIHN3NjU4dWIzNngyIDI1NjUyNzQwNTU3ODMzOTg3MzQgcTdlMArml6Xpn6nnlLXlvbEgc3d6ZzhkZDN3eWUgMjkzMjI3Mjg1NzEzNDEzNzEwNyBtNWIzCuaXpemfqeWJpyBzd3pqeGNwM3dmYSAyOTUxODcwNjYzMTk4MzUxNjg2IG9mODk="
 quarkshare_list_base64="55S15b2xL+WQiOmbhi/nvo7lm73nlLXlvbHlrabpmaLnmb7lubTnmb7lrrblvbHniYcgIDQwNWNjNWJjNjIyNSAgMzk5YmU1YTMyNDVhNGQxMWE3ODEzMzk0ZjNmOGRjZmIK57uP5YW45b2x6KeG44CQ57O75YiX5aSn54mH5oC75ZCI6ZuG44CRICBiOTQ1ZGQxZmMxZGYgIGFmZGFmNjE4Y2U4ZDQyODdiNjYzYjJmMGVlYzg5NzlmCuWKqOa8qy/liqjmvKvnlLXlvbHlkIjpm4YgYjk0NWRkMWZjMWRmIGI5YTdjYThiODg3NTQwOTA4ZGI2ZDFlNmNlMTQ2ZDYwCuWKqOa8qy/lm73lhoXlpJbnu4/lhbjliqjnlLvliqjmvKvlpKflhaggNmI3OTUyMTgzNDJkIDIzZDk1MTI3MWQ0NjQ2OTdiZTIzMmRiYjc0NmIyMjdlCuWKqOa8qy/lm73mvKvmm7TmlrDkuK0gMTdlOGU5YTFhNjU3IDYzMDUwM2JhM2RjZjRiYjVhZTQ4NWQ2ZWEzN2RjM2Y4CuWKqOa8qy/lt7Llroznu5Plm73mvKsgNmI3OTUyMTgzNDJkIGY2YWI2ZGMwMjEwYTQyYmVhMmRjMmJmZWEzOGMyYmU0CuWKqOa8qy/lt7Llroznu5Pml6XmvKsgNmI3OTUyMTgzNDJkIGQyNjU5NTZlMjQxZTQ5ZGJiYjdiZjVlNzE2MzBiMTkzCuWKqOa8qy/lt7Llroznu5Pnvo7mvKsgNmI3OTUyMTgzNDJkIGM0ZDQyOWRmYzY0NDQ3Mzc4NmJkYjIyYWE2NzQyMTkwCuWwj+WTgeebuOWjsC8yMDI05b635LqR56S+IGVjZTUyZDYzYjY5OCBkYWUyZjM2ZDM2ZDA0NzNiODlmZjg0ZGFhODFiODMwMwrlsI/lk4Hnm7jlo7Av5bCP5ZOB5aSn5ZCI6ZuGIGU4MjcyNjRlYTQ1MyA2MDljNWViOGIzMjQ0ZGMyOTU4YmMxM2YxNmQ0NTRlZArlsI/lk4Hnm7jlo7Av5bCP5ZOB57qv5Lqr5ZCI6ZuGIGQ4YjRhNTg0ZmQxYSBhNTI5OTM0OWQzNjk0MjA2OGFkYzg4Yjk1MmM3YzQ2MQrnlLXlvbEv5ZCI6ZuGL+S7pUFCQ0TlvIDlpLTlkIjpm4YgYTYzMjk2Nzc2MGNmIDdkYTRmZDJkYzA4ZjRmYTU4NTJmOTk3MjE1NTkyNTE3CueUteW9sS/lkIjpm4Yv5LulRUZHSOW8gOWktOWQiOmbhiAyZjU5YmI1ZDk2YjkgN2I3MTczN2UzY2Q4NDNjNWE5MzdhYzk3YTUzNTQyZGQK55S15b2xL+WQiOmbhi/ku6VJSktM5byA5aS05ZCI6ZuGIDUwODI4YzM2OGRlZiAwOTY5NTBlM2QxMDI0MmIxOTY2Yjc3NzgxMTE1YTA3YQrnlLXlvbEv5ZCI6ZuGL+S7pU1OT1DlvIDlpLTlkIjpm4YgZTA3ZTI2YWVjYzA4IGEyYjMwNTMxNjMxYzQ2ZGNiMzlmMzIwNjk3ODk4Mjk1CueUteW9sS/lkIjpm4Yv5LulUVJTVOW8gOWktOWQiOmbhiAwNTM2YTM4YTM1NmUgMWQxNzVkYjMwZWFhNDU0ZTlkYmM1ZWFhMDllMWU0NTQK55S15b2xL+WQiOmbhi/ku6VVVldY5byA5aS05ZCI6ZuGIGUyNzNlZjY5NzQwMyA2ZGJkYTZlODE3ZWI0MTQ1YmEyZGQ2ODFlNTdhYTY3NQrnlLXlvbEv5ZCI6ZuGL+S7pVla5byA5aS05ZCI6ZuGIGM4YWM2Yzg4ZTVkOCA0OGM0NzllMjRiYWU0ZWMzYTRhOWQ1NmZjYjA2ZmNmNArnlLXlvbEv5ZCI6ZuGL+S7peaVsOWtl+W8gOWktOWQiOmbhiA0OWFiNzVkNTJlMDAgY2VjMDcwMmRiMjZiNDdjNWFiZDQyY2E3OWFiYjY1ZTEK55S15b2xL+WvvOa8lCBlZDA4NDRjN2QwNDYgOTA5OTI1NGIxY2VlNGIzOWFjYzZmYzcxZmZmNzcwMzkK55S15b2xL+WvvOa8lC/ljJfph47mraYgZmFiMWVkYjllNWViIGQ3YmJmZmM0NWVmNjQxMDg4ZmU0YjIwMjkxMDhiY2FjCueUteW9sS/lr7zmvJQv5rSq6YeR5a6dIGJlMjYxYzhhN2ViOCBlMWRiOWQ3ODQ4MjI0MmMyOTczZDFjYzIzMDYwY2MxZQrnlLXlvbEv5oGQ5oCW54mHMTAw6YOoIDZjMDY2NmVkMjhkZSA2NjIxOGU3MzEwMTE0OWRmOTczODczYmRjMWY0NjUwMwrnlLXlvbEv5ryU5ZGYL+WImOW+t+WNjiAxNzY0YzJjODE2MDMgYWJhZTJmN2U2MWY1NDk4MDg1MTY3ZTA3ZWY4ZGVjMzQK55S15b2xL+a8lOWRmC/lkajmmJ/pqbAgNjBkY2E1ODAwOWFmIDdkYTUwMmQyNGY0NzRiNjBhZmNjMzQyZmQ1YWMwZGUzCueUteW9sS/mvJTlkZgv5ZGo5ram5Y+RIGU1ODNmYWM0NTU5MiA4MmMwNDljMTQwNTA0ZDRhYTMxY2JmZTE2NDVjYjlkOArnlLXlvbEv5ryU5ZGYL+W8oOWbveiNoyBkMzAwMGYxNDk0MmUgOGMzNWZjYmI0ZTg1NGU1MGIzODVkZjcwMjYwNGQzODIK55S15b2xL+a8lOWRmC/miJDpvpkgZTViNjRkZmIxYzgzIDYwN2I4NzlkYTI1YzQ0NjQ4M2JjN2Y4OTUwY2Q3MzNmCueUteW9sS/mvJTlkZgv5p2O5Li954+NIDQ3MzM3MGU2NTdjMCBjMzlhNTY2MDA5MmU0YmJhYWM3Y2FkM2NmMDY0ZTIzYwrnlLXlvbEv5ryU5ZGYL+adjuWwj+m+mSBiOTQ1ZGQxZmMxZGYgMTcyN2IxNjQ1MTE0NDMxYjgxYTMyZjRkMDZlNDA4MGIK55S15b2xL+a8lOWRmC/mnY7ov57mnbAgYmZjMGE2MTUwYWZjIDZlZWIwMzZjN2Q3YTQ1ODBhYjk1YzE2NWJiZWU3NGMzCueUteW9sS/mvJTlkZgv5rKI6IW+IGI5NDVkZDFmYzFkZiBiODkyYjY5NTNkMjM0ZDRlYWI4NzczNTE5NzI3NWViMQrnlLXlvbEv5ryU5ZGYL+iIkua3hyA4NGU1M2RkMzc4ZjIgYzU5Yzc4MzU4NGU3NGQ3MDk0Yjk4YTY0OTg0OTI4NzYK55S15b2xL+a8lOWRmC/pgrHmt5HotJ4gYzRiMDQwM2MwZGZhIGE5MjBlMDY1NTVmYjRkNTA5NzU3MGNhMWI0MTBiZDAyCueUteW9sS/nsr7pgInpq5jnlLvotKjpq5jliIbnlLXlvbEgOGYxYjRiN2RjNjllIGQyZTVlOTE2NzRmOTQzNTJiMzMxMGFiODZiOGMyMzhlCueUteW9sS/pgrXmsI/lkIjpm4YgNTYxMmZlMWFkYjRhIGVkNDRkMDMzZTNmYzRjNWVhMmQ4YTVjODk1MWRmMGQ5CueUteW9sS/pn6nlm71S57qnIDU0MzJiZWFlNGYxYSA1MTI0ZjQ3ODlkYWY0NTAwOWJkMTMzYWY1MDk5ODEwMgrnlLXlvbEv6auY5YiG5Y2O6K+t55S15b2xMzAw6YOoIGI5NDVkZDFmYzFkZiAyMTk4ZGFiNDNmYzY0YWRiYWY5YTZkNGI1YjEzZWZhYgrnlLXop4bliacvMjAyNOaXpemfqeWJpyA0NWQzNDEzMDE2MGYgZTczODBkM2M3YmM0NDllNmFhNWZhMjMwNjNiMmNkZjMK55S16KeG5YmnLzIwMjTmrKfnvo7liacgZjlmNTQyMGNhYjBkIGZkNjIyZDEyZjUzOTQ5ZWZiNWZlZGUwMmRlMDhlNjQ5CueUteinhuWJpy9UVkLjgIFBVFbkuprop4YgMDg1MjEyZGYzODVkIDE3MmI3ZWNjYzM4NDRhZTRhMTE0NTFkNmExNDVmZmUwCueUteinhuWJpy/lt7Llroznu5Mv5pWw5a2X5byA5aS0IGNkNGM1YWM3ZTgzMCBkZmEwMWNiMTg5NTg0MDhjYTBkYTcyYjEzOTMxOWFmMwrnlLXop4bliacv5bey5a6M57uTL+ixhueTo+ivhOWIhjkuMOS7peS4iuWbveS6p+WJpyBkMTljNGViZTFmZjcgN2I0Mjk0M2Q0ZjIwNDJhYmI5MDdjOTlkZGJiMzU0MGQK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41BQkNEIGUxYjJiYThiNmQ2YyBjODkyNDY3YjBjYzI0YWFiYWNiZWM3MWEwYjZmNGQzYwrnlLXop4bliacv5bey5a6M57uTL+mmluWtl+avjUVGR0ggMTY2ZmEwYTdjYTZmIGZmNTcwODNkODkyMzRlZDM4OTMyZGMwNjA5N2QxMTVkCueUteinhuWJpy/lt7Llroznu5Mv6aaW5a2X5q+NSUpLTCAzN2E5MmMwYjdmMTAgNTg1OTA3YWJhMGVmNDY0YmEwMGEwZjIwYjQ3ZmExMTYK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41OTU9QIGZiMzM4NmU0MmFmMiAzNmUyZjgxZmY0MTQ0YTljOGMxNDk4OGVkODlhODYwZArnlLXop4bliacv5bey5a6M57uTL+mmluWtl+avjVFSU1QgNDZjZTIxNGY0ZWQ3IDNiNGY5ZTBjNjc1OTQ5Yzk5MjY5NDc2ZTVmOWMwN2E4CueUteinhuWJpy/lt7Llroznu5Mv6aaW5a2X5q+NVVZXWCBmZTQ2ODFkN2ZiNDMgYmNiY2ZkMzhkMjU0NGY1Zjk1MWVjZmU0MzA0ODMyMDMK55S16KeG5YmnL+W3suWujOe7ky/pppblrZfmr41ZWiA4ZDY1ZTg4NWIwNTkgMDM2ZmQ5ODk1YzRiNGE0N2E1OWIxNzA0NjcxNTgxNmYK55S16KeG5YmnL+e7j+WFuOaXpemfqeWJp+WQiOmbhiBmMGRiZjU1MzU4NzQgNzY0MjI0YjQxYWZlNGY2ZmJlYTUwYjg4YTNhNmI1MmMK6Z+z5LmQL+S5pummmemfs+S5kOS4lue6quWFuOiXjyBkMmRmYTMyNjQ3ZjYgMTY3YWU5ZWRkM2ZlNDY2MmEyY2UzNzc1NTllMzVmNTgK6Z+z5LmQL+WPpOWFuOmfs+S5kOeyvumAieWQiOmbhiAyYjQ5NzgyMTNiMjkgNjkwMzhmZjA5MDA1NGExZWI4ODAzMTJiZTQ3NzUzOTIK6Z+z5LmQL+Wkp+iHqueEtumfs+S5kOezu+WIl+WQiOmbhiA2NTFlNWZhOTMwNTcgOWM5ZjMzMzY3ODNlNDhhZjlmNDdjNWVjZDk5OGU5MTQK6Z+z5LmQL+e6r+mfs+S5kOWQiOmbhiAxMjg0ODM4MWRjZTEgYWUyY2FlYjc4NDZkNGY4NTg0NjdkMmI2MjZkNzhjYTMK6Z+z5LmQL+i9pui9veaXoOaNn+eOr+e7lemfs+aViOmfs+S5kOWQiOmbhiA4MDVkNzZhMDgwNjMgNTkzZjk4MTA0ZjE5NDMwMmEyN2FlOTFiYTdjZDE4ZGIK6Z+z5LmQL+mch+aSvOW/g+eBteeahOWPsuivl+mfs+S5kOWQiOmbhiBkMWEwYjcwNDZiMjAgMjk0YTUzYTNjOWU4NGVmMGEwYWNjMDQxOTVjMDI1ZDg="
 
-function root_need() {
-    if [[ $EUID -ne 0 ]]; then
-        ERROR '此脚本必须以 root 身份运行！'
-        exit 1
-    fi
-}
-
 function get_default_network() {
 
     _default_network=$(cat "${DDSREM_CONFIG_DIR}/default_network.txt")
@@ -101,31 +94,6 @@ function get_default_network() {
 
 }
 
-function check_path() {
-
-    if [ -z "${1}" ]; then
-        return 1
-    fi
-
-    # 目录不能为‘/’
-    if [ "${1}" == "/" ]; then
-        return 1
-    fi
-
-    # 目录结尾不能有空格
-    if [ "${1: -1}" == " " ]; then
-        return 1
-    fi
-
-    # 目录必须以`/`开头，不能包含`//`或`./`或`..`
-    if [[ "${1}" =~ ^/ && ! "${1}" =~ // && ! "${1}" =~ (\./|\.\.) ]]; then
-        return 0
-    else
-        return 1
-    fi
-
-}
-
 function get_path() {
 
     case "${OSNAME}" in
@@ -138,6 +106,11 @@ function get_path() {
     fnos)
         if [ -d "/vol1/1000" ]; then
             path_lib=/vol1/1000
+        fi
+        ;;
+    macos)
+        if [ -n "${RUN_USER}" ]; then
+            path_lib="/Users/${RUN_USER}/Documents"
         fi
         ;;
     *)
@@ -371,31 +344,77 @@ function check_aliyunpan_refreshtoken() {
 
 function check_aliyunpan_opentoken() {
 
-    local token code response refresh_token data_dir
+    function cache_result() {
+
+        local file_path cache_path last_modified current_time difference current_hash
+        file_path="${1}"
+        cache_path="${2}"
+        if command -v md5sum > /dev/null 2>&1; then
+            current_hash=$(md5sum "$file_path" | awk '{ print $1 }')
+        else
+            current_hash=$(head -n 1 "$file_path")
+        fi
+        if [ -f "$cache_path" ] && [ "$(head -n 1 "$cache_path")" == "$current_hash" ]; then
+            last_modified=$(date -r "$cache_path" +%s)
+            current_time=$(date +%s)
+            difference=$(((current_time - last_modified) / 60))
+            if [ "$difference" -lt 60 ]; then
+                # 文件未更改且操作在60分钟内已执行，跳过此次执行
+                return 1
+            fi
+        fi
+        echo "$current_hash" > "$cache_path"
+        return 0
+
+    }
+
+    function cache_update() {
+
+        if [ "${3}" == true ]; then
+            md5sum "${1}" | awk '{ print $1 }' > "${2}"
+        else
+            rm -f "${2}"
+        fi
+
+    }
+
+    local token code response refresh_token data_dir url_host
     data_dir="${1}"
     if [ -n "${2}" ]; then
         token="${2}"
     else
         token=$(head -n1 "${data_dir}/myopentoken.txt")
     fi
-    if ! response=$(curl -s "https://api.xhofe.top/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
-        if ! response=$(curl -s "https://api-cf.nn.ci/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
+    if cache_result "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt"; then
+        if curl -Is https://api.xhofe.top/alist/ali_open/qr | head -n 1 | grep -q '200'; then
+            url_host="api.xhofe.top"
+        else
+            url_host="api-cf.nn.ci"
+        fi
+        if ! response=$(curl -s "https://${url_host}/alist/ali_open/token" -X POST -H "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36" -H "Rererer: https://www.aliyundrive.com/" -H "Content-Type: application/json" -d '{"refresh_token":"'$token'", "grant_type": "refresh_token"}'); then
             WARN "网络问题，无法检测 阿里云盘 Open Token 有效性"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
             return 0
         fi
-    fi
-    code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
-    refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
-    if [ -n "${refresh_token}" ]; then
-        echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
-        INFO "有效 阿里云盘 Open Token"
-        return 0
-    elif [ "${code}" == "Too Many Requests" ]; then
-        WARN "已被限流，无法检测 阿里云盘 Open Token 有效性"
-        return 0
+        code=$(echo "$response" | sed -n 's/.*"code":"\([^"]*\).*/\1/p')
+        refresh_token=$(echo "$response" | sed 's/:\s*/:/g' | sed -n 's/.*"refresh_token":"\([^"]*\).*/\1/p')
+        if [ -n "${refresh_token}" ]; then
+            echo "${refresh_token}" > "${data_dir}/myopentoken.txt"
+            INFO "有效 阿里云盘 Open Token"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "true"
+            return 0
+        elif [ "${code}" == "Too Many Requests" ]; then
+            WARN "已被限流，无法检测 阿里云盘 Open Token 有效性"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
+            return 0
+        else
+            ERROR "无效 阿里云盘 Open Token"
+            cache_update "${data_dir}/myopentoken.txt" "${DDSREM_CONFIG_DIR}/cache_data/check_aliyunpan_opentoken.txt" "false"
+            return 1
+        fi
     else
-        ERROR "无效 阿里云盘 Open Token"
-        return 1
+        INFO "有效 阿里云盘 Open Token（缓存结果）"
+        return 0
     fi
 
 }
@@ -423,6 +442,7 @@ function qrcode_mode_choose() {
         docker run -i --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
+            $(auto_privileged) \
             $(get_default_network "qrcode") \
             ddsderek/xiaoya-glue:python \
             "${2}" --qrcode_mode=web ${extra_parameters}
@@ -462,9 +482,11 @@ function qrcode_mode_choose() {
         read -erp "QRCODE_MODE:" QRCODE_MODE
         [[ -z "${QRCODE_MODE}" ]] && QRCODE_MODE="2"
         if [[ ${QRCODE_MODE} == [1] ]]; then
+            # shellcheck disable=SC2046
             docker run -i --rm \
                 -v "${1}:/data" \
                 -e LANG=C.UTF-8 \
+                $(auto_privileged) \
                 ddsderek/xiaoya-glue:python \
                 "${2}" --qrcode_mode=shell ${extra_parameters}
             return 0
@@ -717,7 +739,7 @@ function settings_aliyunpan_opentoken() {
 
 function enter_115_cookie() {
 
-    touch ${1}/115_cookie.txt
+    touch_chmod "${1}/115_cookie.txt"
     while true; do
         INFO "是否使用扫码自动获取 115 Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_115_cookie
@@ -773,7 +795,7 @@ function settings_115_cookie() {
 
 function enter_quark_cookie() {
 
-    touch ${1}/quark_cookie.txt
+    touch_chmod "${1}/quark_cookie.txt"
     while true; do
         INFO "是否使用扫码自动获取 夸克 Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_quark_cookie
@@ -829,7 +851,7 @@ function settings_quark_cookie() {
 
 function enter_uc_cookie() {
 
-    touch ${1}/uc_cookie.txt
+    touch_chmod "${1}/uc_cookie.txt"
     while true; do
         INFO "是否使用扫码自动获取 UC Cookie [Y/n]（默认 Y）"
         read -erp "Cookie:" choose_qrcode_uc_cookie
@@ -885,7 +907,7 @@ function settings_uc_cookie() {
 
 function enter_pikpak_account() {
 
-    touch ${1}/pikpak.txt
+    touch_chmod "${1}/pikpak.txt"
     INFO "输入你的 PikPak 账号（手机号或邮箱）"
     INFO "如果手机号，要\"+区号\"，比如你的手机号\"12345678900\"那么就填\"+8612345678900\""
     read -erp "PikPak_Username:" PikPak_Username
@@ -923,7 +945,7 @@ function settings_pikpak_account() {
 
 function enter_ali2115() {
 
-    touch ${1}/ali2115.txt
+    touch_chmod "${1}/ali2115.txt"
     if [ -f "${1}/115_cookie.txt" ] && check_115_cookie "${1}"; then
         INFO "自动获取 115 Cookie！"
         set_115_cookie="$(cat ${1}/115_cookie.txt | head -n1)"
@@ -1005,9 +1027,11 @@ function get_aliyunpan_folder_id() {
     "x86_64" | *"amd64"* | "aarch64" | *"arm64"* | *"armv8"* | *"arm/v8"*)
         INFO "阿里云盘 folder id 自动获取"
         pull_glue_python_ddsrem
+        # shellcheck disable=SC2046
         docker run -it --rm \
             -v "${1}:/data" \
             -e LANG=C.UTF-8 \
+            $(auto_privileged) \
             ddsderek/xiaoya-glue:python \
             /get_folder_id/get_folder_id.py --data_path='/data' --drive_mode=r
         ;;
@@ -1111,6 +1135,9 @@ function get_config_dir() {
         fi
         # 设置权限
         find ${CONFIG_DIR} -maxdepth 1 -type f -exec chmod 777 {} \;
+        if [ -n "${GLOBAL_PUID}" ] && [ -n "${GLOBAL_PGID}" ]; then
+            find ${CONFIG_DIR} -maxdepth 1 -type f -exec chown "${GLOBAL_PUID}":"${GLOBAL_PGID}" {} \;
+        fi
     fi
 
 }
@@ -1177,7 +1204,7 @@ function main_account_management() {
     echo -ne "${INFO} 界面加载中...${Font}\r"
     echo -e "1、115 Cookie                        （当前：$(if CHECK_OUT=$(check_115_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 2、夸克 Cookie                       （当前：$(if CHECK_OUT=$(check_quark_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
-3、阿里云盘 Refresh Token（mytoken） （当前：$(if CHECK_OUT=$(check_aliyunpan_refreshtoken "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi))）
+3、阿里云盘 Refresh Token（mytoken） （当前：$(if CHECK_OUT=$(check_aliyunpan_refreshtoken "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 4、阿里云盘 Open Token（myopentoken）（当前：$(if [ -f "${config_dir}/myopentoken.txt" ]; then if [ -f "${config_dir}/open_tv_token_url.txt" ]; then if CHECK_OUT=$(check_aliyunpan_tvtoken "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}阿里云盘 TV Token 已失效${Font}"; fi; elif CHECK_OUT=$(check_aliyunpan_opentoken "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}阿里云盘 Open Token 已失效${Font}"; fi; else echo -e "${Red}未配置${Font}"; fi)）
 5、UC Cookie                         （当前：$(if CHECK_OUT=$(check_uc_cookie "${config_dir}"); then echo -e "${Green}$(echo -e ${CHECK_OUT} | sed 's/\[.*\] //')${Font}"; else echo -e "${Red}错误${Font}"; fi)）
 6、PikPak                            （当前：$(if [ -f "${config_dir}/pikpak.txt" ]; then echo -e "${Green}已配置${Font}"; else echo -e "${Red}未配置${Font}"; fi)）
@@ -1256,6 +1283,7 @@ function install_xiaoya_alist() {
 
     if [ ! -d "${CONFIG_DIR}" ]; then
         mkdir -p "${CONFIG_DIR}"
+        auto_chown "${CONFIG_DIR}"
     else
         if [ -d "${CONFIG_DIR}"/mytoken.txt ]; then
             rm -rf "${CONFIG_DIR}"/mytoken.txt
@@ -1264,12 +1292,13 @@ function install_xiaoya_alist() {
 
     if [ ! -d "${CONFIG_DIR}/data" ]; then
         mkdir -p "${CONFIG_DIR}/data"
+        auto_chown "${CONFIG_DIR}/data"
     fi
 
     files=("mytoken.txt" "myopentoken.txt" "temp_transfer_folder_id.txt")
     for file in "${files[@]}"; do
         if [ ! -f "${CONFIG_DIR}/${file}" ]; then
-            touch "${CONFIG_DIR}/${file}"
+            touch_chmod "${CONFIG_DIR}/${file}"
         fi
     done
 
@@ -1298,6 +1327,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${pikpakshare_list_choose} == [Yy] ]]; then
             echo "${pikpakshare_list_base64}" | base64 --decode > "${CONFIG_DIR}/pikpakshare_list.txt"
+            auto_chown "${CONFIG_DIR}/pikpakshare_list.txt"
         fi
     fi
 
@@ -1316,6 +1346,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${quarkshare_list_choose} == [Yy] ]]; then
             echo "${quarkshare_list_base64}" | base64 --decode > "${CONFIG_DIR}/quarkshare_list.txt"
+            auto_chown "${CONFIG_DIR}/quarkshare_list.txt"
         fi
     fi
 
@@ -1336,6 +1367,7 @@ function install_xiaoya_alist() {
         done
         if [[ ${pan115share_list_choose} == [Yy] ]]; then
             echo "${pan115share_list_base64}" | base64 --decode > "${CONFIG_DIR}/115share_list.txt"
+            auto_chown "${CONFIG_DIR}/115share_list.txt"
         fi
     fi
 
@@ -1376,6 +1408,7 @@ function install_xiaoya_alist() {
     fi
     if [ ! -s "${CONFIG_DIR}"/docker_address.txt ]; then
         echo "http://$localip:5678" > "${CONFIG_DIR}"/docker_address.txt
+        auto_chown "${CONFIG_DIR}/docker_address.txt"
     fi
     docker_command=("docker run" "-itd")
     if [[ ${NET_MODE} == [Yy] ]]; then
@@ -1644,6 +1677,7 @@ function test_disk_capacity() {
 
     if [ ! -d "${MEDIA_DIR}" ]; then
         mkdir -p "${MEDIA_DIR}"
+        auto_chown "${MEDIA_DIR}"
     fi
 
     free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
@@ -1665,6 +1699,15 @@ function test_disk_capacity() {
 
 }
 
+function show_disk_capacity() {
+
+    free_size=$(df -P "${1}" | tail -n1 | awk '{print $4}')
+    free_size=$((free_size))
+    free_size_G=$((free_size / 1024 / 1024))
+    INFO "磁盘容量：${free_size_G}G"
+
+}
+
 function pull_run_glue() {
 
     if docker inspect xiaoyaliu/glue:latest > /dev/null 2>&1; then
@@ -1679,6 +1722,7 @@ function pull_run_glue() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -it \
             --security-opt seccomp=unconfined \
             --rm \
@@ -1686,19 +1730,20 @@ function pull_run_glue() {
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
             ${extra_parameters} \
-            --privileged=true \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
             "${@}"
     else
+        # shellcheck disable=SC2046
         docker run -it \
             --security-opt seccomp=unconfined \
             --rm \
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
-            --privileged=true \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             -e TZ=Asia/Shanghai \
             xiaoyaliu/glue:latest \
@@ -1723,23 +1768,27 @@ function pull_run_glue_xh() {
     fi
 
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            $(auto_privileged) \
             ${extra_parameters} \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --security-opt seccomp=unconfined \
             --name=${BUILDER_NAME} \
             --net=host \
             -v "${MEDIA_DIR}:/media" \
             -v "${CONFIG_DIR}:/etc/xiaoya" \
+            $(auto_privileged) \
             -e LANG=C.UTF-8 \
             xiaoyaliu/glue:latest \
             "${@}" > /dev/null 2>&1
@@ -1769,9 +1818,11 @@ function set_emby_server_infuse_api_key() {
     get_docker0_url
 
     echo "http://$docker0:6908" > "${CONFIG_DIR}"/emby_server.txt
+    auto_chown "${CONFIG_DIR}/emby_server.txt"
 
     if [ ! -f "${CONFIG_DIR}"/infuse_api_key.txt ]; then
         echo "e825ed6f7f8f44ffa0563cddaddce14d" > "${CONFIG_DIR}"/infuse_api_key.txt
+        auto_chown "${CONFIG_DIR}/infuse_api_key.txt"
     fi
 
 }
@@ -1819,27 +1870,122 @@ function check_metadata_size() {
 
 }
 
-function __unzip_all_metadata() {
+function __unzip_metadata() {
+
+    function metadata_unziper() {
+
+        if ! check_metadata_size "${1}"; then
+            exit 1
+        fi
+        if [[ "${OSNAME}" = "macos" ]]; then
+            if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+                if [ ! -d "${MEDIA_DIR}" ]; then
+                    mkdir -p "${MEDIA_DIR}"
+                    auto_chown "${MEDIA_DIR}"
+                    chmod 777 "${MEDIA_DIR}"
+                fi
+                cd "${MEDIA_DIR}" || return 1
+            else
+                if [ ! -d "${MEDIA_DIR}/xiaoya" ]; then
+                    mkdir -p "${MEDIA_DIR}/xiaoya"
+                    auto_chown "${MEDIA_DIR}/xiaoya"
+                    chmod 777 "${MEDIA_DIR}/xiaoya"
+                fi
+                cd "${MEDIA_DIR}/xiaoya" || return 1
+            fi
+            INFO "当前解压工作目录：$(pwd)"
+            7z x -aoa -mmt=16 "${MEDIA_DIR}/temp/${1}"
+        else
+            if [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+                extra_parameters="--workdir=/media"
+            else
+                extra_parameters="--workdir=/media/xiaoya"
+            fi
+            pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}"
+        fi
+
+    }
 
     start_time1=$(date +%s)
 
-    local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
-    for file in "${files[@]}"; do
-        if ! check_metadata_size "${file}"; then
-            exit 1
-        fi
-        if [ "${file}" == "config.mp4" ]; then
-            extra_parameters="--workdir=/media"
-        else
-            extra_parameters="--workdir=/media/xiaoya"
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${file}"
-    done
+    if [ "${1}" == "all_metadata" ]; then
+        local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
+        for file in "${files[@]}"; do
+            metadata_unziper "${file}"
+        done
+        INFO "设置目录权限..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"
+    elif [ "${1}" == "config.mp4" ] || [ "${1}" == "config.new.mp4" ]; then
+        metadata_unziper "${1}"
+        INFO "设置目录权限..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"/config
+    else
+        metadata_unziper "${1}"
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/xiaoya
+    fi
 
     end_time1=$(date +%s)
     total_time1=$((end_time1 - start_time1))
     total_time1=$((total_time1 / 60))
     INFO "解压执行时间：$total_time1 分钟"
+
+}
+
+function __download_metadata() {
+
+    function metadata_downloader() {
+
+        local __data_downloader
+
+        INFO "开始下载 ${1} ..."
+        INFO "下载路径：${MEDIA_DIR}/temp/${1}"
+
+        __data_downloader=$(cat "${DDSREM_CONFIG_DIR}/data_downloader.txt")
+
+        INFO "使用下载器：${__data_downloader}"
+
+        extra_parameters="--workdir=/media/temp"
+
+        if [ "${__data_downloader}" == "wget" ]; then
+            if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
+                ERROR "${1} 下载失败！"
+                exit 1
+            fi
+        else
+            if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
+                if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
+                    ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
+                    exit 1
+                else
+                    INFO "${1} 下载成功！"
+                fi
+            else
+                ERROR "${1} 下载失败！"
+                exit 1
+            fi
+        fi
+
+    }
+
+    if [ "${1}" == "all_metadata" ]; then
+        local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
+        for file in "${files[@]}"; do
+            metadata_downloader "${file}"
+        done
+
+        INFO "设置目录权限..."
+        chmod -R 777 "${MEDIA_DIR}"/temp
+        auto_chown "${MEDIA_DIR}/temp" "-R"
+    else
+        metadata_downloader "${1}"
+
+        INFO "设置目录权限..."
+        chmod 777 "${MEDIA_DIR}"/temp/"${1}"
+        auto_chown "${MEDIA_DIR}/temp/${1}"
+    fi
 
 }
 
@@ -1859,21 +2005,16 @@ function unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}"/xiaoya
     mkdir -p "${MEDIA_DIR}"/config
     chmod 755 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
+    auto_chown "${MEDIA_DIR}/xiaoya"
+    auto_chown "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/temp"
 
     INFO "开始解压..."
 
-    __unzip_all_metadata
+    __unzip_metadata "all_metadata"
 
     set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
 
     INFO "解压完成！"
 
@@ -1885,17 +2026,10 @@ function unzip_xiaoya_emby() {
 
     get_media_dir
 
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+    show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ..."
 
@@ -1904,75 +2038,48 @@ function unzip_xiaoya_emby() {
         exit 1
     fi
 
-    start_time1=$(date +%s)
-
     if [ "${1}" == "config.mp4" ]; then
-        extra_parameters="--workdir=/media"
-
         if [ -d "${MEDIA_DIR}/config" ]; then
             INFO "清理旧配置文件中..."
             INFO "这可能需要一定时间，请耐心等待！"
             rm -rf ${MEDIA_DIR}/config
         fi
         mkdir -p "${MEDIA_DIR}"/config
+        auto_chown "${MEDIA_DIR}/config"
         chmod -R 777 "${MEDIA_DIR}"/config
-
-        if ! check_metadata_size "config.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 temp/config.mp4
-
-        INFO "设置目录权限..."
-        INFO "这可能需要一定时间，请耐心等待！"
-        chmod -R 777 "${MEDIA_DIR}"/config
-    elif [ "${1}" == "all.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
+        __unzip_metadata "${1}"
+    else
         mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "all.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/all.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    elif [ "${1}" == "pikpak.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "pikpak.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/pikpak.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
-    elif [ "${1}" == "115.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
-        mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "115.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/115.mp4
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        auto_chown "${MEDIA_DIR}/xiaoya"
+        __unzip_metadata "${1}"
     fi
-
-    end_time1=$(date +%s)
-    total_time1=$((end_time1 - start_time1))
-    total_time1=$((total_time1 / 60))
-    INFO "解压执行时间：$total_time1 分钟"
 
     INFO "解压完成！"
 
 }
 
 function unzip_appoint_xiaoya_emby_jellyfin() {
+
+    function metadata_unziper() {
+
+        if ! check_metadata_size "${1}"; then
+            exit 1
+        fi
+        if [[ "${OSNAME}" = "macos" ]]; then
+            if [ ! -d "${MEDIA_DIR}/xiaoya" ]; then
+                mkdir -p "${MEDIA_DIR}/xiaoya"
+                auto_chown "${MEDIA_DIR}/xiaoya"
+                chmod 777 "${MEDIA_DIR}/xiaoya"
+            fi
+            cd "${MEDIA_DIR}/xiaoya" || return 1
+            INFO "当前解压工作目录：$(pwd)"
+            7z x -aoa -mmt=16 "${MEDIA_DIR}/temp/${1}" "${2}/*" -o"${MEDIA_DIR}/xiaoya"
+        else
+            extra_parameters="--workdir=/media/xiaoya"
+            pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}" "${2}/*" -o/media/xiaoya
+        fi
+
+    }
 
     get_config_dir
 
@@ -2046,17 +2153,10 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
 
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+    show_disk_capacity "${MEDIA_DIR}"
 
     chmod 777 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
 
     INFO "开始解压 ${MEDIA_DIR}/temp/${1} ${UNZIP_FOLD} ..."
 
@@ -2068,32 +2168,19 @@ function unzip_appoint_xiaoya_emby_jellyfin() {
     start_time1=$(date +%s)
 
     if [ "${1}" == "all.mp4" ] || [ "${1}" == "all_jf.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
         mkdir -p "${MEDIA_DIR}"/xiaoya
-
-        if ! check_metadata_size "all.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} ${UNZIP_FOLD}/* -o/media/xiaoya
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        auto_chown "${MEDIA_DIR}/xiaoya"
+        metadata_unziper "${1}" "${UNZIP_FOLD}"
     elif [ "${1}" == "115.mp4" ]; then
-        extra_parameters="--workdir=/media/xiaoya"
-
         mkdir -p "${MEDIA_DIR}"/xiaoya/115
-
-        if ! check_metadata_size "115.mp4"; then
-            exit 1
-        fi
-        pull_run_glue 7z x -aoa -mmt=16 /media/temp/${1} 115/${UNZIP_FOLD}/* -o/media/xiaoya
-
-        INFO "设置目录权限..."
-        chmod 777 "${MEDIA_DIR}"/xiaoya
+        auto_chown "${MEDIA_DIR}/xiaoya/115"
+        metadata_unziper "${1}" "115/${UNZIP_FOLD}"
     else
         ERROR "此文件暂时不支持解压指定元数据！"
     fi
+
+    INFO "设置目录权限..."
+    chmod 777 "${MEDIA_DIR}"/xiaoya
 
     end_time1=$(date +%s)
     total_time1=$((end_time1 - start_time1))
@@ -2113,99 +2200,20 @@ function download_xiaoya_emby() {
     test_xiaoya_status
 
     mkdir -p "${MEDIA_DIR}"/temp
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp
-    fi
+    auto_chown "${MEDIA_DIR}/temp"
     chmod 777 "${MEDIA_DIR}"/temp
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
+
+    show_disk_capacity "${MEDIA_DIR}"
 
     if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
         INFO "清理旧 ${1} 中..."
-        rm -f ${MEDIA_DIR}/temp/${1}
+        rm -f "${MEDIA_DIR}/temp/${1}"
         if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
+            rm -rf "${MEDIA_DIR}/temp/${1}.aria2"
         fi
     fi
 
-    INFO "开始下载 ${1} ..."
-    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
-
-    extra_parameters="--workdir=/media/temp"
-
-    if pull_run_glue aria2c -o "${1}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${1}"; then
-        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            ERROR "存在 ${MEDIA_DIR}/temp/${1}.aria2 文件，下载不完整！"
-            exit 1
-        else
-            INFO "${1} 下载成功！"
-        fi
-    else
-        ERROR "${1} 下载失败！"
-        exit 1
-    fi
-
-    INFO "设置目录权限..."
-    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp/"${1}"
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
-    fi
-
-    INFO "下载完成！"
-
-}
-
-function download_wget_xiaoya_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    test_xiaoya_status
-
-    mkdir -p "${MEDIA_DIR}"/temp
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp
-    fi
-    chmod 777 "${MEDIA_DIR}"/temp
-    free_size=$(df -P "${MEDIA_DIR}" | tail -n1 | awk '{print $4}')
-    free_size=$((free_size))
-    free_size_G=$((free_size / 1024 / 1024))
-    INFO "磁盘容量：${free_size_G}G"
-
-    if [ -f "${MEDIA_DIR}/temp/${1}" ]; then
-        INFO "清理旧 ${1} 中..."
-        rm -f ${MEDIA_DIR}/temp/${1}
-        if [ -f "${MEDIA_DIR}/temp/${1}.aria2" ]; then
-            rm -rf ${MEDIA_DIR}/temp/${1}.aria2
-        fi
-    fi
-
-    INFO "开始下载 ${1} ..."
-    INFO "下载路径：${MEDIA_DIR}/temp/${1}"
-
-    extra_parameters="--workdir=/media/temp"
-
-    if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${1}"; then
-        ERROR "${1} 下载失败！"
-        exit 1
-    fi
-
-    INFO "设置目录权限..."
-    chmod 777 "${MEDIA_DIR}"/temp/"${1}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"/temp/"${1}"
-    else
-        chown 0:0 "${MEDIA_DIR}"/temp/"${1}"
-    fi
+    __download_metadata "${1}"
 
     INFO "下载完成！"
 
@@ -2219,52 +2227,6 @@ function download_unzip_xiaoya_all_emby() {
 
     test_xiaoya_status
 
-    mkdir -p "${MEDIA_DIR}/temp"
-    rm -rf "${MEDIA_DIR}/config"
-
-    test_disk_capacity
-
-    mkdir -p "${MEDIA_DIR}/xiaoya"
-    mkdir -p "${MEDIA_DIR}/config"
-    chmod 755 "${MEDIA_DIR}"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown root "${MEDIA_DIR}"
-    else
-        chown root:root "${MEDIA_DIR}"
-    fi
-
-    INFO "开始下载解压..."
-
-    local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
-    for file in "${files[@]}"; do
-        extra_parameters="--workdir=/media/temp"
-        if ! pull_run_glue aria2c -o "${file}" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/${file}"; then
-            ERROR "${file} 下载失败！"
-            exit 1
-        fi
-    done
-
-    __unzip_all_metadata
-
-    set_emby_server_infuse_api_key
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
-
-    INFO "下载解压完成！"
-
-}
-
-function download_wget_unzip_xiaoya_all_emby() {
-
-    get_config_dir
-
-    get_media_dir
-
-    test_xiaoya_status
-
-    mkdir -p "${MEDIA_DIR}/temp"
     rm -rf "${MEDIA_DIR}/config"
 
     test_disk_capacity
@@ -2272,11 +2234,10 @@ function download_wget_unzip_xiaoya_all_emby() {
     mkdir -p "${MEDIA_DIR}/xiaoya"
     mkdir -p "${MEDIA_DIR}/config"
     mkdir -p "${MEDIA_DIR}/temp"
-    if [[ "${OSNAME}" = "macos" ]]; then
-        chown 0 "${MEDIA_DIR}"
-    else
-        chown 0:0 "${MEDIA_DIR}"
-    fi
+    auto_chown "${MEDIA_DIR}"
+    auto_chown "${MEDIA_DIR}/xiaoya"
+    auto_chown "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/temp"
     chmod 777 "${MEDIA_DIR}"
 
     local files=("all.mp4" "config.mp4" "115.mp4" "pikpak.mp4")
@@ -2288,42 +2249,17 @@ function download_wget_unzip_xiaoya_all_emby() {
 
     INFO "开始下载解压..."
 
-    for file in "${files[@]}"; do
-        extra_parameters="--workdir=/media/temp"
-        if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/${file}"; then
-            ERROR "${file} 下载失败！"
-            exit 1
-        fi
-    done
+    __download_metadata "all_metadata"
 
-    __unzip_all_metadata
+    __unzip_metadata "all_metadata"
 
     set_emby_server_infuse_api_key
 
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}"
-
-    host=$(echo $xiaoya_addr | cut -f1,2 -d:)
-    INFO "刮削数据已经下载解压完成，请登入${host}:2345，用户名:xiaoya   密码:1234"
+    INFO "刮削数据已经下载解压完成！"
 
 }
 
 function download_unzip_xiaoya_emby_new_config() {
-
-    function compare_version() {
-
-        if [ "${1}" == "4.8.9.0" ]; then
-            return 0
-        fi
-
-        if [ "$(echo -e "${1}\n4.8.9.0" | sort -V | head -n1)" == "${1}" ]; then
-            return 1
-        else
-            return 0
-        fi
-
-    }
 
     function compare_metadata_size() {
 
@@ -2402,7 +2338,7 @@ function download_unzip_xiaoya_emby_new_config() {
             ERROR "当前 Emby 版本获取失败！"
             exit 1
         fi
-        if ! compare_version "${emby_version}"; then
+        if version_lt "${emby_version}" "4.8.9.0"; then
             INFO "您的 Emby 版本过低，开始进入升级流程，请升级到 4.8.9.0 或更高版本！"
             oneclick_upgrade_emby
         fi
@@ -2423,6 +2359,7 @@ function download_unzip_xiaoya_emby_new_config() {
     rm -rf "${MEDIA_DIR}/config"
 
     mkdir -p "${MEDIA_DIR}/config"
+    auto_chown "${MEDIA_DIR}/config"
     chmod -R 777 "${MEDIA_DIR}"/config
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
@@ -2441,39 +2378,13 @@ function download_unzip_xiaoya_emby_new_config() {
         fi
     fi
 
+    show_disk_capacity "${MEDIA_DIR}"
+
     INFO "开始下载解压..."
 
-    extra_parameters="--workdir=/media/temp"
-    if [ "$(cat ${DDSREM_CONFIG_DIR}/data_downloader.txt)" == "wget" ]; then
-        if ! pull_run_glue wget -c --show-progress "${xiaoya_addr}/d/元数据/config.new.mp4"; then
-            ERROR "config.new.mp4 下载失败！"
-            exit 1
-        fi
-    else
-        if pull_run_glue aria2c -o "config.new.mp4" --allow-overwrite=true --auto-file-renaming=false --enable-color=false -c -x6 "${xiaoya_addr}/d/元数据/config.new.mp4"; then
-            if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
-                ERROR "存在 ${MEDIA_DIR}/temp/config.new.mp4.aria2 文件，下载不完整！"
-                exit 1
-            else
-                INFO "config.new.mp4 下载成功！"
-            fi
-        else
-            ERROR "config.new.mp4 下载失败！"
-            exit 1
-        fi
-    fi
+    __download_metadata "config.new.mp4"
 
-    start_time1=$(date +%s)
-
-    if ! check_metadata_size "config.new.mp4"; then
-        exit 1
-    fi
-    extra_parameters="--workdir=/media"
-    pull_run_glue 7z x -aoa -mmt=16 temp/config.new.mp4
-
-    INFO "设置目录权限..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    chmod -R 777 "${MEDIA_DIR}/config"
+    __unzip_metadata "config.new.mp4"
 
     docker start "${emby_name}"
     sleep 5
@@ -2511,11 +2422,7 @@ function main_download_unzip_xiaoya_emby() {
             case "$num" in
             1)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_unzip_xiaoya_all_emby
-                else
-                    download_unzip_xiaoya_all_emby
-                fi
+                download_unzip_xiaoya_all_emby
                 ;;
             2)
                 clear
@@ -2523,11 +2430,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             3)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "all.mp4"
-                else
-                    download_xiaoya_emby "all.mp4"
-                fi
+                download_xiaoya_emby "all.mp4"
                 ;;
             4)
                 clear
@@ -2539,11 +2442,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             6)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "config.mp4"
-                else
-                    download_xiaoya_emby "config.mp4"
-                fi
+                download_xiaoya_emby "config.mp4"
                 ;;
             7)
                 clear
@@ -2551,11 +2450,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             8)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "pikpak.mp4"
-                else
-                    download_xiaoya_emby "pikpak.mp4"
-                fi
+                download_xiaoya_emby "pikpak.mp4"
                 ;;
             9)
                 clear
@@ -2563,11 +2458,7 @@ function main_download_unzip_xiaoya_emby() {
                 ;;
             10)
                 clear
-                if [ "${__data_downloader}" == "wget" ]; then
-                    download_wget_xiaoya_emby "115.mp4"
-                else
-                    download_xiaoya_emby "115.mp4"
-                fi
+                download_xiaoya_emby "115.mp4"
                 ;;
             11)
                 clear
@@ -2633,6 +2524,7 @@ function install_emby_embyserver() {
     esac
     docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2640,7 +2532,7 @@ function install_emby_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
-            --privileged=true \
+            $(auto_privileged) \
             ${extra_parameters} \
             -e UID=0 \
             -e GID=0 \
@@ -2648,6 +2540,7 @@ function install_emby_embyserver() {
             --restart=always \
             "${image_name}:${IMAGE_VERSION}"
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2655,7 +2548,7 @@ function install_emby_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
-            --privileged=true \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
@@ -2683,6 +2576,7 @@ function install_amilys_embyserver() {
     esac
     docker_pull "${image_name}:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2691,12 +2585,14 @@ function install_amilys_embyserver() {
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
             "${image_name}:${IMAGE_VERSION}"
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2704,6 +2600,7 @@ function install_amilys_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
@@ -2736,6 +2633,7 @@ function install_lovechen_embyserver() {
 
     docker_pull "lovechen/embyserver:${IMAGE_VERSION}"
     if [ -n "${extra_parameters}" ]; then
+        # shellcheck disable=SC2046
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2744,12 +2642,14 @@ function install_lovechen_embyserver() {
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
             ${extra_parameters} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
             --restart=always \
             lovechen/embyserver:${IMAGE_VERSION}
     else
+        # shellcheck disable=SC2046
         docker run -itd \
             --name "$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)" \
             -v "${MEDIA_DIR}/config:/config" \
@@ -2757,6 +2657,7 @@ function install_lovechen_embyserver() {
             -v ${NSSWITCH}:/etc/nsswitch.conf \
             --add-host="xiaoya.host:$xiaoya_host" \
             ${NET_MODE} \
+            $(auto_privileged) \
             -e UID=0 \
             -e GID=0 \
             -e TZ=Asia/Shanghai \
@@ -3913,6 +3814,93 @@ function judgment_xiaoya_notify_status() {
 
 }
 
+function xiaoya_emd_pathlib() {
+
+    if [ "${1}" == "install" ]; then
+        PATHLIB_DIR="${2}/pathlib.txt"
+        if [ ! -f "${PATHLIB_DIR}" ]; then
+            echo -e "115/\n每日更新/\n电影/2023/\n纪录片（已刮削）/\n综艺/\n音乐/\n" > "${PATHLIB_DIR}"
+        fi
+    elif [ "${1}" == "once" ]; then
+        PATHLIB_DIR="${2}/once_pathlib.txt"
+        touch_chmod "${2}/once_pathlib.txt"
+    fi
+    sedsh '/^[[:space:]]*$/d' "${PATHLIB_DIR}"
+    while true; do
+        clear
+        emd_all_paths=('115/' 'PikPak/' '动漫/' '每日更新/' '电影/' '电影/2023/' '电视剧/' '纪录片/' '纪录片（已刮削）/' '综艺/' '音乐/' '📺画质演示测试（4K，8K，HDR，Dolby）/')
+        interface=
+        file_array=()
+        while IFS= read -r line; do
+            file_array+=("$line")
+        done < "${PATHLIB_DIR}"
+        for i in "${file_array[@]}"; do
+            skip=false
+            for j in "${emd_all_paths[@]}"; do
+                if [ "$i" == "$j" ]; then
+                    skip=true
+                    break
+                fi
+            done
+            if [[ "$skip" = false ]]; then
+                emd_all_paths+=("$i")
+            fi
+        done
+        for i in "${!emd_all_paths[@]}"; do
+            local CONTENT
+            if grep -q "^${emd_all_paths[$i]}$" "${PATHLIB_DIR}"; then
+                CONTENT="${Green}已选中${Font}"
+            else
+                CONTENT="${Red}未选中${Font}"
+            fi
+            if ((i + 1 <= 12)); then
+                interface+="$((i + 1))、${emd_all_paths[$i]}（${CONTENT}）\n"
+            else
+                interface+="$((i + 1))、${emd_all_paths[$i]}（${Sky_Blue}用户自定义${Font}）（${CONTENT}）\n"
+            fi
+        done
+        echo -e "——————————————————————————————————————————————————————————————————————————————————"
+        echo -e "${Blue}爬取目录选择${Font}\n"
+        echo -e "${Sky_Blue}红色代表未选中，绿色代表已选中，输入对应选项数字可勾选或取消勾选"
+        echo -e "支持输入多个数字，支持自定义爬取路径和现有选项一起输入，自定义爬取路径需要用''包裹"
+        echo -e "示例：1 6 9 10 11 '电影/豆瓣 top 1000部/' '每日更新/动漫/'${Font}\n"
+        echo -e "${interface}\c"
+        echo -e "0、保存退出"
+        echo -e "——————————————————————————————————————————————————————————————————————————————————"
+        read -erp "请输入数字或路径:" user_paths
+        if [ -n "${user_paths}" ]; then
+            if [ "${user_paths}" == 0 ]; then
+                clear
+                break
+            fi
+            eval "user_path_array=($user_paths)"
+            # shellcheck disable=SC2154
+            for j in "${!user_path_array[@]}"; do
+                if [[ "${user_path_array[$j]}" -eq "${user_path_array[$j]}" ]] 2> /dev/null; then
+                    for i in "${!emd_all_paths[@]}"; do
+                        if [[ "$((i + 1))" == "${user_path_array[$j]}" ]]; then
+                            if grep -q "^${emd_all_paths[$i]}$" "${PATHLIB_DIR}"; then
+                                sedsh "\#${emd_all_paths[$i]}#d" "${PATHLIB_DIR}"
+                            else
+                                echo "${emd_all_paths[$i]}" >> "${PATHLIB_DIR}"
+                            fi
+                            break
+                        fi
+                    done
+                else
+                    if grep -q "^${user_path_array[$j]}$" "${PATHLIB_DIR}"; then
+                        sedsh "\#${user_path_array[$j]}#d" "${PATHLIB_DIR}"
+                    else
+                        echo "${user_path_array[$j]}" >> "${PATHLIB_DIR}"
+                    fi
+                fi
+            done
+            sedsh '/^[[:space:]]*$/d' "${PATHLIB_DIR}"
+        fi
+    done
+
+}
+
 function install_xiaoya_emd() {
 
     get_media_dir
@@ -3929,6 +3917,8 @@ function install_xiaoya_emd() {
         fi
     done
     cycle=$((sync_interval * 60 * 60))
+
+    xiaoya_emd_pathlib "install" "${MEDIA_DIR}/xiaoya"
 
     while true; do
         INFO "是否开启重启容器自动更新到最新程序 [Y/n]（默认 n 不开启）"
@@ -3971,12 +3961,16 @@ function install_xiaoya_emd() {
     if [ "${container_run_extra_parameters}" == "true" ]; then
         local RETURN_DATA
         RETURN_DATA="$(data_crep "r" "install_xiaoya_emd")"
+        # 兼容新版本参数
+        if [ "${RETURN_DATA}" == "--media /media" ]; then
+            RETURN_DATA="--media /media --paths /media/pathlib.txt"
+        fi
         if [ "${RETURN_DATA}" == "None" ]; then
-            INFO "请输入运行参数（默认 --media /media ）"
+            INFO "请输入运行参数（默认 --media /media --paths /media/pathlib.txt ）"
             WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
             WARN "警告！！！ 默认请勿修改 /media 路径！！！"
             read -erp "Extra parameters:" extra_parameters
-            [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media"
+            [[ -z "${extra_parameters}" ]] && extra_parameters="--media /media --paths /media/pathlib.txt"
         else
             INFO "已读取您上次设置的运行参数：${RETURN_DATA} (默认不更改回车继续，如果需要更改请输入新参数)"
             WARN "如果需要更改此设置请注意容器目录映射，默认媒体库路径映射到容器内的 /media 文件夹下！"
@@ -3985,7 +3979,7 @@ function install_xiaoya_emd() {
             [[ -z "${extra_parameters}" ]] && extra_parameters=${RETURN_DATA}
         fi
     else
-        extra_parameters="--media /media"
+        extra_parameters="--media /media --paths /media/pathlib.txt"
     fi
     script_extra_parameters="$(data_crep "write" "install_xiaoya_emd")"
 
@@ -4007,6 +4001,7 @@ function install_xiaoya_emd() {
 
     docker_pull "ddsderek/xiaoya-emd:${IMAGE_VERSION}"
 
+    # shellcheck disable=SC2046
     docker run -d \
         --name=xiaoya-emd \
         --restart=always \
@@ -4016,6 +4011,7 @@ function install_xiaoya_emd() {
         -e "RESTART_AUTO_UPDATE=${RESTART_AUTO_UPDATE}" \
         -e TZ=Asia/Shanghai \
         ${run_extra_parameters} \
+        $(auto_privileged) \
         ddsderek/xiaoya-emd:${IMAGE_VERSION} \
         ${script_extra_parameters}
 
@@ -4025,11 +4021,16 @@ function install_xiaoya_emd() {
 
 function update_xiaoya_emd() {
 
-    for i in $(seq -w 3 -1 0); do
-        echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
-        sleep 1
-    done
-    container_update xiaoya-emd
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
+            sleep 1
+        done
+        container_update xiaoya-emd
+    else
+        ERROR "当前版本小雅元数据定时爬虫不支持直接升级，请手动卸载重新安装！"
+        exit 1
+    fi
 
 }
 
@@ -4048,6 +4049,50 @@ function unisntall_xiaoya_emd() {
 
 }
 
+function once_xiaoya_emd() {
+
+    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+        xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+        if [ -z "${xiaoya_emd_dir}" ]; then
+            get_media_dir
+            xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+        fi
+        INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+        sleep 2
+        xiaoya_emd_pathlib "once" "${xiaoya_emd_dir}"
+        cat << EOF > "${xiaoya_emd_dir}/once_run.sh"
+cd /app || exit 1
+if [ -d /tmp/db ]; then
+    rm -rf /tmp/db
+fi
+mkdir -p /tmp/db
+if [ -f /media/solid.lock ]; then
+    echo -e "${ERROR} 当前已有爬虫进程在运行，请稍后再试！"
+    exit 1
+else
+    touch /media/solid.lock
+    echo -e "${INFO} 开始下载同步！"
+    echo -e "${INFO} python3 solid.py --media /media --paths /media/once_pathlib.txt --location /tmp/db"
+    python3 solid.py --media /media --paths /media/once_pathlib.txt --location /tmp/db
+    echo -e "${INFO} 运行完成！"
+    rm -f /media/solid.lock
+    exit 0
+fi
+EOF
+        for i in $(seq -w 3 -1 0); do
+            echo -en "即将开始爬取指定元数据${Blue} $i ${Font}\r"
+            sleep 1
+        done
+        docker exec -it xiaoya-emd bash /media/once_run.sh
+        docker exec -it xiaoya-emd rm -f /media/once_run.sh
+        docker exec -it xiaoya-emd rm -f /media/once_pathlib.txt
+    else
+        ERROR "当前版本小雅元数据定时爬虫不支持立刻爬取指定目录，请手动卸载重新安装！"
+        exit 1
+    fi
+
+}
+
 function main_xiaoya_emd() {
 
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
@@ -4057,9 +4102,11 @@ function main_xiaoya_emd() {
     echo -e "1、安装"
     echo -e "2、更新"
     echo -e "3、卸载"
+    echo -e "4、立刻爬取指定目录"
+    echo -e "5、容器定时爬取目录单独配置"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-3]:" num
+    read -erp "请输入数字 [0-5]:" num
     case "$num" in
     1)
         clear
@@ -4076,13 +4123,35 @@ function main_xiaoya_emd() {
         unisntall_xiaoya_emd
         return_menu "main_xiaoya_emd"
         ;;
+    4)
+        clear
+        once_xiaoya_emd
+        return_menu "main_xiaoya_emd"
+        ;;
+    5)
+        clear
+        if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+            xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+            if [ -z "${xiaoya_emd_dir}" ]; then
+                get_media_dir
+                xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+            fi
+            INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+            sleep 2
+            xiaoya_emd_pathlib "install" "${xiaoya_emd_dir}"
+        else
+            ERROR "当前版本小雅元数据定时爬虫不支持单独配置容器定时爬取目录，请手动卸载重新安装！"
+            exit 1
+        fi
+        return_menu "main_xiaoya_emd"
+        ;;
     0)
         clear
         main_xiaoya_all_emby
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-3]'
+        ERROR '请输入正确数字 [0-5]'
         main_xiaoya_emd
         ;;
     esac
@@ -4151,7 +4220,7 @@ function main_xiaoya_all_emby() {
 4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）
 5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")
 6、立即同步小雅Emby config目录
-7、创建/删除 同步定时更新任务                 当前状态：$(judgment_xiaoya_notify_status)
+7、创建/删除 同步定时更新任务（${Red}已弃用${Font}）       当前状态：$(judgment_xiaoya_notify_status)
 8、图形化编辑 emby_config.txt
 9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)
 10、一键升级Emby容器（可选择镜像版本）
@@ -5724,6 +5793,13 @@ function first_init() {
     INFO "获取系统信息中..."
     get_os
 
+    if [ -f /tmp/run_xiaoya_install_user.txt ]; then
+        INFO "运行脚本的用户：$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
+        RUN_USER="$(head -n 1 /tmp/run_xiaoya_install_user.txt)"
+        GLOBAL_PUID="$(id -u "${RUN_USER}")"
+        GLOBAL_PGID="$(id -g "${RUN_USER}")"
+    fi
+
     INFO "获取 IP 地址中..."
     CITY="$(curl -fsSL -m 10 -s http://ipinfo.io/json | sed -n 's/.*"city": *"\([^"]*\)".*/\1/p')"
     if [ -n "${CITY}" ]; then
@@ -5748,8 +5824,12 @@ function first_init() {
         echo 'false' > ${DDSREM_CONFIG_DIR}/container_run_extra_parameters.txt
     fi
 
-    if [ ! -d ${DDSREM_CONFIG_DIR}/data_crep ]; then
-        mkdir -p ${DDSREM_CONFIG_DIR}/data_crep
+    if [ ! -d "${DDSREM_CONFIG_DIR}/data_crep" ]; then
+        mkdir -p "${DDSREM_CONFIG_DIR}/data_crep"
+    fi
+
+    if [ ! -d "${DDSREM_CONFIG_DIR}/cache_data" ]; then
+        mkdir -p "${DDSREM_CONFIG_DIR}/cache_data"
     fi
 
     if [ ! -f ${DDSREM_CONFIG_DIR}/data_downloader.txt ]; then
@@ -5769,7 +5849,11 @@ function first_init() {
     fi
 
     if [ ! -f "${DDSREM_CONFIG_DIR}/default_network.txt" ]; then
-        echo 'host' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        if [[ "${OSNAME}" = "macos" ]]; then
+            echo 'bridge' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        else
+            echo 'host' > "${DDSREM_CONFIG_DIR}/default_network.txt"
+        fi
     fi
 
     INFO "设置 Docker 镜像源中..."
@@ -5818,9 +5902,68 @@ function first_init() {
 
 }
 
+function root_need() {
+    if [[ $EUID -ne 0 ]] && [ "$(uname -s)" != "Darwin" ]; then
+        ERROR '此脚本必须以 root 身份运行！'
+        exit 1
+    fi
+    if [ $EUID == 0 ] && [ "$(uname -s)" == "Darwin" ]; then
+        ERROR 'MacOS 运行脚本必须使用非 root 身份运行，脚本会自动提权！'
+        exit 1
+    fi
+}
+
 clear
 INFO "初始化中，请稍等...."
 root_need
+if [ "$(uname -s)" == "Darwin" ]; then
+    if ! command -v brew; then
+        WARN "brew 未安装，脚本尝试自动安装..."
+        if /bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"; then
+            INFO "brew 安装成功！"
+        else
+            ERROR "brew 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+    if ! command -v 7z; then
+        WARN "p7zip 未安装，脚本尝试自动安装..."
+        if brew install p7zip; then
+            INFO "p7zip 安装成功！"
+        else
+            ERROR "p7zip 安装失败，请手动安装！"
+            exit 1
+        fi
+    fi
+    if ! command -v docker; then
+        ERROR "docker 未安装，请手动安装！"
+        exit 1
+    fi
+    if [[ $EUID -ne 0 ]]; then
+        if [ -f /tmp/xiaoya_install.sh ]; then
+            rm -rf /tmp/xiaoya_install.sh
+        fi
+        if [ -f /tmp/run_xiaoya_install_user.txt ]; then
+            rm -rf /tmp/run_xiaoya_install_user.txt
+        fi
+        if ! curl -sL https://ddsrem.com/xiaoya/all_in_one.sh -o /tmp/xiaoya_install.sh; then
+            if ! curl -sL https://fastly.jsdelivr.net/gh/DDS-Derek/xiaoya-alist@latest/all_in_one.sh -o /tmp/xiaoya_install.sh; then
+                if ! curl -sL https://raw.githubusercontent.com/DDS-Derek/xiaoya-alist/master/all_in_one.sh -o /tmp/xiaoya_install.sh; then
+                    ERROR "脚本获取失败！"
+                    exit 1
+                fi
+            fi
+        fi
+        INFO "脚本获取成功！"
+        sed -i '' '/^root_need$/d' /tmp/xiaoya_install.sh
+        who | sed -n "2,1p" | awk '{print $1}' > /tmp/run_xiaoya_install_user.txt
+        # shellcheck disable=SC2068
+        if ! sudo bash /tmp/xiaoya_install.sh $@; then
+            exit 1
+        fi
+        exit 0
+    fi
+fi
 if [ ! -d "/tmp/xiaoya_alist_tmp" ]; then
     mkdir -p /tmp/xiaoya_alist_tmp
 fi

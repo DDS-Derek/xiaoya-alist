@@ -71,6 +71,22 @@ function mount_img() {
 
 }
 
+function main_solid() {
+
+    cd /app || return 1
+    if [ -f /media/solid.lock ]; then
+        WARN "当前已有爬虫进程在运行，跳过本次运行！"
+    else
+        touch /media/solid.lock
+        INFO "开始下载同步！"
+        INFO "python3 solid.py $*"
+        python3 solid.py $@
+        INFO "运行完成！"
+        rm -f /media/solid.lock
+    fi
+
+}
+
 if [ "${IMG_VOLUME}" == "true" ]; then
     mount_img
 fi
@@ -87,11 +103,7 @@ else
             update_app
             INFO "更新成功！"
         fi
-        cd /app || exit
-        INFO "开始下载同步！"
-        INFO "python3 solid.py $*"
-        python3 solid.py $@
-        INFO "运行完成！"
+        main_solid $@
         INFO "等待${CYCLE}秒后下次运行！"
         sleep "${CYCLE}"
     done
