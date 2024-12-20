@@ -3,6 +3,8 @@
 # shellcheck disable=SC2068
 # shellcheck disable=SC2114
 
+IMAGE_VERSION=v1.0.0
+
 Green="\033[32m"
 Red="\033[31m"
 Yellow='\033[33m'
@@ -86,6 +88,8 @@ function main_solid() {
     fi
 
 }
+
+INFO "镜像脚本版本：${IMAGE_VERSION}"
 
 if [ "${IMG_VOLUME}" == "true" ]; then
     mount_img
