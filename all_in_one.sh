@@ -1102,12 +1102,20 @@ function get_config_dir() {
                 WARN "默认使用当前保存的小雅配置目录路径"
             fi
             xiaoya_config_dir=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-            INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
+            if [ -z "${xiaoya_config_dir}" ]; then
+                WARN "读取小雅Alist配置文件路径错误，请重新输入你的小雅Alist配置文件路径"
+            else
+                INFO "已读取小雅Alist配置文件路径：${xiaoya_config_dir} (默认不更改回车继续，如果需要更改请输入新路径)"
+            fi
             read -erp "CONFIG_DIR:" CONFIG_DIR
             [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${xiaoya_config_dir}
         elif [ -f ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt ]; then
             OLD_CONFIG_DIR=$(cat ${DDSREM_CONFIG_DIR}/xiaoya_alist_config_dir.txt)
-            INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+            if [ -z "${OLD_CONFIG_DIR}" ]; then
+                WARN "读取小雅Alist配置文件路径错误，请重新输入你的小雅Alist配置文件路径"
+            else
+                INFO "已读取小雅Alist配置文件路径：${OLD_CONFIG_DIR} (默认不更改回车继续，如果需要更改请输入新路径)"
+            fi
             read -erp "CONFIG_DIR:" CONFIG_DIR
             [[ -z "${CONFIG_DIR}" ]] && CONFIG_DIR=${OLD_CONFIG_DIR}
         else
