@@ -3822,6 +3822,22 @@ function judgment_xiaoya_notify_status() {
 
 }
 
+function xiaoya_emd_updated_tips() {
+
+    if ! docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+        ERROR "当前版本小雅元数据定时爬虫不支持执行此操作，请手动卸载重新安装！"
+        exit 1
+    fi
+
+    if [ "${1}" != "None" ]; then
+        if version_lt "$(docker exec -it xiaoya-emd awk -F '=' '/IMAGE_VERSION/ {print $2}' /entrypoint.sh | head -n 1)" "${1}"; then
+            ERROR "当前版本小雅元数据定时爬虫不支持执行此操作，请手动卸载重新安装！"
+            exit 1
+        fi
+    fi
+
+}
+
 function xiaoya_emd_pathlib() {
 
     if [ "${1}" == "install" ]; then
@@ -4029,16 +4045,19 @@ function install_xiaoya_emd() {
 
 function update_xiaoya_emd() {
 
-    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
-        for i in $(seq -w 3 -1 0); do
-            echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
-            sleep 1
-        done
-        container_update xiaoya-emd
-    else
-        ERROR "当前版本小雅元数据定时爬虫不支持直接升级，请手动卸载重新安装！"
-        exit 1
+    xiaoya_emd_updated_tips "None"
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始更新小雅元数据定时爬虫${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+    if [ -n "${xiaoya_emd_dir}" ]; then
+        if [ -f "${xiaoya_emd_dir}/solid.lock" ]; then
+            INFO "检测到存在进程锁，清理中..."
+            rm -f "${xiaoya_emd_dir}/solid.lock"
+        fi
     fi
+    container_update xiaoya-emd
 
 }
 
@@ -4049,9 +4068,20 @@ function unisntall_xiaoya_emd() {
         sleep 1
     done
 
+    xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+    
     docker stop xiaoya-emd
     docker rm xiaoya-emd
     docker rmi ddsderek/xiaoya-emd:latest
+
+    if [ -n "${xiaoya_emd_dir}" ]; then
+        for file in "solid.lock" "once_pathlib.txt" "pathlib.txt" ".tempfiles.db" ".localfiles.db"; do
+            if [ -f "${xiaoya_emd_dir}/${file}" ]; then
+                INFO "清理 ${file} 文件"
+                rm -f "${xiaoya_emd_dir}/${file}"
+            fi
+        done
+    fi
 
     INFO "小雅元数据定时爬虫卸载成功！"
 
@@ -4059,16 +4089,16 @@ function unisntall_xiaoya_emd() {
 
 function once_xiaoya_emd() {
 
-    if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
-        xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
-        if [ -z "${xiaoya_emd_dir}" ]; then
-            get_media_dir
-            xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
-        fi
-        INFO "小雅媒体库路径：${xiaoya_emd_dir}"
-        sleep 2
-        xiaoya_emd_pathlib "once" "${xiaoya_emd_dir}"
-        cat << EOF > "${xiaoya_emd_dir}/once_run.sh"
+    xiaoya_emd_updated_tips "v1.0.0"
+    xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+    if [ -z "${xiaoya_emd_dir}" ]; then
+        get_media_dir
+        xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+    fi
+    INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+    sleep 2
+    xiaoya_emd_pathlib "once" "${xiaoya_emd_dir}"
+    cat << EOF > "${xiaoya_emd_dir}/once_run.sh"
 cd /app || exit 1
 if [ -d /tmp/db ]; then
     rm -rf /tmp/db
@@ -4087,17 +4117,13 @@ else
     exit 0
 fi
 EOF
-        for i in $(seq -w 3 -1 0); do
-            echo -en "即将开始爬取指定元数据${Blue} $i ${Font}\r"
-            sleep 1
-        done
-        docker exec -it xiaoya-emd bash /media/once_run.sh
-        docker exec -it xiaoya-emd rm -f /media/once_run.sh
-        docker exec -it xiaoya-emd rm -f /media/once_pathlib.txt
-    else
-        ERROR "当前版本小雅元数据定时爬虫不支持立刻爬取指定目录，请手动卸载重新安装！"
-        exit 1
-    fi
+    for i in $(seq -w 3 -1 0); do
+        echo -en "即将开始爬取指定元数据${Blue} $i ${Font}\r"
+        sleep 1
+    done
+    docker exec -it xiaoya-emd bash /media/once_run.sh
+    docker exec -it xiaoya-emd rm -f /media/once_run.sh
+    docker exec -it xiaoya-emd rm -f /media/once_pathlib.txt
 
 }
 
@@ -4112,9 +4138,11 @@ function main_xiaoya_emd() {
     echo -e "3、卸载"
     echo -e "4、立刻爬取指定目录"
     echo -e "5、容器定时爬取目录单独配置"
+    echo -e "6、清理爬虫进程锁"
+    echo -e "7、重置爬虫数据库"
     echo -e "0、返回上级"
     echo -e "——————————————————————————————————————————————————————————————————————————————————"
-    read -erp "请输入数字 [0-5]:" num
+    read -erp "请输入数字 [0-7]:" num
     case "$num" in
     1)
         clear
@@ -4138,17 +4166,62 @@ function main_xiaoya_emd() {
         ;;
     5)
         clear
-        if docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
-            xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
-            if [ -z "${xiaoya_emd_dir}" ]; then
-                get_media_dir
-                xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+        xiaoya_emd_updated_tips "v1.0.0"
+        xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+        if [ -z "${xiaoya_emd_dir}" ]; then
+            get_media_dir
+            xiaoya_emd_dir="${MEDIA_DIR}/xiaoya"
+        fi
+        INFO "小雅媒体库路径：${xiaoya_emd_dir}"
+        sleep 2
+        xiaoya_emd_pathlib "install" "${xiaoya_emd_dir}"
+        return_menu "main_xiaoya_emd"
+        ;;
+    6)
+        clear
+        xiaoya_emd_updated_tips "v1.0.0"
+        if [ "$(docker inspect --format='{{.State.Status}}' xiaoya-emd)" == "running" ]; then
+            if docker exec -it xiaoya-emd ps -ef | grep -q 'python3 solid.py'; then
+                ERROR "当前有爬虫进程正在运行，无法清理进程锁！"
+                exit 1
+            else
+                if docker exec -it xiaoya-emd ls -al /media/solid.lock > /dev/null 2>&1; then
+                    INFO "检测到存在进程锁，清理中..."
+                    rm -f "${xiaoya_emd_dir}/solid.lock"
+                fi
             fi
-            INFO "小雅媒体库路径：${xiaoya_emd_dir}"
-            sleep 2
-            xiaoya_emd_pathlib "install" "${xiaoya_emd_dir}"
         else
-            ERROR "当前版本小雅元数据定时爬虫不支持单独配置容器定时爬取目录，请手动卸载重新安装！"
+            xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+            if [ -n "${xiaoya_emd_dir}" ]; then
+                if [ -f "${xiaoya_emd_dir}/solid.lock" ]; then
+                    INFO "检测到存在进程锁，清理中..."
+                    rm -f "${xiaoya_emd_dir}/solid.lock"
+                fi
+            fi
+        fi
+        INFO "进程锁清理完成！"
+        return_menu "main_xiaoya_emd"
+        ;;
+    7)
+        clear
+        xiaoya_emd_updated_tips "v1.0.0"
+        if [ "$(docker inspect --format='{{.State.Status}}' xiaoya-emd)" == "running" ]; then
+            if docker exec -it xiaoya-emd ps -ef | grep -q 'python3 solid.py'; then
+                ERROR "当前有爬虫进程正在运行，无法重置数据库！"
+                exit 1
+            fi
+        fi
+        xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
+        if [ -n "${xiaoya_emd_dir}" ]; then
+            for file in ".tempfiles.db" ".localfiles.db"; do
+                if [ -f "${xiaoya_emd_dir}/${file}" ]; then
+                    INFO "清理 ${file} 文件"
+                    rm -f "${xiaoya_emd_dir}/${file}"
+                fi
+            done
+            INFO "数据库重置完成！"
+        else
+            ERROR "数据库重置失败，无法读取媒体库路径，请手动删除媒体库路径下面的 db 后缀文件！"
             exit 1
         fi
         return_menu "main_xiaoya_emd"
@@ -4159,7 +4232,7 @@ function main_xiaoya_emd() {
         ;;
     *)
         clear
-        ERROR '请输入正确数字 [0-5]'
+        ERROR '请输入正确数字 [0-7]'
         main_xiaoya_emd
         ;;
     esac
