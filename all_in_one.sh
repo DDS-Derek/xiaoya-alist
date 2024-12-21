@@ -4069,7 +4069,7 @@ function unisntall_xiaoya_emd() {
     done
 
     xiaoya_emd_dir="$(docker inspect --format='{{range $v,$conf := .Mounts}}{{$conf.Source}}:{{$conf.Destination}}{{$conf.Type}}~{{end}}' xiaoya-emd | tr '~' '\n' | grep bind | sed 's/bind//g' | grep ":/media$" | awk -F: '{print $1}')"
-    
+
     docker stop xiaoya-emd
     docker rm xiaoya-emd
     docker rmi ddsderek/xiaoya-emd:latest
