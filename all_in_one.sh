@@ -52,6 +52,9 @@ function WARN() {
 # shellcheck disable=SC2034
 mirrors=(
     "docker.io"
+    "hub.rat.dev"
+    "nas.dockerimages.us.kg"
+    "dockerhub.ggbox.us.kg"
     "registry-docker-hub-latest-9vqc.onrender.com"
     "docker.fxxk.dedyn.io"
     "dockerproxy.com"
