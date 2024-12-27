@@ -1,5 +1,7 @@
 flask
-requests
-pycryptodome
+pillow
 qrcode
 argparse
+requests
+pycryptodome
+aligo

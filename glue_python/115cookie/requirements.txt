@@ -1,4 +1,0 @@
-flask
-pillow
-qrcode
-argparse
