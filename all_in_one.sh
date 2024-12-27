@@ -3827,13 +3827,13 @@ function judgment_xiaoya_notify_status() {
 
 function xiaoya_emd_updated_tips() {
 
-    if ! docker exec -it xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
+    if ! docker exec -i xiaoya-emd grep -q 'main_solid' /entrypoint.sh > /dev/null 2>&1; then
         ERROR "当前版本小雅元数据定时爬虫不支持执行此操作，请手动卸载重新安装！"
         exit 1
     fi
 
     if [ "${1}" != "None" ]; then
-        if version_lt "$(docker exec -it xiaoya-emd awk -F '=' '/IMAGE_VERSION/ {print $2}' /entrypoint.sh | head -n 1)" "${1}"; then
+        if version_lt "$(docker exec -i xiaoya-emd awk -F '=' '/IMAGE_VERSION/ {print $2}' /entrypoint.sh | head -n 1)" "${1}"; then
             ERROR "当前版本小雅元数据定时爬虫不支持执行此操作，请手动卸载重新安装！"
             exit 1
         fi
@@ -3892,6 +3892,9 @@ function xiaoya_emd_pathlib() {
         echo -e "支持输入多个数字，支持自定义爬取路径和现有选项一起输入，自定义爬取路径需要用''包裹"
         echo -e "示例：1 5 8 9 10 '电影/豆瓣 top 1000部/' '每日更新/动漫/'${Font}\n"
         echo -e "${interface}\c"
+        if [ "${1}" == "install" ]; then
+            echo -e "101、重置配置"
+        fi
         echo -e "0、保存退出"
         echo -e "——————————————————————————————————————————————————————————————————————————————————"
         read -erp "请输入数字或路径:" user_paths
@@ -3899,6 +3902,10 @@ function xiaoya_emd_pathlib() {
             if [ "${user_paths}" == 0 ]; then
                 clear
                 break
+            fi
+            if [ "${user_paths}" == 101 ] && [ "${1}" == "install" ]; then
+                echo -e "115/\n每日更新/\n纪录片（已刮削）/\n综艺/\n音乐/\n" > "${PATHLIB_DIR}"
+                clear
             fi
             eval "user_path_array=($user_paths)"
             # shellcheck disable=SC2154
@@ -4303,7 +4310,7 @@ function main_xiaoya_all_emby() {
 3、安装Emby（可选择版本）
 4、替换DOCKER_ADDRESS（${Red}已弃用${Font}）
 5、安装/更新/卸载 Resilio-Sync（${Red}已弃用${Font}）      当前状态：$(judgment_container "${xiaoya_resilio_name}")
-6、立即同步小雅Emby config目录
+6、立即同步小雅Emby config目录（${Red}已弃用${Font}）
 7、创建/删除 同步定时更新任务（${Red}已弃用${Font}）       当前状态：$(judgment_xiaoya_notify_status)
 8、图形化编辑 emby_config.txt
 9、安装/更新/卸载 小雅元数据定时爬虫          当前状态：$(judgment_container xiaoya-emd)
