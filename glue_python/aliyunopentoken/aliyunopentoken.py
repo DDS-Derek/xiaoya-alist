@@ -150,6 +150,7 @@ if __name__ == '__main__':
         if re.status_code == 200:
             re_data = json.loads(re.content)
             sid = re_data['sid']
+            # pylint: disable=C0103
             qr_code_url = f"https://www.aliyundrive.com/o/oauth/authorize?sid={sid}"
             qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
             qr.add_data(qr_code_url)
