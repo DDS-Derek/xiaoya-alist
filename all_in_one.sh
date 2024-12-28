@@ -424,6 +424,8 @@ function check_aliyunpan_opentoken() {
 
 function qrcode_mode_choose() {
 
+    extra_parameters=
+
     function qrcode_web() {
 
         if ! check_port "34256"; then
