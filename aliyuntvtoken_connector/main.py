@@ -4,18 +4,15 @@ from Crypto.Util.Padding import unpad
 import json
 import base64
 import requests
-import requests
-import json
 import uuid
 import hashlib
-import base64
 import random
 
 
 app = Flask(__name__)
 headers = {
     "token": "6733b42e28cdba32",
-    'User-Agent': 'Mozilla/5.0 (Linux; U; Android 9; zh-cn; SM-S908E Build/TP1A.220624.014) AppleWebKit/533.1 (KHTML, like Gecko) Mobile Safari/533.1',
+    'User-Agent': 'Mozilla/5.0 (Linux; U; Android 9; zh-cn; SM-S908E Build/TP1A.220624.014) AppleWebKit/533.1 (KHTML, like Gecko) Mobile Safari/533.1',  # noqa: E501
     'Host': 'api.extscreen.com'
 }
 
@@ -23,7 +20,7 @@ headers = {
 def h(char_array, modifier):
     unique_chars = list(dict.fromkeys(char_array))
     numeric_modifier = int(modifier[7:])
-    transformed_string = "".join([chr(abs(ord(c) - (numeric_modifier % 127) - 1) + 33 if abs(ord(c) - (numeric_modifier % 127) - 1) < 33 else
+    transformed_string = "".join([chr(abs(ord(c) - (numeric_modifier % 127) - 1) + 33 if abs(ord(c) - (numeric_modifier % 127) - 1) < 33 else  # noqa: E501
                                          abs(ord(c) - (numeric_modifier % 127) - 1)) for c in unique_chars])
     return transformed_string
 
@@ -78,7 +75,7 @@ def oauth_token():
     unique_id = uuid.uuid4().hex
     wifimac = str(random.randint(10**11, 10**12 - 1))
 
-    resp = requests.post("http://api.extscreen.com/aliyundrive/v3/token", data=req_body, headers={**get_params(timestamp, unique_id, wifimac), **headers})
+    resp = requests.post("http://api.extscreen.com/aliyundrive/v3/token", data=req_body, headers={**get_params(timestamp, unique_id, wifimac), **headers})  # noqa: E501
     if resp.status_code == 200:
         resp_data = resp.json()
         ciphertext = resp_data["data"]["ciphertext"]
