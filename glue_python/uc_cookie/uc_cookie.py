@@ -1,66 +1,74 @@
 #!/usr/local/bin/python3
 
-import json
-import requests
 import time
 import logging
 import os
 import threading
 import sys
-import qrcode
 import argparse
 import random
+
+import json
+import requests
+import qrcode
 from flask import Flask, send_file, render_template, jsonify
 
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-last_status = 0
+LAST_STATUS = 0
 stop_event = threading.Event()
 if sys.platform.startswith('win32'):
-    qrcode_dir = 'qrcode.png'
+    QRCODE_DIR = 'qrcode.png'
 else:
-    qrcode_dir= '/uc_cookie/qrcode.png'
+    QRCODE_DIR= '/uc_cookie/qrcode.png'
 
 
 def cookiejar_to_string(cookiejar):
+    """
+    转换 Cookie 格式
+    """
     cookie_string = ""
     for cookie in cookiejar:
         cookie_string += cookie.name + "=" + cookie.value + "; "
     return cookie_string.strip('; ')
 
 
-def poll_qrcode_status(stop, token, log_print):
-    global last_status
+# pylint: disable=W0603
+def poll_qrcode_status(stop, _token, log_print):
+    """
+    循环等待扫码
+    """
+    global LAST_STATUS
     while not stop.is_set():
         __t = int(time.time() * 1000)
-        data = {
+        _data = {
             'client_id': 381,
             'v': 1.2,
             'request_id': __t,
-            'token': token
+            'token': _token
         }
-        re = requests.post(f'https://api.open.uc.cn/cas/ajax/getServiceTicketByQrcodeToken?__dt={random.randint(100, 999)}&__t={__t}', data=data)
-        if re.status_code == 200:
-            re_data = json.loads(re.content)
+        _re = requests.post(f'https://api.open.uc.cn/cas/ajax/getServiceTicketByQrcodeToken?__dt={random.randint(100, 999)}&__t={__t}', data=_data, timeout=10)  # noqa: E501
+        if _re.status_code == 200:
+            re_data = json.loads(_re.content)
             if re_data['status'] == 2000000:
                 logging.info('扫码成功！')
                 service_ticket = re_data['data']['members']['service_ticket']
-                re = requests.get(f'https://drive.uc.cn/account/info?st={service_ticket}')
-                if re.status_code == 200:
-                    uc_cookie = cookiejar_to_string(re.cookies)
+                _re = requests.get(f'https://drive.uc.cn/account/info?st={service_ticket}', timeout=10)
+                if _re.status_code == 200:
+                    uc_cookie = cookiejar_to_string(_re.cookies)
                     if sys.platform.startswith('win32'):
-                        with open('uc_cookie.txt', 'w') as f:
+                        with open('uc_cookie.txt', 'w', encoding='utf-8') as f:
                             f.write(uc_cookie)
                     else:
-                        with open('/data/uc_cookie.txt', 'w') as f:
+                        with open('/data/uc_cookie.txt', 'w', encoding='utf-8') as f:
                             f.write(uc_cookie)
                     logging.info('扫码成功，UC Cookie 已写入文件！')
-                last_status = 1
+                LAST_STATUS = 1
                 break
             elif re_data['status'] == 50004002:
                 logging.error('二维码无效或已过期！')
-                last_status = 2
+                LAST_STATUS = 2
                 break
             elif re_data['status'] == 50004001:
                 if log_print:
@@ -70,19 +78,28 @@ def poll_qrcode_status(stop, token, log_print):
 
 @app.route("/")
 def index():
+    """
+    网页扫码首页
+    """
     return render_template('index.html')
 
 
 @app.route('/image')
 def serve_image():
-    return send_file(qrcode_dir, mimetype='image/png')
+    """
+    获取二维码图片
+    """
+    return send_file(QRCODE_DIR, mimetype='image/png')
 
 
 @app.route('/status')
 def status():
-    if last_status == 1:
+    """
+    扫码状态获取
+    """
+    if LAST_STATUS == 1:
         return jsonify({'status': 'success'})
-    elif last_status == 2:
+    elif LAST_STATUS == 2:
         return jsonify({'status': 'failure'})
     else:
         return jsonify({'status': 'unknown'})
@@ -90,14 +107,17 @@ def status():
 
 @app.route('/shutdown_server', methods=['GET'])
 def shutdown():
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    """
+    退出进程
+    """
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     os._exit(0)
 
 
 if __name__ == '__main__':
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     parser = argparse.ArgumentParser(description='UC Cookie')
     parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
@@ -108,14 +128,14 @@ if __name__ == '__main__':
         'v': 1.2,
         'request_id': __t
     }
-    re = requests.post(f'https://api.open.uc.cn/cas/ajax/getTokenForQrcodeLogin?__dt={random.randint(100, 999)}&__t={__t}', data=data)
+    re = requests.post(f'https://api.open.uc.cn/cas/ajax/getTokenForQrcodeLogin?__dt={random.randint(100, 999)}&__t={__t}', data=data, timeout=10)  # noqa: E501
     if re.status_code == 200:
         token = json.loads(re.content)['data']['members']['token']
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
         qr.add_data(f'https://su.uc.cn/1_n0ZCv?uc_param_str=dsdnfrpfbivesscpgimibtbmnijblauputogpintnwktprchmt&token={token}&client_id=381&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix')
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save(qrcode_dir)
+        img.save(QRCODE_DIR)
         logging.info('二维码生成完成！')
     else:
         logging.error('二维码生成失败，退出进程')
@@ -130,21 +150,21 @@ if __name__ == '__main__':
             wait_status.start()
             logging.info('请打开 UC浏览器 APP 扫描此二维码！')
             qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-            while last_status != 1 and last_status != 2:
+            while LAST_STATUS != 1 and LAST_STATUS != 2:
                 time.sleep(1)
-            if os.path.isfile(qrcode_dir):
-                os.remove(qrcode_dir)
-            if last_status == 2:
+            if os.path.isfile(QRCODE_DIR):
+                os.remove(QRCODE_DIR)
+            if LAST_STATUS == 2:
                 os._exit(1)
             os._exit(0)
         else:
             logging.error('未知的扫码模式')
-            if os.path.isfile(qrcode_dir):
-                os.remove(qrcode_dir)
+            if os.path.isfile(QRCODE_DIR):
+                os.remove(QRCODE_DIR)
             os._exit(1)
     except KeyboardInterrupt:
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
+        if os.path.isfile(QRCODE_DIR):
+            os.remove(QRCODE_DIR)
         stop_event.set()
         wait_status.join()
         os._exit(0)

@@ -34,7 +34,7 @@ headers = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"  # noqa: E501
 }
 headers_2 = {
     "Accept": "*/*",
@@ -51,14 +51,15 @@ headers_2 = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"  # noqa: E501
 }
 
 
 def poll_qrcode_status(data, log_print):
     global last_status
     while True:
-        re = requests.get(f"https://api.xhofe.top/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status", headers=headers)
+        url = f"https://api.xhofe.top/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status"
+        re = requests.get(url, headers=headers)
         if re.status_code == 200:
             re_data = json.loads(re.text)
             if re_data['status'] == "LoginSuccess":

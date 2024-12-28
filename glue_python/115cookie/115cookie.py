@@ -3,46 +3,50 @@
 __author__ = "ChenyangGao <https://chenyanggao.github.io>"
 __license__ = "GPLv3 <https://www.gnu.org/licenses/gpl-3.0.txt>"
 
-from flask import Flask, render_template, jsonify
 import threading
 import time
 import os
 import base64
 import logging
 import argparse
-import qrcode
 import sys
-from PIL import Image
 from io import BytesIO
 from enum import Enum
 from json import loads
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 
+import qrcode
+from flask import Flask, render_template, jsonify
+from PIL import Image
 
-app = Flask(__name__)
+
+flask_app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-last_status = 0
+LAST_STATUS = 0
 
 
 AppEnum = Enum("AppEnum", {
-    "web": 1, 
-    "ios": 6, 
-    "115ios": 8, 
-    "android": 9, 
-    "115android": 11, 
-    "115ipad": 14, 
-    "tv": 15, 
-    "qandroid": 16, 
-    "windows": 19, 
-    "mac": 20, 
-    "linux": 21, 
-    "wechatmini": 22, 
-    "alipaymini": 23, 
+    "web": 1,
+    "ios": 6,
+    "115ios": 8,
+    "android": 9,
+    "115android": 11,
+    "115ipad": 14,
+    "tv": 15,
+    "qandroid": 16,
+    "windows": 19,
+    "mac": 20,
+    "linux": 21,
+    "wechatmini": 22,
+    "alipaymini": 23,
 })
 
 
 def get_enum_name(val, cls):
+    """
+    获取值其对应的名称
+    """
     if isinstance(val, cls):
         return val.name
     try:
@@ -130,7 +134,7 @@ def post_qrcode_result(uid, app="web"):
     """
     app = get_enum_name(app, AppEnum)
     payload = {"app": app, "account": uid}
-    api = "https://passportapi.115.com/app/1.0/%s/1.0/login/qrcode/" % app
+    api = f"https://passportapi.115.com/app/1.0/{app}/1.0/login/qrcode/"
     return loads(urlopen(Request(api, data=urlencode(payload).encode("utf-8"), method="POST")).read())
 
 
@@ -143,59 +147,72 @@ def get_qrcode(uid: str, /) -> str:
 
 def qrcode_token_url(uid: str, /) -> str:
     """获取二维码图片的扫码链接
-    :return: 扫码链接 
+    :return: 扫码链接
     """
     return "http://115.com/scan/dg-" + uid
 
 
-def poll_qrcode_status(qrcode_token, qrcode_app):
-    global last_status
+# pylint: disable=W0603
+def poll_qrcode_status(_qrcode_token, qrcode_app):
+    """
+    循环等待扫码
+    """
+    global LAST_STATUS
     while True:
         time.sleep(1)
-        resp = get_qrcode_status(qrcode_token)
-        status = resp["data"].get("status")
-        if status == 2:
-            resp = post_qrcode_result(qrcode_token["uid"], qrcode_app)
+        resp = get_qrcode_status(_qrcode_token)
+        _status = resp["data"].get("status")
+        if _status == 2:
+            resp = post_qrcode_result(_qrcode_token["uid"], qrcode_app)
             cookie_data = resp['data']['cookie']
-            cookie_str = "; ".join("%s=%s" % t for t in cookie_data.items())
+            cookie_str = "; ".join(f"{key}={value}" for key, value in cookie_data.items())
             if sys.platform.startswith('win32'):
-                with open('115_cookie.txt', 'w') as f:
+                with open('115_cookie.txt', 'w', encoding='utf-8') as f:
                     f.write(cookie_str)
             else:
-                with open('/data/115_cookie.txt', 'w') as f:
+                with open('/data/115_cookie.txt', 'w', encoding='utf-8') as f:
                     f.write(cookie_str)
             logging.info('扫码成功, cookie 已写入文件！')
-            last_status = 1
-        elif status in [-1, -2]:
+            LAST_STATUS = 1
+        elif _status in [-1, -2]:
             logging.error('扫码失败')
-            last_status = 2
+            LAST_STATUS = 2
 
 
-@app.route('/')
+@flask_app.route('/')
 def index():
-    qrcode_token = get_qrcode_token()["data"]
-    uid = qrcode_token["uid"]
+    """
+    网页扫码首页
+    """
+    _qrcode_token = get_qrcode_token()["data"]
+    uid = _qrcode_token["uid"]
     qrcode_image_io = get_qrcode(uid)
     qrcode_image = Image.open(qrcode_image_io)
     buffered = BytesIO()
     qrcode_image.save(buffered, format="PNG")
     qrcode_image_b64_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-    threading.Thread(target=poll_qrcode_status, args=(qrcode_token, args.qrcode_app)).start()
+    threading.Thread(target=poll_qrcode_status, args=(_qrcode_token, flask_app.config['QRCODE_APP'])).start()
     return render_template('index.html', qrcode_image_b64_str=qrcode_image_b64_str)
 
 
-@app.route('/status')
+@flask_app.route('/status')
 def status():
-    if last_status == 1:
+    """
+    扫码状态获取
+    """
+    if LAST_STATUS == 1:
         return jsonify({'status': 'success'})
-    elif last_status == 2:
+    elif LAST_STATUS == 2:
         return jsonify({'status': 'failure'})
     else:
         return jsonify({'status': 'unknown'})
 
 
-@app.route('/shutdown_server', methods=['GET'])
+@flask_app.route('/shutdown_server', methods=['GET'])
 def shutdown():
+    """
+    退出进程
+    """
     os._exit(0)
 
 
@@ -205,7 +222,8 @@ if __name__ == '__main__':
     parser.add_argument('--qrcode_app', type=str, default='alipaymini', help='扫码绑定设备')
     args = parser.parse_args()
     if args.qrcode_mode == 'web':
-        app.run(host='0.0.0.0', port=34256)
+        flask_app.config['QRCODE_APP'] = args.qrcode_app
+        flask_app.run(host='0.0.0.0', port=34256)
     elif args.qrcode_mode == 'shell':
         qrcode_token = get_qrcode_token()["data"]
         threading.Thread(target=poll_qrcode_status, args=(qrcode_token, args.qrcode_app,)).start()
@@ -214,7 +232,7 @@ if __name__ == '__main__':
         qr.make(fit=True)
         logging.info('请打开 115网盘 扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-        while last_status != 1 and last_status != 2:
+        while LAST_STATUS != 1 and LAST_STATUS != 2:
             time.sleep(1)
         os._exit(0)
     else:
