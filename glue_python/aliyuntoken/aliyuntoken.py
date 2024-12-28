@@ -64,6 +64,10 @@ def poll_qrcode_status(_data, log_print):
                 logging.info('扫码成功, refresh_token 已写入文件！')
                 LAST_STATUS = 1
                 break
+            elif _re_data['content']['data']['qrCodeStatus'] == 'EXPIRED':
+                logging.error('二维码无效或已过期！')
+                LAST_STATUS = 2
+                break
             else:
                 if log_print:
                     logging.info('等待用户扫码...')
@@ -146,10 +150,12 @@ if __name__ == '__main__':
         threading.Thread(target=poll_qrcode_status, args=(data, False)).start()
         logging.info('请打开阿里云盘扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-        while LAST_STATUS != 1:
+        while LAST_STATUS != 1 and LAST_STATUS != 2:
             time.sleep(1)
         if os.path.isfile(QRCODE_DIR):
             os.remove(QRCODE_DIR)
+        if LAST_STATUS == 2:
+            os._exit(1)
         os._exit(0)
     else:
         logging.error('未知的扫码模式')
