@@ -30,27 +30,27 @@ def poll_qrcode_status(data, log_print):
     global LAST_STATUS
     while True:
         url = f"https://api-cf.nn.ci/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status"
-        re = requests.get(url, timeout=10)
-        if re.status_code == 200:
-            re_data = json.loads(re.text)
-            if re_data['status'] == "LoginSuccess":
-                authCode = re_data['authCode']
-                data_2 = {"code": authCode,"grant_type": "authorization_code" ,"client_id": "" ,"client_secret": ""}
-                re = requests.post('https://api-cf.nn.ci/alist/ali_open/code', json=data_2)
-                if re.status_code == 200:
-                    re_data = json.loads(re.text)
-                    refresh_token = re_data['refresh_token']
+        _re = requests.get(url, timeout=10)
+        if _re.status_code == 200:
+            _re_data = json.loads(_re.text)
+            if _re_data['status'] == "LoginSuccess":
+                auth_code = _re_data['authCode']
+                data_2 = {"code": auth_code, "grant_type": "authorization_code", "client_id": "", "client_secret": ""}
+                _re = requests.post('https://api-cf.nn.ci/alist/ali_open/code', json=data_2, timeout=10)
+                if _re.status_code == 200:
+                    _re_data = json.loads(_re.text)
+                    refresh_token = _re_data['refresh_token']
                     if sys.platform.startswith('win32'):
-                        with open('myopentoken.txt', 'w') as f:
+                        with open('myopentoken.txt', 'w', encoding='utf-8') as f:
                             f.write(refresh_token)
                     else:
-                        with open('/data/myopentoken.txt', 'w') as f:
+                        with open('/data/myopentoken.txt', 'w', encoding='utf-8') as f:
                             f.write(refresh_token)
                     logging.info('扫码成功, opentoken 已写入文件！')
                     LAST_STATUS = 1
                     break
                 else:
-                    if json.loads(re.text)['code'] == 'Too Many Requests':
+                    if json.loads(_re.text)['code'] == 'Too Many Requests':
                         logging.warning("Too Many Requests 请一小时后重试！")
                         break
             else:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     logging.info('二维码生成中...')
     re_count = 0
     while True:
-        re = requests.get('https://api-cf.nn.ci/alist/ali_open/qr')
+        re = requests.get('https://api-cf.nn.ci/alist/ali_open/qr', timeout=10)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             sid = re_data['sid']

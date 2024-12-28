@@ -1,24 +1,25 @@
 #!/usr/local/bin/python3
 
-import json
-import requests
 import time
 import logging
 import os
 import threading
 import sys
-import qrcode
 import argparse
+import json
+
+import qrcode
+import requests
 from flask import Flask, send_file, render_template, jsonify
 
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-last_status = 0
+LAST_STATUS = 0
 if sys.platform.startswith('win32'):
-    qrcode_dir = 'qrcode.png'
+    QRCODE_DIR = 'qrcode.png'
 else:
-    qrcode_dir= '/aliyunopentoken/qrcode.png'
+    QRCODE_DIR= '/aliyunopentoken/qrcode.png'
 
 
 headers = {
@@ -55,31 +56,35 @@ headers_2 = {
 }
 
 
+# pylint: disable=W0603
 def poll_qrcode_status(data, log_print):
-    global last_status
+    """
+    循环等待扫码
+    """
+    global LAST_STATUS
     while True:
         url = f"https://api.xhofe.top/proxy/https://open.aliyundrive.com/oauth/qrcode/{data}/status"
-        re = requests.get(url, headers=headers)
-        if re.status_code == 200:
-            re_data = json.loads(re.text)
-            if re_data['status'] == "LoginSuccess":
-                authCode = re_data['authCode']
-                data_2 = {"code": authCode,"grant_type": "authorization_code" ,"client_id": "" ,"client_secret": ""}
-                re = requests.post('https://api.xhofe.top/alist/ali_open/code', json=data_2, headers=headers_2)
-                if re.status_code == 200:
-                    re_data = json.loads(re.text)
-                    refresh_token = re_data['refresh_token']
+        _re = requests.get(url, headers=headers, timeout=10)
+        if _re.status_code == 200:
+            _re_data = json.loads(_re.text)
+            if _re_data['status'] == "LoginSuccess":
+                auth_code = _re_data['authCode']
+                data_2 = {"code": auth_code, "grant_type": "authorization_code", "client_id": "", "client_secret": ""}
+                _re = requests.post('https://api.xhofe.top/alist/ali_open/code', json=data_2, headers=headers_2, timeout=10)  # noqa: E501
+                if _re.status_code == 200:
+                    _re_data = json.loads(_re.text)
+                    refresh_token = _re_data['refresh_token']
                     if sys.platform.startswith('win32'):
-                        with open('myopentoken.txt', 'w') as f:
+                        with open('myopentoken.txt', 'w', encoding='utf-8') as f:
                             f.write(refresh_token)
                     else:
-                        with open('/data/myopentoken.txt', 'w') as f:
+                        with open('/data/myopentoken.txt', 'w', encoding='utf-8') as f:
                             f.write(refresh_token)
                     logging.info('扫码成功, opentoken 已写入文件！')
-                    last_status = 1
+                    LAST_STATUS = 1
                     break
                 else:
-                    if json.loads(re.text)['code'] == 'Too Many Requests':
+                    if json.loads(_re.text)['code'] == 'Too Many Requests':
                         logging.warning("Too Many Requests 请一小时后重试！")
                         break
             else:
@@ -99,14 +104,14 @@ def index():
 
 @app.route('/image')
 def serve_image():
-    return send_file(qrcode_dir, mimetype='image/png')
+    return send_file(QRCODE_DIR, mimetype='image/png')
 
 
 @app.route('/status')
 def status():
-    if last_status == 1:
+    if LAST_STATUS == 1:
         return jsonify({'status': 'success'})
-    elif last_status == 2:
+    elif LAST_STATUS == 2:
         return jsonify({'status': 'failure'})
     else:
         return jsonify({'status': 'unknown'})
@@ -114,21 +119,21 @@ def status():
 
 @app.route('/shutdown_server', methods=['GET'])
 def shutdown():
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     os._exit(0)
 
 
 if __name__ == '__main__':
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     parser = argparse.ArgumentParser(description='AliyunPan Open Token')
     parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     logging.info('二维码生成中...')
     re_count = 0
     while True:
-        re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers)
+        re = requests.get('https://api.xhofe.top/alist/ali_open/qr', headers=headers, timeout=10)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             sid = re_data['sid']
@@ -137,8 +142,8 @@ if __name__ == '__main__':
             qr.add_data(qrCodeUrl)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
-            img.save(qrcode_dir)
-            if os.path.isfile(qrcode_dir):
+            img.save(QRCODE_DIR)
+            if os.path.isfile(QRCODE_DIR):
                 logging.info('二维码生成完成！')
                 break
         else:
@@ -157,13 +162,13 @@ if __name__ == '__main__':
         threading.Thread(target=poll_qrcode_status, args=(sid, False)).start()
         logging.info('请打开阿里云盘扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-        while last_status != 1:
+        while LAST_STATUS != 1:
             time.sleep(1)
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
+        if os.path.isfile(QRCODE_DIR):
+            os.remove(QRCODE_DIR)
         os._exit(0)
     else:
         logging.error('未知的扫码模式')
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
+        if os.path.isfile(QRCODE_DIR):
+            os.remove(QRCODE_DIR)
         os._exit(1)
