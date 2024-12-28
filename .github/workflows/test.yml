@@ -73,5 +73,4 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          ROOT=$(pwd)
-          pylint --disable=C,R $(git ls-files '*.py')
+          pylint --rcfile=$(pwd)/.pylintrc --disable=R $(git ls-files '*.py')

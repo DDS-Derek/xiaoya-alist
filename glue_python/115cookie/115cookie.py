@@ -1,3 +1,5 @@
+# pylint: disable=C0103
+# pylint: disable=C0114
 #!/usr/local/bin/python3
 
 __author__ = "ChenyangGao <https://chenyanggao.github.io>"

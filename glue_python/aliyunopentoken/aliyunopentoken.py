@@ -1,3 +1,4 @@
+# pylint: disable=C0114
 #!/usr/local/bin/python3
 
 import time
@@ -99,16 +100,25 @@ def poll_qrcode_status(data, log_print):
 
 @app.route("/")
 def index():
+    """
+    网页扫码首页
+    """
     return render_template('index.html')
 
 
 @app.route('/image')
 def serve_image():
+    """
+    获取二维码图片
+    """
     return send_file(QRCODE_DIR, mimetype='image/png')
 
 
 @app.route('/status')
 def status():
+    """
+    扫码状态获取
+    """
     if LAST_STATUS == 1:
         return jsonify({'status': 'success'})
     elif LAST_STATUS == 2:
@@ -119,6 +129,9 @@ def status():
 
 @app.route('/shutdown_server', methods=['GET'])
 def shutdown():
+    """
+    退出进程
+    """
     if os.path.isfile(QRCODE_DIR):
         os.remove(QRCODE_DIR)
     os._exit(0)

@@ -1,3 +1,5 @@
+# pylint: disable=C0114
+# pylint: disable=C0116
 import json
 import base64
 import uuid

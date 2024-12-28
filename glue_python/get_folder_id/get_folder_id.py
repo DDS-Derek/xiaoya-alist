@@ -1,3 +1,4 @@
+# pylint: disable=C0114
 #!/usr/local/bin/python3
 
 import os
