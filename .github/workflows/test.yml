@@ -35,3 +35,42 @@ jobs:
         with:
           sh_checker_comment: true
           sh_checker_exclude: "^deprecation/* ^xiaoyahelper/*"
+
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Ruff
+        uses: astral-sh/ruff-action@v3
+
+  pylint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - 
+        name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+          pip install typing-extensions
+          pip install -r aliyuntvtoken_connector/requirements.txt
+          pip install -r glue_python/requirements.txt
+
+      - name: Analysing the code with pylint
+        run: |
+          pylint --rcfile=$(pwd)/.pylintrc --disable=R,C0301 $(git ls-files '*.py')
