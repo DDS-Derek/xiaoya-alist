@@ -102,11 +102,12 @@ if __name__ == '__main__':
     parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     logging.info('二维码生成中...')
-    re_count = 0
+    RE_COUNT = 0
     while True:
         re = requests.get('https://aliyuntoken.vercel.app/api/generate', timeout=10)
         if re.status_code == 200:
             re_data = json.loads(re.content)
+            # pylint: disable=C0103
             t = str(re_data['t'])
             codeContent = re_data['codeContent']
             ck = re_data['ck']
@@ -120,8 +121,8 @@ if __name__ == '__main__':
                 logging.info('二维码生成完成！')
                 break
         time.sleep(1)
-        re_count += 1
-        if re_count == 3:
+        RE_COUNT += 1
+        if RE_COUNT == 3:
             logging.error('二维码生成失败，退出进程')
             os._exit(1)
     if args.qrcode_mode == 'web':

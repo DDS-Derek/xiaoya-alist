@@ -110,15 +110,15 @@ if __name__ == '__main__':
     parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     logging.info('二维码生成中...')
-    re_count = 0
+    RE_COUNT = 0
     while True:
         re = requests.get('https://api-cf.nn.ci/alist/ali_open/qr', timeout=10)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             sid = re_data['sid']
-            qrCodeUrl = f"https://www.aliyundrive.com/o/oauth/authorize?sid={sid}"
+            qr_code_url = f"https://www.aliyundrive.com/o/oauth/authorize?sid={sid}"
             qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=5, border=4)
-            qr.add_data(qrCodeUrl)
+            qr.add_data(qr_code_url)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
             img.save(QRCODE_DIR)
@@ -130,8 +130,8 @@ if __name__ == '__main__':
                 logging.warning("Too Many Requests 请一小时后重试！")
                 os._exit(0)
         time.sleep(1)
-        re_count += 1
-        if re_count == 3:
+        RE_COUNT += 1
+        if RE_COUNT == 3:
             logging.error('二维码生成失败，退出进程')
             os._exit(1)
     if args.qrcode_mode == 'web':
