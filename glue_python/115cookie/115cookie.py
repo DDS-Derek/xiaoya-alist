@@ -1,6 +1,6 @@
+#!/usr/local/bin/python3
 # pylint: disable=C0103
 # pylint: disable=C0114
-#!/usr/local/bin/python3
 
 __author__ = "ChenyangGao <https://chenyanggao.github.io>"
 __license__ = "GPLv3 <https://www.gnu.org/licenses/gpl-3.0.txt>"

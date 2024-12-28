@@ -1,7 +1,7 @@
+#!/usr/local/bin/python3
 # pylint: disable=C0114
 # pylint: disable=C0116
 # pylint: disable=C0103
-#!/usr/local/bin/python3
 
 import time
 import os

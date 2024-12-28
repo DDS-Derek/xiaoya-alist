@@ -1,5 +1,5 @@
-# pylint: disable=C0114
 #!/usr/local/bin/python3
+# pylint: disable=C0114
 
 import json
 import base64

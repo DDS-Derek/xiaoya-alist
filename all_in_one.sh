@@ -1917,6 +1917,22 @@ function __unzip_metadata() {
 
     }
 
+    function metadata_unziper_config_upgrade() {
+
+        if ! check_metadata_size "${1}"; then
+            exit 1
+        fi
+        if [[ "${OSNAME}" = "macos" ]]; then
+            cd "${MEDIA_DIR}" || return 1
+            INFO "当前解压工作目录：$(pwd)"
+            7z x -aoa -mmt=16 "${MEDIA_DIR}/temp/${1}" "${2}/*" -o"${MEDIA_DIR}"
+        else
+            extra_parameters="--workdir=/media"
+            pull_run_glue 7z x -aoa -mmt=16 "/media/temp/${1}" "${2}/*" -o/media
+        fi
+
+    }
+
     start_time1=$(date +%s)
 
     if [ "${1}" == "all_metadata" ]; then
@@ -1932,6 +1948,11 @@ function __unzip_metadata() {
         INFO "设置目录权限..."
         INFO "这可能需要一定时间，请耐心等待！"
         chmod -R 777 "${MEDIA_DIR}"/config
+    elif [ "${1}" == "config.new.mp4.upgrade" ]; then
+        metadata_unziper_config_upgrade "$(echo -e "${1}" | cut -d'.' -f1-3)" "config/plugins"
+        INFO "设置目录权限..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        chmod -R 777 "${MEDIA_DIR}"/config/plugins
     else
         metadata_unziper "${1}"
         INFO "设置目录权限..."
@@ -2307,21 +2328,47 @@ function download_unzip_xiaoya_emby_new_config() {
 
     if [ -f "${MEDIA_DIR}/config/config/system.xml" ]; then
         INFO "检测到非第一次安装全家桶..."
-        WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
-        local OPERATE
-        while true; do
-            INFO "是否继续操作 [Y/n]（默认 Y）"
-            read -erp "OPERATE:" OPERATE
-            [[ -z "${OPERATE}" ]] && OPERATE="y"
-            if [[ ${OPERATE} == [YyNn] ]]; then
-                break
-            else
-                ERROR "非法输入，请输入 [Y/n]"
+        local unzip_mode
+        INFO "全新解压：删除旧 Emby 配置文件，全新解压 config.new.mp4"
+        INFO "升级解压：只解压 config.new.mp4 的 plugins 目录，仅对原有 Emby 配置文件进行升级"
+        INFO "请选择 config.new.mp4 解压方式 [ 1:全新解压 | 2:升级解压 ]（默认 1）"
+        valid_choice=false
+        while [ "$valid_choice" = false ]; do
+            read -erp "请输入数字 [1-2]:" choice
+            [[ -z "${choice}" ]] && choice="1"
+            for i in {1..2}; do
+                if [ "$choice" = "$i" ]; then
+                    valid_choice=true
+                    break
+                fi
+            done
+            if [ "$valid_choice" = false ]; then
+                ERROR "请输入正确数字 [1-2]"
             fi
         done
-        if [[ "${OPERATE}" == [Nn] ]]; then
-            exit 0
-        fi
+        case $choice in
+        1)
+            WARN "警告：本次元数据升级会丢失当前 Emby 所有用户配置信息！"
+            local OPERATE
+            while true; do
+                INFO "是否继续操作 [Y/n]（默认 Y）"
+                read -erp "OPERATE:" OPERATE
+                [[ -z "${OPERATE}" ]] && OPERATE="y"
+                if [[ ${OPERATE} == [YyNn] ]]; then
+                    break
+                else
+                    ERROR "非法输入，请输入 [Y/n]"
+                fi
+            done
+            if [[ "${OPERATE}" == [Nn] ]]; then
+                exit 0
+            fi
+            unzip_mode=all
+            ;;
+        2)
+            unzip_mode=plugins
+            ;;
+        esac
 
         local emby_name emby_image_name emby_version
         emby_name="$(cat ${DDSREM_CONFIG_DIR}/container_name/xiaoya_emby_name.txt)"
@@ -2361,17 +2408,31 @@ function download_unzip_xiaoya_emby_new_config() {
                 exit 1
             fi
         fi
+    else
+        unzip_mode=new_all
     fi
 
     test_xiaoya_status
 
-    INFO "清理旧配置文件中..."
-    INFO "这可能需要一定时间，请耐心等待！"
-    rm -rf "${MEDIA_DIR}/config"
-
-    mkdir -p "${MEDIA_DIR}/config"
-    auto_chown "${MEDIA_DIR}/config"
-    chmod -R 777 "${MEDIA_DIR}"/config
+    if [ "${unzip_mode}" == "all" ]; then
+        INFO "清理旧配置文件中..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        rm -rf "${MEDIA_DIR}/config"
+    fi
+    if [ "${unzip_mode}" == "plugins" ]; then
+        INFO "清理旧配置文件中..."
+        INFO "这可能需要一定时间，请耐心等待！"
+        rm -rf "${MEDIA_DIR}/config/plugins"
+    fi
+    if [ "${unzip_mode}" != "plugins" ]; then
+        mkdir -p "${MEDIA_DIR}/config"
+        auto_chown "${MEDIA_DIR}/config"
+        chmod -R 777 "${MEDIA_DIR}/config"
+    else
+        mkdir -p "${MEDIA_DIR}/config/plugins"
+        auto_chown "${MEDIA_DIR}/config/plugins"
+        chmod -R 777 "${MEDIA_DIR}/config/plugins"
+    fi
 
     if [ -f "${MEDIA_DIR}/temp/config.new.mp4.aria2" ]; then
         rm -rf "${MEDIA_DIR}/temp/config.new.mp4.aria2"
@@ -2395,7 +2456,11 @@ function download_unzip_xiaoya_emby_new_config() {
 
     __download_metadata "config.new.mp4"
 
-    __unzip_metadata "config.new.mp4"
+    if [ "${unzip_mode}" == "all" ] || [ "${unzip_mode}" == "new_all" ]; then
+        __unzip_metadata "config.new.mp4"
+    else
+        __unzip_metadata "config.new.mp4.upgrade"
+    fi
 
     docker start "${emby_name}"
     sleep 5
