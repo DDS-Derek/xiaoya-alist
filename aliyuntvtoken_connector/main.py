@@ -1,12 +1,13 @@
-from flask import Flask, request, Response
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
 import json
 import base64
-import requests
 import uuid
 import hashlib
 import random
+
+import requests
+from flask import Flask, request, Response
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 
 
 app = Flask(__name__)
@@ -71,11 +72,11 @@ def oauth_token():
         "refresh_token": refresh_token
     }
 
-    timestamp = str(requests.get('http://api.extscreen.com/timestamp').json()['data']['timestamp'])
+    timestamp = str(requests.get('http://api.extscreen.com/timestamp', timeout=10).json()['data']['timestamp'])
     unique_id = uuid.uuid4().hex
     wifimac = str(random.randint(10**11, 10**12 - 1))
 
-    resp = requests.post("http://api.extscreen.com/aliyundrive/v3/token", data=req_body, headers={**get_params(timestamp, unique_id, wifimac), **headers})  # noqa: E501
+    resp = requests.post("http://api.extscreen.com/aliyundrive/v3/token", data=req_body, headers={**get_params(timestamp, unique_id, wifimac), **headers}, timeout=10)  # noqa: E501
     if resp.status_code == 200:
         resp_data = resp.json()
         ciphertext = resp_data["data"]["ciphertext"]

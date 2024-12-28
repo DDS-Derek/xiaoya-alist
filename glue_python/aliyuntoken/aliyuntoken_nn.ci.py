@@ -2,44 +2,49 @@
 
 import json
 import base64
-import requests
 import time
 import logging
 import os
 import threading
 import sys
-import qrcode
 import argparse
+
+import requests
+import qrcode
 from flask import Flask, send_file, render_template, jsonify
 
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-last_status = 0
+LAST_STATUS = 0
 if sys.platform.startswith('win32'):
-    qrcode_dir = 'qrcode.png'
+    QRCODE_DIR = 'qrcode.png'
 else:
-    qrcode_dir= '/aliyuntoken/qrcode.png'
+    QRCODE_DIR= '/aliyuntoken/qrcode.png'
 
 
-def poll_qrcode_status(data, log_print):
-    global last_status
+# pylint: disable=W0603
+def poll_qrcode_status(_data, log_print):
+    """
+    循环等待扫码
+    """
+    global LAST_STATUS
     while True:
-        re = requests.post('https://api-cf.nn.ci/alist/ali/ck', json=data)
-        if re.status_code == 200:
-            re_data = json.loads(re.text)
-            if re_data['content']['data']['qrCodeStatus'] == 'CONFIRMED':
-                h = re_data['content']['data']['bizExt']
+        _re = requests.post('https://api-cf.nn.ci/alist/ali/ck', json=_data, timeout=10)
+        if _re.status_code == 200:
+            _re_data = json.loads(_re.text)
+            if _re_data['content']['data']['qrCodeStatus'] == 'CONFIRMED':
+                h = _re_data['content']['data']['bizExt']
                 c = json.loads(base64.b64decode(h).decode('gbk'))
                 refresh_token = c['pds_login_result']['refreshToken']
                 if sys.platform.startswith('win32'):
-                    with open('mytoken.txt', 'w') as f:
+                    with open('mytoken.txt', 'w', encoding='utf-8') as f:
                         f.write(refresh_token)
                 else:
-                    with open('/data/mytoken.txt', 'w') as f:
+                    with open('/data/mytoken.txt', 'w', encoding='utf-8') as f:
                         f.write(refresh_token)
                 logging.info('扫码成功, refresh_token 已写入文件！')
-                last_status = 1
+                LAST_STATUS = 1
                 break
             else:
                 if log_print:
@@ -54,14 +59,14 @@ def index():
 
 @app.route('/image')
 def serve_image():
-    return send_file(qrcode_dir, mimetype='image/png')
+    return send_file(QRCODE_DIR, mimetype='image/png')
 
 
 @app.route('/status')
 def status():
-    if last_status == 1:
+    if LAST_STATUS == 1:
         return jsonify({'status': 'success'})
-    elif last_status == 2:
+    elif LAST_STATUS == 2:
         return jsonify({'status': 'failure'})
     else:
         return jsonify({'status': 'unknown'})
@@ -69,21 +74,21 @@ def status():
 
 @app.route('/shutdown_server', methods=['GET'])
 def shutdown():
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     os._exit(0)
 
 
 if __name__ == '__main__':
-    if os.path.isfile(qrcode_dir):
-        os.remove(qrcode_dir)
+    if os.path.isfile(QRCODE_DIR):
+        os.remove(QRCODE_DIR)
     parser = argparse.ArgumentParser(description='AliyunPan Refresh Token')
     parser.add_argument('--qrcode_mode', type=str, required=True, help='扫码模式')
     args = parser.parse_args()
     logging.info('二维码生成中...')
     re_count = 0
     while True:
-        re = requests.get('https://api-cf.nn.ci/alist/ali/qr')
+        re = requests.get('https://api-cf.nn.ci/alist/ali/qr', timeout=10)
         if re.status_code == 200:
             re_data = json.loads(re.content)
             t = str(re_data['content']['data']['t'])
@@ -94,8 +99,8 @@ if __name__ == '__main__':
             qr.add_data(codeContent)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
-            img.save(qrcode_dir)
-            if os.path.isfile(qrcode_dir):
+            img.save(QRCODE_DIR)
+            if os.path.isfile(QRCODE_DIR):
                 logging.info('二维码生成完成！')
                 break
         time.sleep(1)
@@ -110,13 +115,13 @@ if __name__ == '__main__':
         threading.Thread(target=poll_qrcode_status, args=(data, False)).start()
         logging.info('请打开阿里云盘扫描此二维码！')
         qr.print_ascii(invert=True, tty=sys.stdout.isatty())
-        while last_status != 1:
+        while LAST_STATUS != 1:
             time.sleep(1)
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
+        if os.path.isfile(QRCODE_DIR):
+            os.remove(QRCODE_DIR)
         os._exit(0)
     else:
         logging.error('未知的扫码模式')
-        if os.path.isfile(qrcode_dir):
-            os.remove(qrcode_dir)
+        if os.path.isfile(QRCODE_DIR):
+            os.remove(QRCODE_DIR)
         os._exit(1)
