@@ -4264,7 +4264,7 @@ function main_xiaoya_emd() {
             else
                 if docker exec -it xiaoya-emd ls -al /media/solid.lock > /dev/null 2>&1; then
                     INFO "检测到存在进程锁，清理中..."
-                    rm -f "${xiaoya_emd_dir}/solid.lock"
+                    docker exec -it xiaoya-emd rm -f /media/solid.lock
                 fi
             fi
         else
