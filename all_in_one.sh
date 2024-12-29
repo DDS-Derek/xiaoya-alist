@@ -4181,7 +4181,7 @@ if [ -d /tmp/db ]; then
     rm -rf /tmp/db
 fi
 mkdir -p /tmp/db
-if [ -f /media/solid.lock ]; then
+if [ -f /media/solid.lock ] && grep -q 'python3 solid.py'; then
     echo -e "${ERROR} 当前已有爬虫进程在运行，请稍后再试！"
     exit 1
 else

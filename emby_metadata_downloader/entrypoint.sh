@@ -3,7 +3,7 @@
 # shellcheck disable=SC2068
 # shellcheck disable=SC2114
 
-IMAGE_VERSION=v1.0.0
+IMAGE_VERSION=v1.0.1
 
 Green="\033[32m"
 Red="\033[31m"
@@ -76,7 +76,7 @@ function mount_img() {
 function main_solid() {
 
     cd /app || return 1
-    if [ -f /media/solid.lock ]; then
+    if [ -f /media/solid.lock ] && grep -q 'python3 solid.py'; then
         WARN "当前已有爬虫进程在运行，跳过本次运行！"
     else
         touch /media/solid.lock
