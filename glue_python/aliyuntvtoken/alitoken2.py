@@ -49,7 +49,7 @@ def decrypt(ciphertext, iv, t, _unique_id, _wifimac):
         dec = decrypted.decode('utf-8')
         return dec
     except Exception as error:
-        logging.error("Decryption failed", error)
+        logging.error("Decryption failed %s", error)
         raise error
 
 
