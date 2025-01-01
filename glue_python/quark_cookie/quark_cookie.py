@@ -51,6 +51,18 @@ def poll_qrcode_status(_token, stop, log_print):
                 _re = requests.get(f'https://pan.quark.cn/account/info?st={service_ticket}&lw=scan', timeout=10)
                 if _re.status_code == 200:
                     quark_cookie = cookiejar_to_string(_re.cookies)
+                    headers = {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch",  # noqa: E501
+                        "Referer": "https://pan.quark.cn",
+                        "Cookie": quark_cookie
+                    }
+                    _re = requests.get('https://drive-pc.quark.cn/1/clouddrive/config?pr=ucpro&fr=pc&uc_param_str=', headers=headers, timeout=10)  # noqa: E501
+                    if _re.status_code == 200:
+                        quark_cookie += '; ' + cookiejar_to_string(_re.cookies)
+                    else:
+                        logging.error('获取 __puus 失败！')
+                        LAST_STATUS = 2
+                        break
                     if sys.platform.startswith('win32'):
                         with open('quark_cookie.txt', 'w', encoding='utf-8') as f:
                             f.write(quark_cookie)
