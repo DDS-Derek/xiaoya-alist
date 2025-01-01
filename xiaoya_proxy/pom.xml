@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20210307</version>
+            <version>20241224</version>
         </dependency>
     </dependencies>
     <properties>
